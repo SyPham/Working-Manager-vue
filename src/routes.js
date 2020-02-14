@@ -2,14 +2,16 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 //admin
 import OC from "./views/admin/oc/Index.vue";
-import Project from "./views/admin/project/Index.vue";
 import Role from "./views/admin/role/Index.vue";
-import OCUser from "./views/admin/OCUser/Index.vue";
+import OCUser from "./views/admin/ocUser/Index.vue";
 import User from "./views/admin/user/Index.vue";
 
 //client
+import Project from "./views/admin/project/Index.vue";
+import ProjectUser from "./views/admin/projectUser/Index.vue";
 import Task from "./views/clients/Task.vue";
 import History from "./views/clients/History.vue";
+import Subscribe from "./views/clients/Subscribe.vue";
 
 // auth
 import Auth from "./views/shares/auth/Auth.vue";
@@ -28,12 +30,19 @@ const router = new VueRouter({
       path: "/",
       component: Dash,
       redirect: "/home",
+
       children: [
-        { path: "home", component: Home, meta: { requiresAuth: true } }
+        {
+          path: "home",
+          name: "Index",
+          component: Home,
+          meta: { requiresAuth: true }
+        }
       ]
     },
     //adminoc
     {
+      name: "OC",
       path: "/admin-oc",
       component: Dash,
       children: [
@@ -42,6 +51,7 @@ const router = new VueRouter({
     },
     //adminrole
     {
+      name: "Role",
       path: "/admin-role",
       component: Dash,
       children: [
@@ -55,7 +65,21 @@ const router = new VueRouter({
       children: [
         {
           path: "/admin-Oc-user",
+          name: "OC-User",
           component: OCUser,
+          meta: { requiresAuth: true }
+        }
+      ]
+    },
+    //client-project-user
+    {
+      path: "/client-project-user",
+      component: Dash,
+      children: [
+        {
+          path: "/client-project-user",
+          name: "Project-User",
+          component: ProjectUser,
           meta: { requiresAuth: true }
         }
       ]
@@ -64,17 +88,19 @@ const router = new VueRouter({
     {
       path: "/admin-user",
       component: Dash,
+      name: "User",
       children: [
         { path: "/admin-user", component: User, meta: { requiresAuth: true } }
       ]
     },
     //adminproject
     {
-      path: "/admin-project",
+      path: "/client-project",
       component: Dash,
       children: [
         {
-          path: "/admin-project",
+          path: "/client-project",
+          name: "Project",
           component: Project,
           meta: { requiresAuth: true }
         }
@@ -92,7 +118,25 @@ const router = new VueRouter({
       path: "/client-task",
       component: Dash,
       children: [
-        { path: "/client-task", component: Task, meta: { requiresAuth: true } }
+        {
+          path: "/client-task",
+          name: "Client-Task",
+          component: Task,
+          meta: { requiresAuth: true }
+        }
+      ]
+    },
+    //client-subscribe
+    {
+      path: "/client-subscribe",
+      component: Dash,
+      children: [
+        {
+          path: "/client-subscribe",
+          name: "Client-Subscribe",
+          component: Subscribe,
+          meta: { requiresAuth: true }
+        }
       ]
     },
 
@@ -103,6 +147,7 @@ const router = new VueRouter({
       children: [
         {
           path: "/client-history",
+          name: "Client-History",
           component: History,
           meta: { requiresAuth: true }
         }

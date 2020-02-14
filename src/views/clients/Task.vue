@@ -4,17 +4,44 @@
       <div class="col-md-12 pb-4">
         <button
           type="button"
-          class="btn bg-gradient-secondary btn-sm"
+          class="btn bg-info btn-sm"
           data-toggle="modal"
           data-target="#modal-task"
+          @click="newTaskInfo"
         >
-          <i class="fas fa-plus"></i> Task Add
+          <i class="fas fa-plus"></i> New Task
+        </button>
+      </div>
+      <div class="col-md-12">
+        <h5>Sort:</h5>
+      </div>
+      <div class="col-md-12 pb-4">
+        <button type="button" @click="sortProject" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-tasks"></i> Project
+        </button>
+        <button type="button" @click="sortRoutine" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-book-open"></i> Routine Job
+        </button>
+
+        <button type="button" @click="sortHigh" class="btn bg-danger btn-sm">
+          <i class="fas fa-exclamation"></i> High
+        </button>
+        <button type="button" @click="sortMedium" class="btn bg-warning btn-sm">
+          <i class="fab fa-medium"></i> Medium
+        </button>
+        <button type="button" @click="sortLow" class="btn bg-info btn-sm">
+          <i class="fas fa-low-vision"></i> Low
+        </button>
+        <button type="button" @click="getTasks" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-sync-alt"></i> All
         </button>
       </div>
       <div class="col-md-12">
         <div class="card">
           <div class="card-header">
-            <h5 class="card-title">List Task</h5>
+            <h5 class="card-title">
+              <i class="fas fa-list"></i> To Do List
+            </h5>
 
             <div class="card-tools">
               <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -50,28 +77,33 @@
               :treeColumnIndex="1"
               :allowPaging="true"
               :pageSettings="pageSettings"
-              :allowExcelExport="true"
-              :allowPdfExport="true"
               :allowSorting="true"
               :contextMenuItems="contextMenuItems"
               :contextMenuClick="contextMenuClick"
-              :editSettings="editing"
               :dataSourceChanged="dataSourceChanged"
+              :sortSettings="sortSettings"
+              :toolbar="toolbar"
             >
               <e-columns>
                 <e-column
-                  field="ID"
-                  headerText="ID"
-                  :disableHtmlEncode="false"
-                  width="80"
+                  field="Priority"
+                  :template="priorityTemplate"
+                  headerText="Priority"
+                  width="110"
                   textAlign="Center"
                 ></e-column>
-                <e-column field="Level" headerText="Level" width="100" textAlign="Center"></e-column>
+                <!-- <e-column field="Level" headerText="Level" width="150" textAlign="Center"></e-column> -->
+                <e-column
+                  field="ProjectName"
+                  headerText="Project name"
+                  :disableHtmlEncode="false"
+                  width="240"
+                ></e-column>
                 <e-column
                   field="JobName"
-                  headerText="Job Name / Project name"
+                  headerText="Job Name"
                   :disableHtmlEncode="false"
-                  width="230"
+                  width="240"
                 ></e-column>
                 <e-column
                   field="From"
@@ -79,14 +111,14 @@
                   :disableHtmlEncode="false"
                   width="230"
                 ></e-column>
-                <e-column field="PIC" headerText="PIC" width="180" format="yMd" textAlign="Right"></e-column>
                 <e-column
                   field="Description"
                   headerText="Description"
                   width="180"
                   textAlign="Center"
                 ></e-column>
-                <e-column field="DueDate" headerText="DueDate" width="250" textAlign="Center"></e-column>
+                <e-column field="PIC" headerText="PIC" width="180" format="yMd" textAlign="Right"></e-column>
+                <e-column field="DueDate" headerText="DueDate" width="160" textAlign="Center"></e-column>
                 <e-column field="Remark" headerText="Remark" width="180" textAlign="Center"></e-column>
                 <e-column
                   field="state"
@@ -98,88 +130,20 @@
                 <e-column
                   field="CreatedDate"
                   headerText="CreatedDate"
-                  width="250"
+                  width="160"
+                  textAlign="Center"
+                ></e-column>
+                <e-column
+                  field="Option"
+                  :template="optionTemplate"
+                  headerText="Option"
+                  width="220"
                   textAlign="Center"
                 ></e-column>
               </e-columns>
             </ejs-treegrid>
-            <!-- <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>From</th>
-                  <th>Job Name/ Project Name</th>
-                  <th>Be Assigned</th>
-                  <th>Description</th>
-                  <th>Deadline</th>
-                  <th>Remark</th>
-                  <th>Status</th>
-                  <th>Created Time</th>
-                  <th>Option</th>
-                </tr>
-              </thead>
-              <tbody style="overflow-y:hidden">
-                <tr v-for="(task,key,index) in tasks" :key="index">
-                  <td>{{key + 1}}</td>
-                  <td>{{task.From}}</td>
-                  <td>{{task.ProjectName}}</td>
-                  <td>
-                    <span
-                      v-for="(pic,key,index) in task.PIC"
-                      :key="index"
-                      class="badge bg-secondary"
-                    >{{pic}}</span>
-                  </td>
-                  <td>{{task.Description}}</td>
-                  <td>{{task.DueDate}}</td>
-                  <td>{{task.Remark}}</td>
-                  <td>
-                    <span class="badge bg-danger">{{task.Status== true ? "done": "undone"}}</span>
-                  </td>
-                  <td>{{task.CreatedDate}}</td>
-                  <td class="py-0 align-middle">
-                    <button
-                      type="button"
-                      class="btn btn-block btn-info btn-xs"
-                      data-toggle="modal"
-                      data-target="#modal-sub-task"
-                    >
-                      <i class="fas fa-plus"></i> Sub
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>-->
           </div>
           <!-- ./card-body -->
-          <div class="card-footer clearfix">
-            <!-- <ul class="pagination pagination-sm m-0 float-right">
-              <li class="page-item">
-                <a class="page-link" href="#">First</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">Next</a>
-              </li>
-
-              <li class="page-item">
-                <a class="page-link" href="#">1</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">2</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">3</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">Previous</a>
-              </li>
-
-              <li class="page-item">
-                <a class="page-link" href="#">Last</a>
-              </li>
-            </ul>-->
-          </div>
-          <!-- /.card-footer -->
         </div>
         <!-- /.card -->
       </div>
@@ -199,7 +163,7 @@
           </div>
           <div class="modal-body">
             <div class="row">
-              <div class="col-md-12">
+              <div class="col-md-6">
                 <div class="card card-primary card-outline card-outline-tabs">
                   <div class="card-header p-0 border-bottom-0">
                     <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
@@ -237,6 +201,7 @@
                       >
                         <div class="form-group">
                           <label for="JobType">Routine</label>
+                          <small v-if="!editStatus" class="text-danger">(*) Require</small>
                           <input
                             type="text"
                             id="JobType"
@@ -253,6 +218,7 @@
                       >
                         <div class="form-group">
                           <label class="typo__label">Project</label>
+                          <small v-if="!editStatus" class="text-danger">(*) Require</small>
                           <multiselect
                             v-model="projectSelected"
                             deselect-label="Can't remove this value"
@@ -272,7 +238,7 @@
                   <!-- /.card -->
                 </div>
               </div>
-              <div class="col-md-12">
+              <div class="col-md-6">
                 <div class="card card-primary card-outline card-outline-tabs">
                   <div class="card-header p-0 border-bottom-0">
                     <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
@@ -310,12 +276,21 @@
                       >
                         <div class="form-group">
                           <label for="JobType">Who?</label>
-                          <input
-                            type="text"
-                            id="JobType"
-                            v-model="who"
-                            class="form-control JobType"
-                          />
+                          <small
+                            v-if="!editStatus"
+                            class="text-danger"
+                          >(*) Require (Default is yourself!)</small>
+                          <multiselect
+                            v-model="whoSelected"
+                            deselect-label="Can't remove this value"
+                            track-by="ID"
+                            label="Username"
+                            placeholder="Select one"
+                            :options="whoOptions"
+                            :searchable="false"
+                            :allow-empty="false"
+                            @select="onSelectWho"
+                          ></multiselect>
                         </div>
                       </div>
                       <div
@@ -326,6 +301,7 @@
                       >
                         <div class="form-group">
                           <label class="typo__label">Where?</label>
+                          <small v-if="!editStatus" class="text-danger">(*) Require</small>
                           <multiselect
                             v-model="ocSelected"
                             deselect-label="Can't remove this value"
@@ -348,6 +324,7 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="Assigned">Be Assigned</label>
+                  <small v-if="!editStatus" class="text-danger">(*) Require</small>
                   <multiselect
                     v-model="selected"
                     tag-placeholder="Add this as new tag"
@@ -376,6 +353,7 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="Description">Deadline</label>
+                  <small v-if="!editStatus" class="text-danger">(*) Require</small>
                   <datetime
                     v-model="date"
                     input-class="form-control"
@@ -395,10 +373,54 @@
                   />
                 </div>
               </div>
+              <div class="col-md-12">
+                <label>Priority</label>
+                <small v-if="!editStatus" class="text-danger">(*) Require (Default is medium)</small>
+
+                <div class="form-group">
+                  <div class="custom-control custom-radio">
+                    <input
+                      class="custom-control-input"
+                      v-model="task.priority"
+                      type="radio"
+                      id="priorityHigh"
+                      name="priority"
+                      value="H"
+                    />
+                    <label for="priorityHigh" class="custom-control-label">High</label>
+                  </div>
+
+                  <div class="custom-control custom-radio">
+                    <input
+                      class="custom-control-input"
+                      :checked="true"
+                      v-model="task.priority"
+                      type="radio"
+                      value="M"
+                      id="priorityMedium"
+                      name="priority"
+                    />
+                    <label for="priorityMedium" class="custom-control-label">Medium</label>
+                  </div>
+
+                  <div class="custom-control custom-radio">
+                    <input
+                      class="custom-control-input"
+                      v-model="task.priority"
+                      type="radio"
+                      id="priorityLow"
+                      name="priority"
+                      value="L"
+                    />
+                    <label for="priorityLow" class="custom-control-label">Low</label>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="modal-footer justify-content-between">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
             <button type="button" class="btn btn-primary" @click="createTask">Save changes</button>
           </div>
         </div>
@@ -406,81 +428,7 @@
       </div>
       <!-- /.modal-dialog -->
     </div>
-    <div class="modal fade" id="modal-sub-task" aria-hidden="true" style="display: none;">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">
-              <i class="fas fa-plus"></i> Sub-Task Add
-            </h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="JobType">Job Type</label>
-                  <input type="text" id="JobType" class="form-control JobType" />
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="TypeName">Project Name / Job Name</label>
-                  <input type="text" id="TypeName" class="form-control TypeName" />
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="Assigned">Be Assigned</label>
-                  <multiselect
-                    v-model="selected"
-                    tag-placeholder="Add this as new tag"
-                    placeholder="Search or add a tag"
-                    label="ID"
-                    track-by="Username"
-                    :options="options"
-                    :multiple="true"
-                    :taggable="true"
-                    @tag="addTag"
-                  ></multiselect>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="Description">Description</label>
-                  <input type="text" id="Description" class="form-control Description" />
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="Description">Deadline</label>
-                  <datetime
-                    v-model="date"
-                    input-class="form-control"
-                    placeholder="Select date"
-                    type="datetime"
-                  ></datetime>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="Remark">Remark</label>
-                  <input type="text" id="Remark" class="form-control Remark" />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-          </div>
-        </div>
-        <!-- /.modal-content -->
-      </div>
-      <!-- /.modal-dialog -->
-    </div>
+
     <div class="modal fade" id="modal-remark" aria-hidden="true" style="display: none;">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -530,21 +478,21 @@
 import Vue from "vue";
 import Multiselect from "vue-multiselect";
 import { Datetime } from "vue-datetime";
-
+import EventBus from "../../EventBus";
 import {
   TreeGridPlugin,
   ContextMenu,
   Sort,
-  Edit,
   ExcelExport,
   PdfExport,
   Page,
-  Resize
+  CommandColumn,
+  Toolbar
 } from "@syncfusion/ej2-vue-treegrid";
 Vue.use(TreeGridPlugin);
 // register globally
 Vue.component("multiselect", Multiselect);
-export default {
+export default Vue.extend({
   name: "client-task",
   components: {
     Multiselect,
@@ -552,16 +500,100 @@ export default {
   },
   data() {
     return {
-      modalTitle: "Add Task",
-      contextMenuItems: [
-        { text: "Add Sub-Task", target: ".e-content", id: "Add-Sub-Task" },
-        { text: "Finish Task", target: ".e-content", id: "Done" },
-        { text: "Delete Task", target: ".e-content", id: "DeleteTask" },
-        { text: "Add Remark", target: ".e-content", id: "Remark" }
+      priorityTemplate: function() {
+        return {
+          template: Vue.component("priority", {
+            template: `<span id="priority" :class="data.Priority == 'High' ? 'badge bg-danger' : data.Priority =='Medium' ? 'badge bg-warning' : 'badge bg-info'"  style="padding:4px;color:white">{{data.Priority}}</span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            }
+          })
+        };
+      },
+      optionTemplate: function() {
+        return {
+          template: Vue.component("optionTemplate", {
+            template: `<div id="optionTemplate">
+                      <div class="btn-group">
+                        <button type="button" @click="addSubTask(data)" class="btn btn-info btn-xs mr-2"><i class="fas fa-plus"></i> Sub</button>
+                        <button type="button" @click="addSubscribe(data)"class="btn btn-danger btn-xs" v-if="data.Level == 1" ><i :class="!data.Subscribe ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{!data.Subscribe?'Subscribe':'Subscribed'}}</button>
+                      </div>
+                    </div>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubTask(data) {
+                EventBus.$emit("taskItem", data);
+                $("#modal-task").modal("show");
+              },
+              addSubscribe(data) {
+                EventBus.$emit("subscribe", data);
+              }
+            }
+          })
+        };
+      },
+      editStatus: true,
+      commands: [
+        {
+          type: "Edit",
+          buttonOption: { iconCss: " e-icons e-add", cssClass: "e-flat" }
+        }
       ],
-      editing: { allowDeleting: true, allowEditing: true, mode: "Row" },
-      pageSettings: { pageSize: 10 },
-      editparams: { params: { format: "n" } },
+      modalTitle: "Add New Task",
+      sort: "",
+      contextMenuItems: [
+        {
+          text: "Add Sub-Task",
+          iconCss: " e-icons e-add",
+          target: ".e-content",
+          id: "Add-Sub-Task"
+        },
+        {
+          text: "Add Remark",
+          iconCss: " e-icons e-add",
+          target: ".e-content",
+          id: "Remark"
+        },
+        {
+          text: "Finish Task",
+          iconCss: " e-icons e-edit",
+          target: ".e-content",
+          id: "Done"
+        },
+        {
+          text: "Edit",
+          iconCss: " e-icons e-edit",
+          target: ".e-content",
+          id: "EditTask"
+        },
+        {
+          text: "Delete",
+          iconCss: " e-icons e-delete",
+          target: ".e-content",
+          id: "DeleteTask"
+        }
+      ],
+      pageSettings: { pageSize: 15 },
+      toolbar: [
+        // "Search",
+        "ExpandAll",
+        "CollapseAll"
+        // "ExcelExport",
+        // "PdfExport"
+      ],
+      sortSettings: {
+        columns: [
+          { field: "DueDate", direction: "Ascending" },
+          { field: "CreatedDate", direction: "Ascending" },
+          { field: "JobName", direction: "Ascending" }
+        ]
+      },
       PIC: [],
       expanded: {},
       selected: [],
@@ -591,22 +623,128 @@ export default {
         remark: "",
         deadline: "",
         status: false,
+        fromWhoID: 0,
+        priority: "M",
         pic: []
       },
       projectOptions: [],
-      projectSelected: []
+      projectSelected: [],
+      whoOptions: [],
+      whoSelected: []
     };
   },
+  mounted() {
+    EventBus.$on("subscribe", this.addSubscribe);
+    EventBus.$on("taskItem", this.infoEdit);
+  },
+  destroyed() {
+    // Stop listening the event hello with handler
+    EventBus.$off("taskItem", this.infoEdit);
+    EventBus.$off("subscribe", this.addSubscribe);
+  },
   created() {
-    this.getUser();
     this.getProjects();
     this.getFrom();
+    this.getUserForWho();
     console.log(this.task);
-    console.log(this.$refs.treegrid);
     this.getTasks();
     this.who = localStorage.getItem("User");
   },
   methods: {
+    infoEdit(taskItem) {
+      var self = this;
+      self.getUser(taskItem.ProjectID);
+      console.log("handler");
+      console.log(taskItem);
+      self.editStatus = false;
+      self.clearForm();
+      self.date = "";
+
+      self.modalTitle = "Add Sub-Task";
+      self.task.parentID = taskItem.ID;
+      self.task.projectID = taskItem.ProjectID;
+      self.projectSelected = {
+        ID: taskItem.ProjectID,
+        Name: taskItem.ProjectName
+      };
+      // self.task.priority = taskItem.PriorityID;
+      self.whoSelected = {
+        Username: localStorage.getItem("User"),
+        ID: localStorage.getItem("UserID")
+      };
+    },
+    addSubscribe(data) {
+      var self = this;
+      self.$api.get(`api/Tasks/Subscribe/${data.ID}`).then(res => {
+        console.log("addSubscribe");
+        console.log(res);
+        if (res) {
+          self.$alertify.success("You have already subscribed this one!");
+          self.dataSourceChanged();
+        }
+      });
+    },
+    sortProject() {
+      var self = this;
+      self.$api.get(`api/Tasks/GetListTreeTask/project`).then(res => {
+        self.tasks = res.data;
+        self.data = res.data;
+        console.log("sortProject");
+        console.log(self.tasks);
+      });
+    },
+    sortRoutine() {
+      var self = this;
+      self.$api.get(`api/Tasks/GetListTreeTask/routine`).then(res => {
+        self.tasks = res.data;
+        self.data = res.data;
+        console.log(self.tasks);
+      });
+    },
+    sortHigh() {
+      var self = this;
+      self.$api.get(`api/Tasks/GetListTreeTask/H/%20`).then(res => {
+        self.tasks = res.data;
+        self.data = res.data;
+        console.log("sortHigh");
+        console.log(self.tasks);
+      });
+    },
+    sortMedium() {
+      var self = this;
+      self.$api.get(`api/Tasks/GetListTreeTask/M/%20`).then(res => {
+        self.tasks = res.data;
+        self.data = res.data;
+        console.log("sortMedium");
+        console.log(self.tasks);
+      });
+    },
+    sortLow() {
+      var self = this;
+      self.$api.get(`api/Tasks/GetListTreeTask/L/%20`).then(res => {
+        self.tasks = res.data;
+        self.data = res.data;
+        console.log("sortLow");
+        console.log(self.tasks);
+      });
+    },
+    toolbarClick: function(args) {
+      var self = this;
+      console.log(self.$refs.treegrid);
+
+      console.log(args);
+      switch (args.item.text) {
+        case "PDF Export":
+          self.$refs.treegrid.pdfExport();
+          break;
+        case "Excel Export":
+          self.$refs.treegrid.excelExport();
+          break;
+        case "CSV Export":
+          self.$refs.treegrid.csvExport();
+          break;
+      }
+    },
     remark() {
       var self = this;
 
@@ -625,8 +763,9 @@ export default {
       self.$api.get("api/Tasks/Done/" + id).then(res => {
         if (res.data) {
           self.dataSourceChanged();
+        } else {
+          this.$swal("Warning !", "Please finish all sub-tasks!", "warning");
         }
-        this.$swal("Success !", "Done", "success");
       });
     },
     delete(id) {
@@ -645,28 +784,62 @@ export default {
     contextMenuClick: function(args) {
       var self = this;
       console.log(args);
-      console.log(args.rowInfo.rowData);
-      if (args.item.id === "Done") {
-        self.done(args.rowInfo.rowData.ID);
-      } else if (args.item.id === "DeleteTask") {
-        self.delete(args.rowInfo.rowData.ID);
-      } else if (args.item.id === "Remark") {
-        self.remarkObj.id = args.rowInfo.rowData.ID;
-        self.remarkObj.remark = args.rowInfo.rowData.Remark;
-        $("#modal-remark").modal("show");
-      } else {
-        self.modalTitle = "Add Sub-Task";
-        self.task.parentID = args.rowInfo.rowData.ID;
-        $("#modal-task").modal("show");
-        console.log(self.primaryKey);
-      }
-    },
-    customiseCell: function(args) {
-      console.log("customiseCell");
-      console.log(args);
+      switch (args.item.id) {
+        case "Add-Sub-Task":
+          self.editStatus = false;
+          self.clearForm();
+          self.date = "";
+          self.getUser(args.rowInfo.rowData.ProjectID);
 
-      if (args.column.field === "State") {
-        args.cell.setAttribute("style", "background-color:red;color:white;");
+          self.modalTitle = "Add Sub-Task";
+          self.task.parentID = args.rowInfo.rowData.ID;
+          self.task.projectID = args.rowInfo.rowData.ProjectID;
+          self.projectSelected = {
+            ID: args.rowInfo.rowData.ProjectID,
+            Name: args.rowInfo.rowData.ProjectName
+          };
+          self.whoSelected = {
+            Username: localStorage.getItem("User"),
+            ID: localStorage.getItem("UserID")
+          };
+
+          $("#modal-task").modal("show");
+          break;
+        case "Done":
+          self.done(args.rowInfo.rowData.ID);
+          break;
+        case "EditTask":
+          self.clearForm();
+          self.editStatus = true;
+          self.modalTitle = "Edit Task";
+          $("#modal-task").modal("show");
+          self.getUser(args.rowInfo.rowData.ProjectID);
+          self.task.priority = args.rowInfo.rowData.PriorityID;
+          self.whoSelected = args.rowInfo.rowData.FromWho;
+          self.projectSelected = {
+            ID: args.rowInfo.rowData.ProjectID,
+            Name: args.rowInfo.rowData.ProjectName
+          };
+          self.task = {
+            description: args.rowInfo.rowData.Description,
+            jobName: args.rowInfo.rowData.JobName,
+            remark: args.rowInfo.rowData.Remark,
+            priority: args.rowInfo.rowData.PriorityID
+          };
+          self.selected = args.rowInfo.rowData.BeAssigneds;
+          self.date = args.rowInfo.rowData.Deadline;
+
+          break;
+        case "Remark":
+          self.task.remark = "";
+          self.editStatus = false;
+          self.remarkObj.id = args.rowInfo.rowData.ID;
+          self.remarkObj.remark = args.rowInfo.rowData.Remark;
+          $("#modal-remark").modal("show");
+          break;
+        case "DeleteTask":
+          self.delete(args.rowInfo.rowData.ID);
+          break;
       }
     },
     addTagProject(newTag) {
@@ -682,7 +855,6 @@ export default {
       console.log(this.task.projectID);
     },
     addTagOC(newTag) {
-      debugger;
       const tag = {
         ID: newTag,
         Name: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000)
@@ -705,12 +877,27 @@ export default {
         this.task.pic.push(item.ID);
       });
     },
-    getUser() {
+    getUser(projectID = 0) {
       var self = this;
-      self.$api.get("api/Tasks/GetListUser").then(res => {
+      self.$api.get(`api/Tasks/GetListUser/${projectID}`).then(res => {
         self.options = res.data;
         console.log(res);
       });
+    },
+    getUserForWho() {
+      var self = this;
+      self.$api.get("api/Users/GetListUser").then(res => {
+        self.whoOptions = res.data;
+        console.log("getUserForWho");
+        console.log(res);
+      });
+    },
+    clearForm() {
+      var self = this;
+      self.date = "";
+      self.projectSelected = {};
+      self.task = [];
+      self.selected = [];
     },
     getTasks() {
       var self = this;
@@ -731,6 +918,12 @@ export default {
     onSelectProject(option) {
       this.task.projectID = option.ID;
       console.log(this.task.projectID);
+      console.log("projectSelected da thay doi load lai user");
+      this.getUser(option.ID);
+    },
+    onSelectWho(option) {
+      this.task.fromWhoID = option.ID;
+      console.log(this.task.fromWhoID);
     },
     getProjects() {
       var self = this;
@@ -748,7 +941,13 @@ export default {
         console.log(res);
       });
     },
-    clearFrom() {
+    newTaskInfo() {
+      var self = this;
+      self.modalTitle = "Add-Task";
+      self.getUser();
+      self.clearForm();
+    },
+    clearForm() {
       this.task = {
         id: 0,
         description: "",
@@ -760,32 +959,36 @@ export default {
         remark: "",
         deadline: "",
         status: false,
+        priority: "M",
         pic: []
       };
+      this.projectSelected = [];
+      this.selected = [];
+      this.date = "";
     },
     createTask() {
       var self = this;
       console.log("createTask");
       console.log(self.task);
       if (self.task.parentID > 0) {
+        self.task.fromWhoID = self.whoSelected.ID;
         self.$api.post("api/Tasks/CreateSubTask", self.task).then(res => {
-          self.options = res.data;
           if (res.data) {
-            self.clearFrom();
+            self.clearForm();
             $("#modal-task").modal("hide");
             self.dataSourceChanged();
           }
-          alert("add sub-task");
+          self.$swal("Success!", "Add Sub-Tasks successfully!", "success");
           console.log(res);
         });
       } else {
         self.$api.post("api/Tasks/CreateTask", self.task).then(res => {
-          self.options = res.data;
           if (res.data) {
-            self.clearFrom();
+            self.clearForm();
             $("#modal-task").modal("hide");
             self.dataSourceChanged();
           }
+          self.$swal("Success!", "Add Tasks successfully!", "success");
           console.log(res);
         });
       }
@@ -812,9 +1015,17 @@ export default {
     }
   },
   provide: {
-    treegrid: [ContextMenu, Sort, Edit, ExcelExport, PdfExport, Page, Resize]
+    treegrid: [
+      ContextMenu,
+      CommandColumn,
+      Sort,
+      ExcelExport,
+      PdfExport,
+      Page,
+      Toolbar
+    ]
   }
-};
+});
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style>
@@ -825,5 +1036,14 @@ export default {
 }
 .e-treecell {
   font-size: 16px;
+}
+.e-btn.e-flat {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+  box-shadow: none !important;
+  color: #fff !important;
+}
+.e-grid .e-unboundcelldiv .e-icons {
+  color: #fff2f2 !important;
 }
 </style>

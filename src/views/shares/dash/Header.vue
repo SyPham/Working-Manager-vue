@@ -11,6 +11,12 @@
       </ul>
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link">
+            <i class="fa fa-sign-out"></i>
+            <span class="font-weight-bold text-info">{{currentTime}}</span>
+          </a>
+        </li>
         <!-- Notifications Dropdown Menu -->
         <li class="nav-item dropdown">
           <a class="nav-link" data-toggle="dropdown" href="#">
@@ -49,9 +55,23 @@
 </template>
 
 <script>
+import moment from "moment-timezone";
 export default {
   name: "appHeader",
+  data() {
+    return {
+      currentTime: null
+    };
+  },
+
+  created() {
+    this.currentTime = moment().format("LTS");
+    setInterval(() => this.updateCurrentTime(), 1 * 1000);
+  },
   methods: {
+    updateCurrentTime() {
+      this.currentTime = moment().format("LTS");
+    },
     logout: function() {
       this.$auth.destroyToken();
       // this.user = {};
@@ -59,7 +79,7 @@ export default {
       console.log(uri);
       this.$router.push({ path: "/login", query: { redirect: uri } });
       // alert("success!");
-      this.$swal("success!");
+      this.$alertify.success("Sign-out Successfully!");
     }
   }
 };

@@ -89,18 +89,32 @@ export default {
             res.data.user.User.Username,
             res.data.user.User.Role
           ); // + 4 hours
-          console.log("res.data.user.User");
-          console.log(res.data.user.User);
-          var routerArr = ["/client-task", "/client-history"];
-          var uri = self.$route.query.redirect || "";
-          console.log("self.$route.query.redirect");
-          console.log(self.$route.query.redirect);
-          if (self.$route.query.redirect.length != 0) {
-            var n = routerArr.includes(uri);
 
-            if (localStorage.getItem("Role") == 2 && n) {
+          localStorage.setItem("UserID", res.data.user.User.ID);
+          localStorage.setItem("Role", res.data.user.User.Role);
+          //roleid = 2
+          var routerArrUser = ["/client-task", "/client-history"];
+          //roleid = 4
+          var routerArrOwner = [
+            "/client-task",
+            "/client-history",
+            "/client-project",
+            "/client-project-user"
+          ];
+          var uri = self.$route.query.redirect || "";
+          if (self.$route.query.redirect.length != 0) {
+            var roleUser = routerArrUser.includes(uri);
+            var roleOwner = routerArrUser.includes(uri);
+
+            if (localStorage.getItem("Role") == 2 && roleUser) {
               self.$router.push(uri);
-            } else if (localStorage.getItem("Role") == 1 && !n) {
+            } else if (
+              localStorage.getItem("Role") == 1 &&
+              !roleUser &&
+              !roleOwner
+            ) {
+              self.$router.push(uri);
+            } else if (localStorage.getItem("Role") == 4 && !roleOwner) {
               self.$router.push(uri);
             } else {
               self.$router.push("/home");
@@ -108,11 +122,14 @@ export default {
           } else {
             self.$router.push("/home");
           }
-          self.$swal("success!");
+          self.$alertify.success("Sign-In Successfully!");
         })
         .catch(res => {
-          console.log(res);
-          self.$swal("Username and password are incorrect, please try again!");
+          self.$swal(
+            "Sign-In Failed!",
+            "Username and password are incorrect, please try again!",
+            "error"
+          );
         });
     }
   }

@@ -1,11 +1,11 @@
 <template>
   <footer class="main-footer" id="appFooter">
     <div class="float-right d-none d-sm-block">
-      <b>Version</b> 3.0.2
+      <b>Online</b> 1
     </div>
     <strong>
-      Copyright &copy; 2014-2019
-      <a href="http://adminlte.io">AdminLTE.io</a>.
+      Copyright &copy; 2019-2020
+      <a href="http://adminlte.io">by Lab Team</a>.
     </strong>
     All rights reserved.
   </footer>

@@ -38,7 +38,7 @@
           >
             <!-- Add icons to the links using the .nav-icon class
             with font-awesome or any other icon font library-->
-            <li v-if="display" class="nav-item has-treeview">
+            <li v-if="display==1" class="nav-item has-treeview">
               <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
@@ -59,10 +59,11 @@
                     <p>OC User</p>
                   </a>
                 </li>
+
                 <li class="nav-item">
-                  <a href="#/admin-project" class="nav-link">
+                  <a href="#/admin-user" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
-                    <p>Project</p>
+                    <p>User</p>
                   </a>
                 </li>
                 <li class="nav-item">
@@ -71,24 +72,36 @@
                     <p>Role</p>
                   </a>
                 </li>
-                <li class="nav-item">
-                  <a href="#/admin-user" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>User</p>
-                  </a>
-                </li>
               </ul>
             </li>
-            <li class="nav-item" v-if="!display">
+            <li class="nav-item" v-if="display==4">
+              <a href="#/client-project" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Project</p>
+              </a>
+            </li>
+            <li class="nav-item" v-if="display==4">
+              <a href="#/client-project-user" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Project User</p>
+              </a>
+            </li>
+            <li class="nav-item" v-if="display==4 || display == 2">
               <a href="#/client-task" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="far fa-circle nav-icon"></i>
                 <p>Task</p>
               </a>
             </li>
-            <li class="nav-item" v-if="!display">
+            <li class="nav-item" v-if="display==4 || display == 2">
               <a href="#/client-history" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="far fa-circle nav-icon"></i>
                 <p>History</p>
+              </a>
+            </li>
+            <li class="nav-item" v-if="display==4 || display == 2">
+              <a href="#/client-subscribe" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Subscribe</p>
               </a>
             </li>
           </ul>
@@ -105,11 +118,15 @@ export default {
   data() {
     return {
       username: "No Name",
-      display: false
+      display: 0
     };
   },
   created() {
-    this.display = localStorage.getItem("Role") == 1 ? true : false;
+    this.display = localStorage.getItem("Role");
+    this.username = localStorage.getItem("User");
+  },
+  mounted() {
+    this.display = localStorage.getItem("Role");
     this.username = localStorage.getItem("User");
   }
 };

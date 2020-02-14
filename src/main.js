@@ -2,7 +2,11 @@ import Vue from "vue";
 import App from "./App.vue";
 import Router from "./routes";
 import VueSweetalert2 from "vue-sweetalert2";
-
+import VueMoment from "vue-moment";
+import moment from "moment-timezone";
+Vue.use(VueMoment, {
+  moment
+});
 // If you don't need the styles, do not connect
 import "sweetalert2/dist/sweetalert2.min.css";
 import { Datetime } from "vue-datetime";
@@ -13,8 +17,8 @@ Vue.component("paginate", Paginate);
 Vue.use(Datetime);
 Vue.use(VueSweetalert2);
 import Auth from "./assets/plugins/auth";
+import Alertify from "./assets/plugins/alertify";
 
-import { TreeGridPlugin } from "@syncfusion/ej2-vue-treegrid";
 import axios from "axios";
 axios.defaults.headers.post["Content-Type"] = "application/json; charset=utf-8";
 //  axios.defaults.headers.post['Content-Type'] = 'application/octet-stream';
@@ -28,8 +32,8 @@ Vue.use({
   }
 });
 
-Vue.use(TreeGridPlugin);
 Vue.use(Auth);
+Vue.use(Alertify);
 //configure route guards
 Router.beforeEach(function(to, from, next) {
   //prevent access to 'requiresGuest' routes;

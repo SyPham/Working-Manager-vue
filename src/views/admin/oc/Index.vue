@@ -25,22 +25,6 @@
                 <i class="fas fa-times"></i>
               </button>
             </div>
-            <!-- <div class="card-tools pr-5">
-              <div class="input-group input-group-sm" style="width: 150px;">
-                <input
-                  type="text"
-                  name="table_search"
-                  class="form-control float-right"
-                  placeholder="Search"
-                />
-
-                <div class="input-group-append">
-                  <button type="submit" class="btn btn-default">
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
-              </div>
-            </div>-->
           </div>
           <!-- /.card-header -->
           <div class="card-body table-responsive p-0">
@@ -57,103 +41,37 @@
               :contextMenuClick="contextMenuClick"
               :editSettings="editing"
               :dataSourceChanged="dataSourceChanged"
+              :rowSelected="rowSelected "
+              :actionComplete="actionComplete"
+              :toolbar="toolbar"
             >
               <e-columns>
                 <e-column
-                  field="key"
-                  width="80"
-                  headerText="ID"
+                  field="levelnumber"
+                  width="100"
+                  isPrimaryKey="true"
+                  headerText="Level"
                   :disableHtmlEncode="false"
-                  textAlign="Center"
                 ></e-column>
-                <e-column field="title" headerText="OC Name" :disableHtmlEncode="false"></e-column>
-                <e-column field="levelnumber" headerText="Level" :disableHtmlEncode="false"></e-column>
+
+                <e-column
+                  field="title"
+                  editType="stringedit"
+                  headerText="OC Name"
+                  :edit="editparams"
+                  :disableHtmlEncode="false"
+                ></e-column>
               </e-columns>
             </ejs-treegrid>
-            <!-- <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>From</th>
-                  <th>Job Name/ Project Name</th>
-                  <th>Be Assigned</th>
-                  <th>Description</th>
-                  <th>Deadline</th>
-                  <th>Remark</th>
-                  <th>Status</th>
-                  <th>Created Time</th>
-                  <th>Option</th>
-                </tr>
-              </thead>
-              <tbody style="overflow-y:hidden">
-                <tr v-for="(task,key,index) in tasks" :key="index">
-                  <td>{{key + 1}}</td>
-                  <td>{{task.From}}</td>
-                  <td>{{task.ProjectName}}</td>
-                  <td>
-                    <span
-                      v-for="(pic,key,index) in task.PIC"
-                      :key="index"
-                      class="badge bg-secondary"
-                    >{{pic}}</span>
-                  </td>
-                  <td>{{task.Description}}</td>
-                  <td>{{task.DueDate}}</td>
-                  <td>{{task.Remark}}</td>
-                  <td>
-                    <span class="badge bg-danger">{{task.Status== true ? "done": "undone"}}</span>
-                  </td>
-                  <td>{{task.CreatedDate}}</td>
-                  <td class="py-0 align-middle">
-                    <button
-                      type="button"
-                      class="btn btn-block btn-info btn-xs"
-                      data-toggle="modal"
-                      data-target="#modal-sub-task"
-                    >
-                      <i class="fas fa-plus"></i> Sub
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>-->
           </div>
           <!-- ./card-body -->
-          <div class="card-footer clearfix">
-            <!-- <ul class="pagination pagination-sm m-0 float-right">
-              <li class="page-item">
-                <a class="page-link" href="#">First</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">Next</a>
-              </li>
-
-              <li class="page-item">
-                <a class="page-link" href="#">1</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">2</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">3</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">Previous</a>
-              </li>
-
-              <li class="page-item">
-                <a class="page-link" href="#">Last</a>
-              </li>
-            </ul>-->
-          </div>
-          <!-- /.card-footer -->
         </div>
         <!-- /.card -->
       </div>
       <!-- /.col -->
     </div>
     <div class="modal fade" id="modal-oc" aria-hidden="true" style="display: none;">
-      <div class="modal-dialog modal-xl">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h4 class="modal-title">
@@ -166,22 +84,10 @@
           </div>
           <div class="modal-body">
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md">
                 <div class="form-group">
                   <label for="Name">Name</label>
                   <input type="text" id="Name" v-model="oc.name" class="form-control Name" />
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="Level">Level</label>
-                  <input
-                    type="text"
-                    id="Description"
-                    v-model="oc.level"
-                    class="form-control Description"
-                  />
                 </div>
               </div>
             </div>
@@ -211,7 +117,8 @@ import {
   ExcelExport,
   PdfExport,
   Page,
-  Resize
+  Resize,
+  Toolbar
 } from "@syncfusion/ej2-vue-treegrid";
 Vue.use(TreeGridPlugin);
 // register globally
@@ -226,10 +133,33 @@ export default {
     return {
       oc: { id: 0, name: "", level: 0, parentid: 0 },
       modalTitle: "Add OC",
+      editparams: { params: { format: "n" } },
       contextMenuItems: [
-        { text: "Add Sub-OC", target: ".e-content", id: "Add-Sub-OC" },
-        { text: "Edit OC", target: ".e-content", id: "EditOC" },
-        { text: "Delete", target: ".e-content", id: "DeleteOC" }
+        {
+          text: "Add Sub-OC",
+          iconCss: " e-icons e-add",
+          target: ".e-content",
+          id: "Add-Sub-OC"
+        },
+        {
+          text: "Edit OC",
+          iconCss: " e-icons e-edit",
+          target: ".e-content",
+          id: "EditOC"
+        },
+        {
+          text: "Delete",
+          iconCss: " e-icons e-delete",
+          target: ".e-content",
+          id: "DeleteOC"
+        }
+      ],
+      toolbar: [
+        // "Search",
+        "ExpandAll",
+        "CollapseAll"
+        // "ExcelExport",
+        // "PdfExport"
       ],
       editing: { allowDeleting: true, allowEditing: true, mode: "Row" },
       pageSettings: { pageSize: 10 },
@@ -241,6 +171,10 @@ export default {
       remarkObj: {
         id: 0,
         remark: ""
+      },
+      edit: {
+        key: 0,
+        title: ""
       }
     };
   },
@@ -254,6 +188,26 @@ export default {
     });
   },
   methods: {
+    actionComplete(args) {
+      console.log("actionComplete");
+      console.log(args);
+      var self = this;
+
+      if (args.requestType == "save") {
+        self.$api.post("api/Ocs/Rename", self.edit).then(res => {
+          this.$swal("Success !", "Edit Successfully!", "success");
+        });
+      }
+    },
+    rowSelected(args) {
+      console.log("rowSelected ");
+      console.log(args);
+      var self = this;
+      self.edit = {
+        key: args.data.key,
+        title: args.data.title
+      };
+    },
     remark() {
       var self = this;
 
@@ -295,7 +249,6 @@ export default {
       console.log(args.rowInfo.rowData);
       if (args.item.id === "EditOC") {
         self.modalTitle = "Edit OC";
-        $("#modal-oc").modal("show");
         //self.delete(args.rowInfo.rowData.ID);
       } else if (args.item.id === "DeleteOC") {
         self.delete(args.rowInfo.rowData.key);
@@ -368,10 +321,27 @@ export default {
   },
   watch: {},
   provide: {
-    treegrid: [ContextMenu, Sort, Edit, ExcelExport, PdfExport, Page, Resize]
+    treegrid: [
+      ContextMenu,
+      Sort,
+      Edit,
+      ExcelExport,
+      PdfExport,
+      Page,
+      Resize,
+      Toolbar
+    ]
   }
 };
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-<style scoped>
+<style >
+.e-headertext {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.74);
+}
+.e-treecell {
+  font-size: 16px;
+}
 </style>

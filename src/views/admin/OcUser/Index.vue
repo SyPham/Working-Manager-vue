@@ -108,7 +108,7 @@
                   <td>
                     <div class="pretty p-switch">
                       <input
-                        type="radio"
+                        type="checkbox"
                         :checked="user.Status"
                         @click="AddOrUpdate(user.ID)"
                         name="switch1"

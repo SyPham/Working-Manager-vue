@@ -76,31 +76,23 @@
           </div>
           <!-- ./card-body -->
           <div class="card-footer clearfix">
-            <ul class="pagination pagination-sm m-0 float-right">
-              <li class="page-item">
-                <a class="page-link" href="#">First</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">Next</a>
-              </li>
-
-              <li class="page-item">
-                <a class="page-link" href="#">1</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">2</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">3</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">Previous</a>
-              </li>
-
-              <li class="page-item">
-                <a class="page-link" href="#">Last</a>
-              </li>
-            </ul>
+            <paginate
+              v-model="page"
+              :page-count="totalPage"
+              :page-range="3"
+              :margin-pages="2"
+              :click-handler="clickCallback"
+              :prev-text="'Prev'"
+              :next-text="'Next'"
+              :container-class="'pagination pagination-sm m-0'"
+              :page-class="'page-item'"
+              :page-link-class="'page-link'"
+              :prev-class="'page-item'"
+              :prev-link-class="'page-link'"
+              :next-class="'page-item'"
+              :next-link-class="'page-link'"
+              :first-last-button="true"
+            ></paginate>
           </div>
           <!-- /.card-footer -->
         </div>
@@ -158,8 +150,17 @@
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="Role">Role</label>
-                  <input v-model="user.roleid" type="text" id="Role" class="form-control Role" />
+                  <label class="typo__label">Role</label>
+                  <multiselect
+                    v-model="user.roleid"
+                    deselect-label="Can't remove this value"
+                    track-by="ID"
+                    label="Name"
+                    placeholder="Select one"
+                    :options="dataRole"
+                    :searchable="false"
+                    :allow-empty="false"
+                  ></multiselect>
                 </div>
               </div>
             </div>
@@ -204,17 +205,7 @@
                   />
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="Password">Password</label>
-                  <input
-                    v-model="user.password"
-                    type="text"
-                    id="Password"
-                    class="form-control Password"
-                  />
-                </div>
-              </div>
+
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="Email">Email</label>
@@ -223,8 +214,18 @@
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="Role">Role</label>
-                  <input v-model="user.roleid" type="text" id="Role" class="form-control Role" />
+                  <label class="typo__label">Role</label>
+                  <multiselect
+                    v-model="selected"
+                    deselect-label="Can't remove this value"
+                    track-by="ID"
+                    label="Name"
+                    placeholder="Select one"
+                    :options="dataRole"
+                    :searchable="true"
+                    :allow-empty="true"
+                    @select="onSelect"
+                  ></multiselect>
                 </div>
               </div>
             </div>
@@ -242,36 +243,66 @@
 </template>
 
 <script>
+import Multiselect from "vue-multiselect";
 export default {
   name: "admin-user",
+  components: {
+    Multiselect
+  },
   data() {
     return {
+      page: 1,
+      name: " ",
+      pageSize: 20,
+      totalPage: 0,
       ListUser: [],
+      dataRole: [],
       name: null,
       nameEdit: null,
       ID: null,
       bugIndex: null,
+      selected: {
+        ID: 0,
+        Name: ""
+      },
       user: {
         id: 0,
         username: "",
         password: "",
         email: "",
-        roleid: ""
+        roleid: 0
       }
     };
   },
   created() {
     this.getUser();
+    this.getRole();
   },
   methods: {
+    onSelect(option) {
+      this.user.roleid = option.ID;
+    },
+    getRole() {
+      let self = this;
+      this.$api.get("api/Roles/GetAll").then(res => {
+        self.dataRole = res.data;
+      });
+    },
+    clickCallback(pageNum) {
+      let self = this;
+
+      self.page = pageNum;
+      this.getUser();
+    },
     getUser() {
       let self = this;
-      this.$api.get("api/Users/GetListUser").then(res => {
-        console.log(res);
-        self.ListUser = res.data;
-        console.log("self.ListUser");
-        console.log(self.ListUser);
-      });
+      this.$api
+        .get(`api/Users/GetAllPaging/${self.page}/${self.pageSize}`)
+        .then(res => {
+          console.log(res.data.total);
+          self.ListUser = res.data.data;
+          self.totalPage = res.data.total;
+        });
     },
     save() {
       var self = this;
@@ -332,6 +363,10 @@ export default {
         email: item.Email,
         roleid: item.RoleID
       };
+      this.selected = {
+        ID: item.RoleID,
+        Name: item.RoleName
+      };
       $("#modal-edit").modal("show");
     },
     update(item, index) {
@@ -351,6 +386,7 @@ export default {
   }
 };
 </script>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <style scoped>
 </style>
