@@ -8,7 +8,7 @@
           data-toggle="modal"
           data-target="#modal-add"
         >
-          <i class="fas fa-plus"></i> User Add
+          <i class="fas fa-plus"></i> Add User
         </button>
       </div>
       <div class="col-md-12">
@@ -51,6 +51,7 @@
                   <th>Username</th>
                   <th>Email</th>
                   <th>Role</th>
+                  <th>Position</th>
                   <th>Option</th>
                 </tr>
               </thead>
@@ -60,6 +61,7 @@
                   <td>{{item.Username}}</td>
                   <td>{{item.Email}}</td>
                   <td>{{item.RoleName}}</td>
+                  <td>{{item.isLeader == true ?"Leader" : "Staff"}}</td>
                   <td class="py-0 align-middle">
                     <div class="btn-group btn-group-sm">
                       <a @click="edit(item,index)" style="cursor: pointer;" class="btn btn-info">
@@ -106,7 +108,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h4 class="modal-title">
-              <i class="fas fa-plus"></i> User Add
+              <i class="fas fa-plus"></i>Add User
             </h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">×</span>
@@ -123,6 +125,7 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="Username">Username</label>
+                  <small class="text-danger">*Require</small>
                   <input
                     v-model="user.username"
                     type="text"
@@ -134,6 +137,7 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="Password">Password</label>
+                  <small class="text-danger">*Require</small>
                   <input
                     v-model="user.password"
                     type="text"
@@ -145,14 +149,16 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="Email">Email</label>
+                  <small class="text-danger">*Require</small>
                   <input v-model="user.email" type="text" id="Email" class="form-control Email" />
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="typo__label">Role</label>
+                  <small class="text-danger">*Require</small>
                   <multiselect
-                    v-model="user.roleid"
+                    v-model="selectedRole"
                     deselect-label="Can't remove this value"
                     track-by="ID"
                     label="Name"
@@ -161,6 +167,22 @@
                     :searchable="false"
                     :allow-empty="false"
                   ></multiselect>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="pretty p-switch">
+                <input
+                  type="checkbox"
+                  :checked="user.isLeader"
+                  v-model="user.isLeader"
+                  name="switch1"
+                />
+                <div class="state p-success">
+                  <label
+                    class="font-weight-bold"
+                  >{{user.isLeader ==true ? "Is Leader" : "Is Staff"}}</label>
+                  <small class="text-danger">*Require</small>
                 </div>
               </div>
             </div>
@@ -228,6 +250,21 @@
                   ></multiselect>
                 </div>
               </div>
+              <div class="col-md-6">
+                <div class="pretty p-switch">
+                  <input
+                    type="checkbox"
+                    :checked="user.isLeader"
+                    v-model="user.isLeader"
+                    name="switch1"
+                  />
+                  <div class="state p-success">
+                    <label
+                      class="font-weight-bold"
+                    >{{user.isLeader ==true ? "Is Leader" : "Is Staff"}}</label>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="modal-footer justify-content-between">
@@ -265,15 +302,18 @@ export default {
         ID: 0,
         Name: ""
       },
+      selectedRole: [],
       user: {
         id: 0,
         username: "",
         password: "",
         email: "",
-        roleid: 0
+        roleid: 0,
+        isLeader: false
       }
     };
   },
+  mounted() {},
   created() {
     this.getUser();
     this.getRole();
@@ -300,6 +340,7 @@ export default {
         .get(`api/Users/GetAllPaging/${self.page}/${self.pageSize}`)
         .then(res => {
           console.log(res.data.total);
+          console.log(res);
           self.ListUser = res.data.data;
           self.totalPage = res.data.total;
         });
@@ -308,7 +349,7 @@ export default {
       var self = this;
       this.$api.post("api/Users/create", self.user).then(res => {
         // this.$router.push()
-        this.$swal("Success !", "New User Add Success", "success");
+        this.$swal("Success !", " Add New User Success", "success");
         this.getUser();
         this.resetForm();
       });
@@ -321,9 +362,11 @@ export default {
         username: "",
         password: "",
         email: "",
-        roleid: 0
+        roleid: 0,
+        isLeader: false
       };
     },
+
     remove(id) {
       this.$swal({
         title: "Are you sure?",
@@ -361,7 +404,8 @@ export default {
         id: item.ID,
         username: item.Username,
         email: item.Email,
-        roleid: item.RoleID
+        roleid: item.RoleID,
+        isLeader: item.isLeader
       };
       this.selected = {
         ID: item.RoleID,
@@ -382,6 +426,13 @@ export default {
         .catch(e => {
           this.$swal("error!");
         });
+    }
+  },
+  watch: {
+    selectedRole: function(newVal, oldVal) {
+      console.log(newVal);
+      let self = this;
+      self.user.roleid = newVal.ID;
     }
   }
 };

@@ -1,6 +1,25 @@
 <template>
   <div>
     <div class="row">
+      <div class="col-md-12">
+        <div id="action-description">
+          <p>You can perform CRUD operations as follows,</p>
+          <ul>
+            <li>
+              <code>Add</code> - To add new OC, click Add OC button.
+            </li>
+            <li>
+              <code>Add Sub-OC</code>- To add Sub-OC, right click select add Sub-OC button after selected a row.
+            </li>
+            <li>
+              <code>Edit</code> - To edit OC, double click a row after selected a row.
+            </li>
+            <li>
+              <code>Delete</code> - To delete OC, right click select delete button after selected a row.
+            </li>
+          </ul>
+        </div>
+      </div>
       <div class="col-md-12 pb-4">
         <button
           type="button"
@@ -8,7 +27,7 @@
           data-toggle="modal"
           data-target="#modal-oc"
         >
-          <i class="fas fa-plus"></i> OC Add
+          <i class="fas fa-plus"></i> Add OC
         </button>
       </div>
       <div class="col-md-12">
@@ -29,6 +48,7 @@
           <!-- /.card-header -->
           <div class="card-body table-responsive p-0">
             <ejs-treegrid
+              ref="treegrid"
               :dataSource="data"
               childMapping="children"
               :treeColumnIndex="1"
@@ -43,6 +63,7 @@
               :dataSourceChanged="dataSourceChanged"
               :rowSelected="rowSelected "
               :actionComplete="actionComplete"
+              :searchSettings="searchSettings"
               :toolbar="toolbar"
             >
               <e-columns>
@@ -66,8 +87,10 @@
           </div>
           <!-- ./card-body -->
         </div>
+
         <!-- /.card -->
       </div>
+
       <!-- /.col -->
     </div>
     <div class="modal fade" id="modal-oc" aria-hidden="true" style="display: none;">
@@ -113,6 +136,7 @@ import {
   TreeGridPlugin,
   ContextMenu,
   Sort,
+  Filter,
   Edit,
   ExcelExport,
   PdfExport,
@@ -131,6 +155,7 @@ export default {
   },
   data() {
     return {
+      searchSettings: { hierarchyMode: "Parent" },
       oc: { id: 0, name: "", level: 0, parentid: 0 },
       modalTitle: "Add OC",
       editparams: { params: { format: "n" } },
@@ -141,12 +166,12 @@ export default {
           target: ".e-content",
           id: "Add-Sub-OC"
         },
-        {
-          text: "Edit OC",
-          iconCss: " e-icons e-edit",
-          target: ".e-content",
-          id: "EditOC"
-        },
+        // {
+        //   text: "Edit OC",
+        //   iconCss: " e-icons e-edit",
+        //   target: ".e-content",
+        //   id: "EditOC"
+        // },
         {
           text: "Delete",
           iconCss: " e-icons e-delete",
@@ -155,11 +180,11 @@ export default {
         }
       ],
       toolbar: [
-        // "Search",
+        "Search",
         "ExpandAll",
-        "CollapseAll"
-        // "ExcelExport",
-        // "PdfExport"
+        "CollapseAll",
+        "ExcelExport",
+        "PdfExport"
       ],
       editing: { allowDeleting: true, allowEditing: true, mode: "Row" },
       pageSettings: { pageSize: 10 },
@@ -328,6 +353,7 @@ export default {
       ExcelExport,
       PdfExport,
       Page,
+      Filter,
       Resize,
       Toolbar
     ]

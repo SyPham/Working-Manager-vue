@@ -10,12 +10,15 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
+    "@microsoft/signalr": "^3.1.2",
     "@syncfusion/ej2-vue-grids": "^17.4.47",
     "@syncfusion/ej2-vue-treegrid": "^17.4.47",
     "admin-lte": "^3.0.2",
     "axios": "^0.19.2",
+    "cropperjs": "^1.5.6",
     "luxon": "^1.22.0",
     "pretty-checkbox": "^3.0.3",
+    "v-md-date-range-picker": "^2.6.0",
     "vue": "^2.5.11",
     "vue-datetime": "^1.0.0-beta.11",
     "vue-moment": "^4.1.0",
@@ -23,6 +26,7 @@
     "vue-page-transition": "^0.2.2",
     "vue-router": "^3.1.5",
     "vue-sweetalert2": "^3.0.1",
+    "vue-upload-component": "^2.8.20",
     "vuejs-paginate": "^2.1.0",
     "weekstart": "^1.0.1"
   },

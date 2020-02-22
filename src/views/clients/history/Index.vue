@@ -1,30 +1,6 @@
 <template>
   <div>
     <div class="row">
-      <div class="col-md-12">
-        <h5>Sort:</h5>
-      </div>
-      <div class="col-md-12 pb-4">
-        <button type="button" @click="sortProject" class="btn bg-gradient-secondary btn-sm">
-          <i class="fas fa-tasks"></i> Project
-        </button>
-        <button type="button" @click="sortRoutine" class="btn bg-gradient-secondary btn-sm">
-          <i class="fas fa-book-open"></i> Routine Job
-        </button>
-
-        <button type="button" @click="sortHigh" class="btn bg-danger btn-sm">
-          <i class="fas fa-exclamation"></i> High
-        </button>
-        <button type="button" @click="sortMedium" class="btn bg-warning btn-sm">
-          <i class="fab fa-medium"></i> Medium
-        </button>
-        <button type="button" @click="sortLow" class="btn bg-info btn-sm">
-          <i class="fas fa-low-vision"></i> Low
-        </button>
-        <button type="button" @click="getTasks" class="btn bg-gradient-secondary btn-sm">
-          <i class="fas fa-sync-alt"></i> All
-        </button>
-      </div>
       <!-- <div class="col-md-12 pb-4">
         <button
           type="button"
@@ -36,9 +12,33 @@
         </button>
       </div>-->
       <div class="col-md-12">
+        <h5>Sort:</h5>
+      </div>
+      <div class="col-md-12 pb-4">
+        <button type="button" @click="sortProject" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-tasks"></i> Project
+        </button>
+        <button type="button" @click="sortRoutine" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-book-open"></i> Routine Job
+        </button>
+
+        <button type="button" @click="sortHigh" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-exclamation"></i> High
+        </button>
+        <button type="button" @click="sortMedium" class="btn bg-gradient-secondary btn-sm">
+          <i class="fab fa-medium"></i> Medium
+        </button>
+        <button type="button" @click="sortLow" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-low-vision"></i> Low
+        </button>
+        <button type="button" @click="getTasks" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-sync-alt"></i> All
+        </button>
+      </div>
+      <div class="col-md-12">
         <div class="card">
           <div class="card-header">
-            <h5 class="card-title">List Subscribe</h5>
+            <h5 class="card-title">List History</h5>
 
             <div class="card-tools">
               <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -79,7 +79,6 @@
               :allowSorting="true"
               :toolbar="toolbar"
               :dataSourceChanged="dataSourceChanged"
-              :contextMenuItems="contextMenuItems"
             >
               <e-columns>
                 <e-column
@@ -134,7 +133,7 @@
                   field="Option"
                   :template="optionTemplate"
                   headerText="Option"
-                  width="250"
+                  width="120"
                   textAlign="Center"
                 ></e-column>
               </e-columns>
@@ -228,12 +227,11 @@
 import Vue from "vue";
 import Multiselect from "vue-multiselect";
 import { Datetime } from "vue-datetime";
-import EventBus from "../../EventBus";
+import EventBus from "../../../EventBus";
 
 import {
   TreeGridPlugin,
   Sort,
-  ContextMenu,
   ExcelExport,
   PdfExport,
   Toolbar,
@@ -243,21 +241,13 @@ Vue.use(TreeGridPlugin);
 // register globally
 Vue.component("multiselect", Multiselect);
 export default {
-  name: "client-subscribe",
+  name: "client-task",
   components: {
     Multiselect,
     Datetime
   },
   data() {
     return {
-      contextMenuItems: [
-        {
-          text: "Add Remark",
-          iconCss: " e-icons e-add",
-          target: ".e-content",
-          id: "Remark"
-        }
-      ],
       priorityTemplate: function() {
         return {
           template: Vue.component("priority", {
@@ -275,7 +265,7 @@ export default {
           template: Vue.component("optionTemplate", {
             template: `<div id="optionTemplate">
                       <div class="btn-group">
-                        <button type="button" :style="data.Level != 1?'visibility: hidden;':'visibility: initial;'" @click="unsubscribe(data)" class="btn btn-danger btn-xs"><i class="fas fa-bell-slash"></i> Unsubscribe</button>
+                        <button type="button" @click="Undo(data.ID)" v-if="data.Level == 1" class="btn btn-success btn-xs"><i class="fas fa-undo"></i> Undo</button>
                       </div>
                     </div>`,
             data: function() {
@@ -284,12 +274,8 @@ export default {
               };
             },
             methods: {
-              addSubTask(data) {
-                EventBus.$emit("taskItem", data);
-                $("#modal-task").modal("show");
-              },
-              unsubscribe(data) {
-                EventBus.$emit("subscribe", data);
+              Undo(taskid) {
+                EventBus.$emit("Undo", taskid);
               }
             }
           })
@@ -312,32 +298,19 @@ export default {
     };
   },
   mounted() {
-    EventBus.$on("subscribe", this.unsubscribe);
+    EventBus.$on("Undo", this.undo);
   },
   destroyed() {
     // Stop listening the event hello with handler
-    EventBus.$off("subscribe", this.unsubscribe);
+    EventBus.$off("Undo", this.undo);
   },
   created() {
     this.getTasks();
   },
   methods: {
-    unsubscribe(data) {
-      var self = this;
-
-      self.$api.delete(`api/Subscribe/Unsubscribe/${data.ID}`).then(res => {
-        console.log("unsubscribe");
-        if (res) {
-          self.$alertify.success("You have already unsubscribed this one!");
-          self.getTasks();
-        } else {
-          self.$swal("Warning !", "You can't unsubscribe!", "warning");
-        }
-      });
-    },
     sortProject() {
       var self = this;
-      self.$api.get(`api/Subscribe/LoadSubscribe/project`).then(res => {
+      self.$api.get(`api/Tasks/GetListTreeHistory/project`).then(res => {
         self.data = res.data;
         console.log("sortProject");
         console.log(self.data);
@@ -345,14 +318,14 @@ export default {
     },
     sortRoutine() {
       var self = this;
-      self.$api.get(`api/Subscribe/LoadSubscribe/routine`).then(res => {
+      self.$api.get(`api/Tasks/GetListTreeHistory/routine`).then(res => {
         self.data = res.data;
         console.log(self.data);
       });
     },
     sortHigh() {
       var self = this;
-      self.$api.get(`api/Subscribe/LoadSubscribe/H/%20`).then(res => {
+      self.$api.get(`api/Tasks/GetListTreeHistory/H/%20`).then(res => {
         self.data = res.data;
         console.log("sortHigh");
         console.log(self.data);
@@ -360,7 +333,7 @@ export default {
     },
     sortMedium() {
       var self = this;
-      self.$api.get(`api/Subscribe/LoadSubscribe/M/%20`).then(res => {
+      self.$api.get(`api/Tasks/GetListTreeHistory/M/%20`).then(res => {
         self.data = res.data;
         console.log("sortMedium");
         console.log(self.tasks);
@@ -368,10 +341,23 @@ export default {
     },
     sortLow() {
       var self = this;
-      self.$api.get(`api/Subscribe/LoadSubscribe/L/%20`).then(res => {
+      self.$api.get(`api/Tasks/GetListTreeHistory/L/%20`).then(res => {
         self.data = res.data;
         console.log("sortLow");
         console.log(self.data);
+      });
+    },
+    undo(taskid) {
+      var self = this;
+      self.$api.get(`api/Tasks/Undo/${taskid}`).then(res => {
+        console.log("Undo");
+        console.log(res);
+        if (res) {
+          self.$alertify.success("You have already undoed this one!");
+          self.getTasks();
+        } else {
+          self.$swal("Warning !", "You can't undo this one!", "warning");
+        }
       });
     },
     dataSourceChanged() {
@@ -380,8 +366,7 @@ export default {
     },
     getTasks() {
       var self = this;
-      self.$api.get("api/Subscribe/LoadSubscribe").then(res => {
-        self.tasks = res.data;
+      self.$api.get(`api/Tasks/GetListTreeHistory`).then(res => {
         self.data = res.data;
         console.log(self.data);
       });
@@ -389,7 +374,7 @@ export default {
   },
   watch: {},
   provide: {
-    treegrid: [ContextMenu, Sort, ExcelExport, PdfExport, Page, Toolbar]
+    treegrid: [Sort, ExcelExport, PdfExport, Page, Toolbar]
   }
 };
 </script>

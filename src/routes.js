@@ -7,18 +7,23 @@ import OCUser from "./views/admin/ocUser/Index.vue";
 import User from "./views/admin/user/Index.vue";
 
 //client
-import Project from "./views/admin/project/Index.vue";
-import ProjectUser from "./views/admin/projectUser/Index.vue";
-import Task from "./views/clients/Task.vue";
-import History from "./views/clients/History.vue";
-import Subscribe from "./views/clients/Subscribe.vue";
+import Project from "./views/clients/project/Index.vue";
+import ProjectDetail from "./views/clients/project/Detail.vue";
+import ProjectUser from "./views/clients/projectUser/Index.vue";
+import ToDoList from "./views/clients/todolist/Index.vue";
+import History from "./views/clients/history/Index.vue";
+import Follow from "./views/clients/follow/Index.vue";
+import Chat from "./views/clients/chat/Index.vue";
+import Photo from "./views/clients/photo/Index.vue";
+import RoutineJob from "./views/clients/routine-job/Index.vue";
+import Abnormal from "./views/clients/abnormal/Index.vue";
 
 // auth
 import Auth from "./views/shares/auth/Auth.vue";
 import Login from "./views/shares/auth/Login.vue";
 
 //dash
-import Dash from "./views/shares/dash/Dash.vue";
+import Dash from "./views/shares/dash/Dashboard.vue";
 import Home from "./views/shares/dash/Home.vue";
 
 Vue.use(VueRouter);
@@ -29,12 +34,27 @@ const router = new VueRouter({
       //HOME
       path: "/",
       component: Dash,
-      redirect: "/home",
+      redirect: "/todolist",
 
       children: [
         {
-          path: "home",
-          name: "Index",
+          path: "/todolist",
+          name: "To Do List",
+          component: ToDoList,
+          meta: { requiresAuth: true }
+        }
+      ]
+    },
+    {
+      //HOME
+      path: "/dashboard-admin",
+      component: Dash,
+      redirect: "/dashboard-admin",
+
+      children: [
+        {
+          path: "/dashboard-admin",
+          name: "Dashboard Admin",
           component: Home,
           meta: { requiresAuth: true }
         }
@@ -46,62 +66,83 @@ const router = new VueRouter({
       path: "/admin-oc",
       component: Dash,
       children: [
-        { path: "/admin-oc", component: OC, meta: { requiresAuth: true } }
+        {
+          path: "/admin-oc",
+          name: "OC",
+          component: OC,
+          meta: { requiresAuth: true }
+        }
       ]
     },
     //adminrole
     {
-      name: "Role",
       path: "/admin-role",
       component: Dash,
       children: [
-        { path: "/admin-role", component: Role, meta: { requiresAuth: true } }
+        {
+          path: "/admin-role",
+          name: "Role",
+          component: Role,
+          meta: { requiresAuth: true }
+        }
       ]
     },
     //adminocuser
     {
-      path: "/admin-Oc-user",
+      path: "/admin-oc-user",
       component: Dash,
       children: [
         {
-          path: "/admin-Oc-user",
-          name: "OC-User",
+          path: "/admin-oc-user",
+          name: "OC User",
           component: OCUser,
+          meta: { requiresAuth: true }
+        }
+      ]
+    },
+
+    //adminuser
+    {
+      path: "/admin-user",
+      component: Dash,
+
+      children: [
+        {
+          path: "/admin-user",
+          name: "User",
+          component: User,
+          meta: { requiresAuth: true }
+        }
+      ]
+    },
+    //adminproject
+    {
+      path: "/project",
+      component: Dash,
+      children: [
+        {
+          path: "/project",
+          name: "Project",
+          component: Project,
+          meta: { requiresAuth: true }
+        },
+        {
+          path: "/project-detail/:id",
+          name: "Project-Detail",
+          component: ProjectDetail,
           meta: { requiresAuth: true }
         }
       ]
     },
     //client-project-user
     {
-      path: "/client-project-user",
+      path: "/project-user",
       component: Dash,
       children: [
         {
-          path: "/client-project-user",
-          name: "Project-User",
+          path: "/project-user",
+          name: "Project User",
           component: ProjectUser,
-          meta: { requiresAuth: true }
-        }
-      ]
-    },
-    //adminuser
-    {
-      path: "/admin-user",
-      component: Dash,
-      name: "User",
-      children: [
-        { path: "/admin-user", component: User, meta: { requiresAuth: true } }
-      ]
-    },
-    //adminproject
-    {
-      path: "/client-project",
-      component: Dash,
-      children: [
-        {
-          path: "/client-project",
-          name: "Project",
-          component: Project,
           meta: { requiresAuth: true }
         }
       ]
@@ -115,26 +156,26 @@ const router = new VueRouter({
 
     //client task
     {
-      path: "/client-task",
+      path: "/",
       component: Dash,
       children: [
         {
-          path: "/client-task",
-          name: "Client-Task",
-          component: Task,
+          path: "/todolist",
+          name: "To Do List",
+          component: ToDoList,
           meta: { requiresAuth: true }
         }
       ]
     },
-    //client-subscribe
+    //client-Follow
     {
-      path: "/client-subscribe",
+      path: "/follow",
       component: Dash,
       children: [
         {
-          path: "/client-subscribe",
-          name: "Client-Subscribe",
-          component: Subscribe,
+          path: "/follow",
+          name: "Follow",
+          component: Follow,
           meta: { requiresAuth: true }
         }
       ]
@@ -142,13 +183,66 @@ const router = new VueRouter({
 
     //client task
     {
-      path: "/client-history",
+      path: "/history",
       component: Dash,
       children: [
         {
-          path: "/client-history",
-          name: "Client-History",
+          path: "/history",
+          name: "History",
           component: History,
+          meta: { requiresAuth: true }
+        }
+      ]
+    },
+
+    //client chat
+    {
+      path: "/client-chat",
+      component: Dash,
+      children: [
+        {
+          path: "/client-chat",
+          name: "Client-chat",
+          component: Chat,
+          meta: { requiresAuth: true }
+        }
+      ]
+    },
+    //client RoutineJob
+    {
+      path: "/routine",
+      component: Dash,
+      children: [
+        {
+          path: "/routine",
+          name: "Routine Job",
+          component: RoutineJob,
+          meta: { requiresAuth: true }
+        }
+      ]
+    },
+    //client Abnormal
+    {
+      path: "/abnormal",
+      component: Dash,
+      children: [
+        {
+          path: "/abnormal",
+          name: "Abnormal",
+          component: Abnormal,
+          meta: { requiresAuth: true }
+        }
+      ]
+    },
+    //client phoyo
+    {
+      path: "/client-photo",
+      component: Dash,
+      children: [
+        {
+          path: "/client-photo",
+          name: "Client-photo",
+          component: Photo,
           meta: { requiresAuth: true }
         }
       ]

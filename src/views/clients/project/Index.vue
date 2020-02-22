@@ -8,7 +8,7 @@
           data-toggle="modal"
           data-target="#modal-add"
         >
-          <i class="fas fa-plus"></i> Project Add
+          <i class="fas fa-plus"></i>Add Project
         </button>
       </div>
       <div class="col-md-12">
@@ -38,22 +38,42 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Project Name</th>
-                  <th>Option</th>
+                  <th class="text-center" width="20">#</th>
+                  <th class="text-center">Project Name</th>
+                  <th class="text-center">Created By</th>
+                  <th class="text-center">Option</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(item,key,index) in ListProject" :key="index">
-                  <td>{{key + 1}}</td>
-                  <td>{{item.Name}}</td>
-                  <td class="py-0 align-middle">
-                    <div v-if="item.CreatedBy == createdBy" class="btn-group btn-group-sm">
-                      <a @click="edit(item,index)" style="cursor: pointer;" class="btn btn-info">
+                  <td class="text-center">{{key + 1}}</td>
+                  <td class="text-center">{{item.Name}}</td>
+                  <td class="text-center">{{$common.toTitleCase(item.CreatedByName)}}</td>
+                  <td class="py-0 align-middle text-center">
+                    <div class="btn-group btn-group-sm">
+                      <a
+                        v-if="item.CreatedBy == createdBy"
+                        @click="edit(item,index)"
+                        style="cursor: pointer;"
+                        class="btn btn-info"
+                      >
                         <i style="color:white" class="fas fa-edit"></i>
                       </a>
-                      <a style="cursor: pointer;" @click="remove(item.ID)" class="btn btn-danger">
+                      <a
+                        v-if="item.CreatedBy == createdBy"
+                        style="cursor: pointer;"
+                        @click="remove(item.ID)"
+                        class="btn btn-danger"
+                      >
                         <i style="color:white" class="fas fa-trash"></i>
+                      </a>
+                      <a
+                        style="cursor: pointer;"
+                        class="btn btn-info"
+                        @click="$router.push(`/project-detail/${item.ID}`)"
+                        v-if="item.CreatedBy == createdBy || item.Manager.includes(Number(createdBy)) || item.Members.includes(Number(createdBy))"
+                      >
+                        <i style="color:white" class="fas fa-info-circle"></i>
                       </a>
                     </div>
                   </td>
@@ -166,7 +186,7 @@
 
 <script>
 export default {
-  name: "admin-project",
+  name: "project",
   data() {
     return {
       page: 1,

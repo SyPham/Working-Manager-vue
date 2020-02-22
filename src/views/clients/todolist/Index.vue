@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row">
-      <div class="col-md-12 pb-4">
+      <div class="col-md-12 pb-4" v-if="1 > 2">
         <button
           type="button"
           class="btn bg-info btn-sm"
@@ -13,9 +13,9 @@
         </button>
       </div>
       <div class="col-md-12">
-        <h5>Sort:</h5>
+        <h5 class="text-primary">Sort:</h5>
       </div>
-      <div class="col-md-12 pb-4">
+      <div class="col-lg-5 col-xs-12 col-12 pb-4">
         <button type="button" @click="sortProject" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-tasks"></i> Project
         </button>
@@ -23,18 +23,37 @@
           <i class="fas fa-book-open"></i> Routine Job
         </button>
 
-        <button type="button" @click="sortHigh" class="btn bg-danger btn-sm">
+        <button type="button" @click="sortHigh" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-exclamation"></i> High
         </button>
-        <button type="button" @click="sortMedium" class="btn bg-warning btn-sm">
+        <button type="button" @click="sortMedium" class="btn bg-gradient-secondary btn-sm">
           <i class="fab fa-medium"></i> Medium
         </button>
-        <button type="button" @click="sortLow" class="btn bg-info btn-sm">
+        <button type="button" @click="sortLow" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-low-vision"></i> Low
         </button>
         <button type="button" @click="getTasks" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-sync-alt"></i> All
         </button>
+      </div>
+      <div class="col-lg-4 col-xs-6 col-6 pb-4">
+        <v-md-date-range-picker
+          max-year="2050"
+          min-year="2019"
+          show-year-select
+          :start-date="startDate"
+          :end-date="endDate"
+          :showCustomRangeLabel="true"
+          @change="handleChange"
+        ></v-md-date-range-picker>
+      </div>
+      <div class="col-lg-3 col-xs-6 col-6 pb-4">
+        <div class="form-group EveryDay">
+          <select class="form-control" v-model="selectedEveryday">
+            <option disabled value="reset">Filter weekdays</option>
+            <option v-for="(day,index) in everydays" :value="day.substring(0,3)">{{day}}</option>
+          </select>
+        </div>
       </div>
       <div class="col-md-12">
         <div class="card">
@@ -72,17 +91,21 @@
           <!-- /.card-header -->
           <div class="card-body table-responsive p-0">
             <ejs-treegrid
+              ref="treegrid"
               :dataSource="data"
               childMapping="children"
               :treeColumnIndex="1"
               :allowPaging="true"
               :pageSettings="pageSettings"
               :allowSorting="true"
-              :contextMenuItems="contextMenuItems"
               :contextMenuClick="contextMenuClick"
               :dataSourceChanged="dataSourceChanged"
               :sortSettings="sortSettings"
               :toolbar="toolbar"
+              :searchSettings="searchSettings"
+              :toolbarClick="toolbarClick"
+              :allowExcelExport="true"
+              :allowPdfExport="true"
             >
               <e-columns>
                 <e-column
@@ -133,11 +156,18 @@
                   width="160"
                   textAlign="Center"
                 ></e-column>
+                <!-- <e-column
+                  field="Add Sub-Task"
+                  :template="optionSubTaskTemplate"
+                  headerText="Add Sub-Task"
+                  width="150"
+                  textAlign="Center"
+                ></e-column>-->
                 <e-column
-                  field="Option"
-                  :template="optionTemplate"
-                  headerText="Option"
-                  width="220"
+                  field="Follow"
+                  :template="optionFollowTemplate"
+                  headerText="Follow"
+                  width="130"
                   textAlign="Center"
                 ></e-column>
               </e-columns>
@@ -170,22 +200,22 @@
                       <li class="nav-item">
                         <a
                           class="nav-link active"
-                          id="custom-tabs-three-home-tab"
+                          id="routine-tabs-three-home-tab"
                           data-toggle="pill"
-                          href="#custom-tabs-three-home"
+                          href="#routine-tabs"
                           role="tab"
-                          aria-controls="custom-tabs-three-home"
+                          aria-controls="routine-tabs"
                           aria-selected="true"
                         >Routine</a>
                       </li>
                       <li class="nav-item">
                         <a
                           class="nav-link"
-                          id="custom-tabs-three-profile-tab"
+                          id="project-tabs-tab"
                           data-toggle="pill"
-                          href="#custom-tabs-three-profile"
+                          href="#project-tabs"
                           role="tab"
-                          aria-controls="custom-tabs-three-profile"
+                          aria-controls="project-tabs"
                           aria-selected="false"
                         >Project</a>
                       </li>
@@ -195,9 +225,9 @@
                     <div class="tab-content" id="custom-tabs-three-tabContent">
                       <div
                         class="tab-pane fade active show"
-                        id="custom-tabs-three-home"
+                        id="routine-tabs"
                         role="tabpanel"
-                        aria-labelledby="custom-tabs-three-home-tab"
+                        aria-labelledby="routine-tabs-tab"
                       >
                         <div class="form-group">
                           <label for="JobType">Routine</label>
@@ -212,9 +242,9 @@
                       </div>
                       <div
                         class="tab-pane fade"
-                        id="custom-tabs-three-profile"
+                        id="project-tabs"
                         role="tabpanel"
-                        aria-labelledby="custom-tabs-three-profile-tab"
+                        aria-labelledby="project-tabs-tab"
                       >
                         <div class="form-group">
                           <label class="typo__label">Project</label>
@@ -355,7 +385,7 @@
                   <label for="Description">Deadline</label>
                   <small v-if="!editStatus" class="text-danger">(*) Require</small>
                   <datetime
-                    v-model="date"
+                    v-model="dateDateTime"
                     input-class="form-control"
                     placeholder="Select date"
                     type="date"
@@ -478,7 +508,7 @@
 import Vue from "vue";
 import Multiselect from "vue-multiselect";
 import { Datetime } from "vue-datetime";
-import EventBus from "../../EventBus";
+import EventBus from "../../../EventBus";
 import {
   TreeGridPlugin,
   ContextMenu,
@@ -486,20 +516,33 @@ import {
   ExcelExport,
   PdfExport,
   Page,
+  Filter,
   CommandColumn,
+  TreeGridComponent,
   Toolbar
 } from "@syncfusion/ej2-vue-treegrid";
 Vue.use(TreeGridPlugin);
 // register globally
 Vue.component("multiselect", Multiselect);
-export default Vue.extend({
-  name: "client-task",
+
+import VMdDateRangePicker from "v-md-date-range-picker";
+Vue.use(VMdDateRangePicker);
+export default {
+  name: "todolist",
   components: {
     Multiselect,
     Datetime
   },
   data() {
     return {
+      //-----------------datetime range
+      selectedEveryday: "reset",
+      startDate: this.$common.dateNow("-"),
+      endDate: this.$common.dateNow("-"),
+
+      valueRange: [],
+      //-----------------end datetime range
+      searchSettings: { hierarchyMode: "Parent" },
       priorityTemplate: function() {
         return {
           template: Vue.component("priority", {
@@ -512,13 +555,12 @@ export default Vue.extend({
           })
         };
       },
-      optionTemplate: function() {
+      optionSubTaskTemplate: function() {
         return {
           template: Vue.component("optionTemplate", {
             template: `<div id="optionTemplate">
                       <div class="btn-group">
-                        <button type="button" @click="addSubTask(data)" class="btn btn-info btn-xs mr-2"><i class="fas fa-plus"></i> Sub</button>
-                        <button type="button" @click="addSubscribe(data)"class="btn btn-danger btn-xs" v-if="data.Level == 1" ><i :class="!data.Subscribe ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{!data.Subscribe?'Subscribe':'Subscribed'}}</button>
+                        <button type="button" @click="addSubTask(data)" class="btn btn-info btn-xs mr-2"><i class="fas fa-plus"></i> Sub-Task</button>
                       </div>
                     </div>`,
             data: function() {
@@ -530,9 +572,27 @@ export default Vue.extend({
               addSubTask(data) {
                 EventBus.$emit("taskItem", data);
                 $("#modal-task").modal("show");
-              },
-              addSubscribe(data) {
-                EventBus.$emit("subscribe", data);
+              }
+            }
+          })
+        };
+      },
+      optionFollowTemplate: function() {
+        return {
+          template: Vue.component("optionTemplate", {
+            template: `<div id="optionTemplate">
+                      <div class="btn-group">
+                        <button type="button" @click="addFollow(data)"class="btn btn-danger btn-xs" v-if="data.Level == 1" ><i :class="!data.Follow ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{!data.Follow?'Follow':'Followed'}}</button>
+                      </div>
+                    </div>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addFollow(data) {
+                EventBus.$emit("follow", data);
               }
             }
           })
@@ -579,13 +639,21 @@ export default Vue.extend({
           id: "DeleteTask"
         }
       ],
+      everydays: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
       pageSettings: { pageSize: 15 },
       toolbar: [
-        // "Search",
+        "Search",
         "ExpandAll",
-        "CollapseAll"
-        // "ExcelExport",
-        // "PdfExport"
+        "CollapseAll",
+        "ExcelExport",
+        "PdfExport"
       ],
       sortSettings: {
         columns: [
@@ -598,7 +666,7 @@ export default Vue.extend({
       expanded: {},
       selected: [],
       options: [],
-      date: "",
+      dateDateTime: "",
       data: [],
       ocSelected: [],
       ocOptions: [],
@@ -630,17 +698,21 @@ export default Vue.extend({
       projectOptions: [],
       projectSelected: [],
       whoOptions: [],
-      whoSelected: []
+      whoSelected: [],
+      start: "",
+      end: ""
     };
   },
   mounted() {
-    EventBus.$on("subscribe", this.addSubscribe);
+    console.log("this.$refs.treegrid");
+    console.log(this.$refs.treegrid);
+    EventBus.$on("follow", this.addFollow);
     EventBus.$on("taskItem", this.infoEdit);
   },
   destroyed() {
     // Stop listening the event hello with handler
     EventBus.$off("taskItem", this.infoEdit);
-    EventBus.$off("subscribe", this.addSubscribe);
+    EventBus.$off("follow", this.addFollow);
   },
   created() {
     this.getProjects();
@@ -650,7 +722,23 @@ export default Vue.extend({
     this.getTasks();
     this.who = localStorage.getItem("User");
   },
+  computed: {},
+
   methods: {
+    handleChange(values) {
+      console.log(values);
+      var self = this;
+      self.valueRange = values;
+      self.start = self.$common.dateFormat(values[0]);
+      self.end = self.$common.dateFormat(values[1]);
+      self.$api
+        .get(`api/Tasks/GetListTreeTask/%20/%20/${self.start}/${self.end}/%20`)
+        .then(res => {
+          self.tasks = res.data;
+          self.data = res.data;
+          console.log(self.tasks);
+        });
+    },
     infoEdit(taskItem) {
       var self = this;
       self.getUser(taskItem.ProjectID);
@@ -658,7 +746,7 @@ export default Vue.extend({
       console.log(taskItem);
       self.editStatus = false;
       self.clearForm();
-      self.date = "";
+      self.dateDateTime = "";
 
       self.modalTitle = "Add Sub-Task";
       self.task.parentID = taskItem.ID;
@@ -673,13 +761,13 @@ export default Vue.extend({
         ID: localStorage.getItem("UserID")
       };
     },
-    addSubscribe(data) {
+    addFollow(data) {
       var self = this;
-      self.$api.get(`api/Tasks/Subscribe/${data.ID}`).then(res => {
-        console.log("addSubscribe");
+      self.$api.get(`api/Tasks/Follow/${data.ID}`).then(res => {
+        console.log("addFollow");
         console.log(res);
         if (res) {
-          self.$alertify.success("You have already subscribed this one!");
+          self.$alertify.success("You have already followd this one!");
           self.dataSourceChanged();
         }
       });
@@ -728,20 +816,14 @@ export default Vue.extend({
         console.log(self.tasks);
       });
     },
-    toolbarClick: function(args) {
+    toolbarClick(args) {
       var self = this;
-      console.log(self.$refs.treegrid);
-
-      console.log(args);
       switch (args.item.text) {
         case "PDF Export":
           self.$refs.treegrid.pdfExport();
           break;
         case "Excel Export":
           self.$refs.treegrid.excelExport();
-          break;
-        case "CSV Export":
-          self.$refs.treegrid.csvExport();
           break;
       }
     },
@@ -763,6 +845,7 @@ export default Vue.extend({
       self.$api.get("api/Tasks/Done/" + id).then(res => {
         if (res.data) {
           self.dataSourceChanged();
+          self.$alertify.success("You have already finished this one!");
         } else {
           this.$swal("Warning !", "Please finish all sub-tasks!", "warning");
         }
@@ -788,7 +871,7 @@ export default Vue.extend({
         case "Add-Sub-Task":
           self.editStatus = false;
           self.clearForm();
-          self.date = "";
+          self.dateDateTime = "";
           self.getUser(args.rowInfo.rowData.ProjectID);
 
           self.modalTitle = "Add Sub-Task";
@@ -824,10 +907,12 @@ export default Vue.extend({
             description: args.rowInfo.rowData.Description,
             jobName: args.rowInfo.rowData.JobName,
             remark: args.rowInfo.rowData.Remark,
-            priority: args.rowInfo.rowData.PriorityID
+            priority: args.rowInfo.rowData.PriorityID,
+            id: args.rowInfo.rowData.ID,
+            pic: args.rowInfo.rowData.PIC || []
           };
           self.selected = args.rowInfo.rowData.BeAssigneds;
-          self.date = args.rowInfo.rowData.Deadline;
+          self.dateDateTime = args.rowInfo.rowData.Deadline;
 
           break;
         case "Remark":
@@ -894,18 +979,21 @@ export default Vue.extend({
     },
     clearForm() {
       var self = this;
-      self.date = "";
+      self.dateDateTime = "";
       self.projectSelected = {};
       self.task = [];
       self.selected = [];
     },
     getTasks() {
       var self = this;
-      self.$api.get("api/Tasks/GetListTreeTask").then(res => {
-        self.tasks = res.data;
-        self.data = res.data;
-        console.log(self.data);
-      });
+
+      self.$api
+        .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/%20`)
+        .then(res => {
+          self.tasks = res.data;
+          self.data = res.data;
+          console.log(self.data);
+        });
     },
     onSelectOC(option) {
       this.task.OCID = option.ID;
@@ -944,6 +1032,10 @@ export default Vue.extend({
     newTaskInfo() {
       var self = this;
       self.modalTitle = "Add-Task";
+      self.whoSelected = {
+        ID: Number(localStorage.getItem("UserID")),
+        Username: localStorage.getItem("User")
+      };
       self.getUser();
       self.clearForm();
     },
@@ -953,18 +1045,19 @@ export default Vue.extend({
         description: "",
         from: "",
         jobName: "",
-        createdBy: 0,
+        createdBy: Number(localStorage.getItem("UserID")),
         projectID: 0,
         parentID: 0,
         remark: "",
         deadline: "",
         status: false,
+        fromWhoID: 0,
         priority: "M",
         pic: []
       };
       this.projectSelected = [];
       this.selected = [];
-      this.date = "";
+      this.dateDateTime = "";
     },
     createTask() {
       var self = this;
@@ -982,6 +1075,7 @@ export default Vue.extend({
           console.log(res);
         });
       } else {
+        self.task.fromWhoID = self.whoSelected.ID;
         self.$api.post("api/Tasks/CreateTask", self.task).then(res => {
           if (res.data) {
             self.clearForm();
@@ -992,6 +1086,22 @@ export default Vue.extend({
           console.log(res);
         });
       }
+    },
+    dateNow(ch = "/") {
+      function pad(s) {
+        return s < 10 ? "0" + s : s;
+      }
+      var date = new Date();
+      var day = date.getDate(); // yields date
+      var month = date.getMonth() + 1; // yields month (add one as '.getMonth()' is zero indexed)
+      var year = date.getFullYear(); // yields year
+      // var hour = date.getHours(); // yields hours
+      // var minute = date.getMinutes(); // yields minutes
+      // var second = date.getSeconds(); // yields seconds
+
+      // After this construct a string with the above results as below
+      var time = pad(month) + ch + pad(day) + ch + year; //+ " " + hour + ":" + minute + ":" + second;
+      return time;
     },
     dateFormat(date) {
       var d = new Date(date);
@@ -1012,6 +1122,16 @@ export default Vue.extend({
     },
     date: function(newVal, oldVal) {
       this.task.deadline = this.dateFormat(newVal);
+    },
+    selectedEveryday: function(newOld) {
+      var self = this;
+      self.$api
+        .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/${newOld}`)
+        .then(res => {
+          self.tasks = res.data;
+          self.data = res.data;
+          console.log(self.tasks);
+        });
     }
   },
   provide: {
@@ -1022,11 +1142,14 @@ export default Vue.extend({
       ExcelExport,
       PdfExport,
       Page,
+      Filter,
       Toolbar
     ]
   }
-});
+};
 </script>
+
+
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style>
 .e-headertext {

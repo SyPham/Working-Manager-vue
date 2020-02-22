@@ -18,32 +18,32 @@
           </div>
           <!-- /.card-header -->
           <div class="card-body table-responsive p-0">
-            <ejs-treegrid
-              :dataSource="data"
-              childMapping="children"
-              :treeColumnIndex="1"
-              :allowPaging="true"
-              :pageSettings="pageSettings"
-              :allowExcelExport="true"
-              :allowPdfExport="true"
-              :allowSorting="true"
-              :contextMenuItems="contextMenuItems"
-              :contextMenuClick="contextMenuClick"
-              :editSettings="editing"
-              :dataSourceChanged="dataSourceChanged"
-              :rowSelected="rowSelected"
-            >
-              <e-columns>
-                <e-column
-                  field="levelnumber"
-                  width="120"
-                  headerText="Level"
-                  :disableHtmlEncode="false"
-                  textAlign="Center"
-                ></e-column>
-                <e-column field="title" headerText="OC Name" :disableHtmlEncode="false"></e-column>
-              </e-columns>
-            </ejs-treegrid>
+            <div>
+              <ejs-treegrid
+                :dataSource="data"
+                childMapping="children"
+                :treeColumnIndex="1"
+                :allowPaging="true"
+                :pageSettings="pageSettings"
+                :allowExcelExport="true"
+                :allowPdfExport="true"
+                :allowSorting="true"
+                :contextMenuClick="contextMenuClick"
+                :dataSourceChanged="dataSourceChanged"
+                :rowSelected="rowSelected"
+              >
+                <e-columns>
+                  <e-column
+                    field="levelnumber"
+                    width="120"
+                    headerText="Level"
+                    :disableHtmlEncode="false"
+                    textAlign="Center"
+                  ></e-column>
+                  <e-column field="title" headerText="OC Name" :disableHtmlEncode="false"></e-column>
+                </e-columns>
+              </ejs-treegrid>
+            </div>
           </div>
           <!-- ./card-body -->
           <div class="card-footer clearfix">
@@ -80,7 +80,7 @@
       <div class="col-md-7">
         <div class="card">
           <div class="card-header">
-            <h5 class="card-title">List User</h5>
+            <h5 class="card-title">List User {{title}}</h5>
 
             <div class="card-tools">
               <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -94,7 +94,7 @@
           </div>
           <!-- /.card-header -->
           <div class="card-body table-responsive p-0">
-            <table class="table table-hover">
+            <table class="table table-hover" v-if="isHide">
               <thead>
                 <tr>
                   <th>#</th>
@@ -122,6 +122,11 @@
                 </tr>
               </tbody>
             </table>
+
+            <div
+              v-else
+              class="text-center text-danger"
+            >* Note: Please click on a department to display list user.</div>
           </div>
           <!-- ./card-body -->
           <div class="card-footer clearfix">
@@ -186,6 +191,8 @@ export default {
   data() {
     return {
       ocid: 0,
+      title: "",
+      isHide: false,
       oc: { id: 0, name: "", level: 0, parentid: 0 },
       modalTitle: "Add OC",
       contextMenuItems: [
@@ -198,6 +205,7 @@ export default {
       editparams: { params: { format: "n" } },
       expanded: {},
       data: [],
+      olduser: 0,
       who: "",
       primaryKey: 0,
       remarkObj: {
@@ -221,8 +229,10 @@ export default {
     rowSelected(args) {
       var self = this;
       self.ocid = args.data.key;
+      self.title = "- " + args.data.title;
       self.getListUser();
       console.log(args);
+      self.isHide = true;
     },
     AddOrUpdate(userid) {
       var self = this;
@@ -230,8 +240,15 @@ export default {
       self.$api
         .get(`api/OCUsers/AddOrUpdate/${userid}/${self.ocid}`)
         .then(res => {
-          self.getListUser();
-          self.$swal("Success !", "AddOrUpdate", "success");
+          console.log(res);
+          if (res.data.status) {
+            self.getListUser();
+            self.$alertify.success(res.data.message);
+          } else {
+            self.$swal("Warning!", res.data.message, "warning");
+            self.users = [];
+            self.getListUser();
+          }
         });
     },
     dataSourceChanged() {

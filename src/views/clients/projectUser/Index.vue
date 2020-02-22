@@ -28,16 +28,24 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Project Name</th>
-                  <th>Option</th>
+                  <th width="20" class="text-center">ID</th>
+                  <th class="text-center">Project Name</th>
+                  <th class="text-center">Manager</th>
+                  <th class="text-center">Members</th>
+                  <th class="text-center">Option</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(item,key,index) in data" :key="index">
-                  <td>{{item.ID}}</td>
-                  <td>{{item.Name}}</td>
-                  <td class="py-0 align-middle">
+                  <td class="text-center">{{item.ID}}</td>
+                  <td class="text-center">{{item.Name}}</td>
+                  <td class="text-center">
+                    <span class="font-weight-bold text-danger">{{item.Manager}}</span>
+                  </td>
+                  <td class="text-center">
+                    <span class="font-weight-bold text-green">{{item.Members.join(" , ")}}</span>
+                  </td>
+                  <td class="py-0 align-middle text-center">
                     <div v-if="item.CreatedBy == createdBy" class="btn-group btn-group-sm">
                       <button
                         style="cursor: pointer;"
@@ -209,7 +217,7 @@ export default {
     },
     onSelectMember(option) {
       this.member.users.push(option.ID);
-      console.log(this.member.UserID);
+      console.log(this.member.users);
     },
     infoManager(item, index) {
       let self = this;
@@ -220,6 +228,7 @@ export default {
     infoMember(item, index) {
       let self = this;
       $("#modal-add-member").modal("show");
+
       self.member.ProjectID = item.ID;
       self.GetUserByProjectID(item.ID);
     },
@@ -227,6 +236,7 @@ export default {
       let self = this;
       self.$api.post("api/Projects/AddManager", self.manager).then(res => {
         if (res) {
+          self.getProject();
           self.$alertify.success("Add Manager Successfully!");
           $("#modal-add-manager").modal("hide");
         }
@@ -238,6 +248,7 @@ export default {
       this.$api.post("api/Projects/AddMember", self.member).then(res => {
         console.log(res);
         if (res) {
+          self.getProject();
           self.$alertify.success("Add Member Successfully!");
           $("#modal-add-member").modal("hide");
         }
@@ -278,6 +289,10 @@ export default {
         if (res.data.status) {
           self.selected = res.data.selected;
           self.selectedMember = res.data.selectedMember;
+          let members = res.data.selectedMember;
+          self.member.users = members.map((member, index, members) => {
+            return member.ID;
+          });
         }
       });
     }
@@ -287,6 +302,13 @@ export default {
       var self = this;
       self.projectName = newVal;
       self.getProject();
+    },
+    selectedMember: function(newVal, oldVal) {
+      var self = this;
+      let members = newVal;
+      self.member.users = members.map((member, index, members) => {
+        return member.ID;
+      });
     }
   }
 };

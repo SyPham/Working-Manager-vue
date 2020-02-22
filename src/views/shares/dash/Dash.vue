@@ -14,7 +14,9 @@
 
       <!-- Main content -->
       <section class="content">
-        <router-view></router-view>
+        <transition name="fade" mode="out-in">
+          <router-view></router-view>
+        </transition>
       </section>
       <!-- /.content -->
     </div>
@@ -45,4 +47,14 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style >
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 1s, transform 1s;
+}
+.page-enter,
+.page-leave-to {
+  opacity: 0;
+  transform: translateX(-30%);
+}
+</style>

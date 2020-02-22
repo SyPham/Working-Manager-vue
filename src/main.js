@@ -1,39 +1,50 @@
 import Vue from "vue";
 import App from "./App.vue";
 import Router from "./routes";
+import axios from "axios";
 import VueSweetalert2 from "vue-sweetalert2";
-import VueMoment from "vue-moment";
-import moment from "moment-timezone";
-Vue.use(VueMoment, {
-  moment
-});
+
 // If you don't need the styles, do not connect
 import "sweetalert2/dist/sweetalert2.min.css";
 import { Datetime } from "vue-datetime";
 // You need a specific loader for CSS files
 import "vue-datetime/dist/vue-datetime.css";
 import Paginate from "vuejs-paginate";
+import Auth from "./assets/plugins/auth";
+import Alertify from "./assets/plugins/alertify";
+import CommonPlugin from "./assets/plugins/common";
 Vue.component("paginate", Paginate);
 Vue.use(Datetime);
 Vue.use(VueSweetalert2);
-import Auth from "./assets/plugins/auth";
-import Alertify from "./assets/plugins/alertify";
 
-import axios from "axios";
-axios.defaults.headers.post["Content-Type"] = "application/json; charset=utf-8";
-//  axios.defaults.headers.post['Content-Type'] = 'application/octet-stream';
-axios.defaults.headers.common["Authorization"] =
-  "Bearer " + localStorage.getItem("authToken");
+Vue.use(Auth);
 Vue.use({
   install(Vue) {
-    Vue.prototype.$api = axios.create({
-      baseURL: "http://10.4.4.224:93/"
-    });
+    axios.defaults.baseURL = "http://10.4.4.224:93";
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json; charset=utf-8";
+    var instance = axios.create();
+    instance.interceptors.request.use(
+      function(config) {
+        config.headers = {
+          Authorization: "Bearer " + Vue.auth.getToken()
+        };
+        config.headers.post = {
+          "Content-Type": "application/json; charset=utf-8"
+        };
+        return config;
+      },
+      function(error) {
+        // Do something with request error
+        return Promise.reject(error);
+      }
+    );
+    Vue.prototype.$api = instance;
   }
 });
 
-Vue.use(Auth);
 Vue.use(Alertify);
+Vue.use(CommonPlugin);
 //configure route guards
 Router.beforeEach(function(to, from, next) {
   //prevent access to 'requiresGuest' routes;

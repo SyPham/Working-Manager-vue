@@ -89,40 +89,49 @@ export default {
             res.data.user.User.Username,
             res.data.user.User.Role
           ); // + 4 hours
+          localStorage.setItem("Role", res.data.user.User.Role);
 
           localStorage.setItem("UserID", res.data.user.User.ID);
-          localStorage.setItem("Role", res.data.user.User.Role);
+          localStorage.setItem("ListOCs", res.data.user.User.ListOCs);
+          localStorage.setItem("Level", res.data.user.User.OCLevel);
+          localStorage.setItem("IsLeader", res.data.user.User.IsLeader);
           //roleid = 2
-          var routerArrUser = ["/client-task", "/client-history"];
-          //roleid = 4
-          var routerArrOwner = [
-            "/client-task",
-            "/client-history",
-            "/client-project",
-            "/client-project-user"
+          var routerArrUser = [
+            "/todolist",
+            "/history",
+            "/project",
+            "/history",
+            "/project-detail",
+            "/abnormal",
+            "/routine"
+          ];
+          var routerArrAdmin = [
+            "/admin-oc",
+            "/admin-role",
+            "/admin-user",
+            "/admin-oc-user",
+            "/dashboard-admin"
           ];
           var uri = self.$route.query.redirect || "";
           if (self.$route.query.redirect.length != 0) {
             var roleUser = routerArrUser.includes(uri);
-            var roleOwner = routerArrUser.includes(uri);
-
-            if (localStorage.getItem("Role") == 2 && roleUser) {
+            var roleAdmin = routerArrAdmin.includes(uri);
+            if (Number(localStorage.getItem("Role")) == 2 && roleUser) {
               self.$router.push(uri);
-            } else if (
-              localStorage.getItem("Role") == 1 &&
-              !roleUser &&
-              !roleOwner
-            ) {
+            } else if (Number(localStorage.getItem("Role")) == 2 && roleAdmin) {
+              self.$router.push("/todolist");
+            } else if (Number(localStorage.getItem("Role")) == 1 && roleAdmin) {
               self.$router.push(uri);
-            } else if (localStorage.getItem("Role") == 4 && !roleOwner) {
-              self.$router.push(uri);
-            } else {
-              self.$router.push("/home");
+            } else if (Number(localStorage.getItem("Role")) == 1 && roleUser) {
+              self.$router.push("/dashboard-admin");
             }
           } else {
-            self.$router.push("/home");
+            if (localStorage.getItem("Role") == 1) {
+              self.$router.push("/dashboard-admin");
+            } else {
+              self.$router.push("/todolist");
+            }
           }
-          self.$alertify.success("Sign-In Successfully!");
         })
         .catch(res => {
           self.$swal(

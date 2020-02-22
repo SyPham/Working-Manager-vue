@@ -66,7 +66,7 @@
       <!-- /.col -->
     </div>
     <div class="row">
-      <a class="col-12 col-sm-6 col-md-3" href="#/client-project" v-if="display==4">
+      <a class="col-12 col-sm-6 col-md-3" href="#/project" v-if="display==4">
         <div class="info-box mb-3">
           <span class="info-box-icon bg-info elevation-1">
            <i class="fas fa-project-diagram"></i>
@@ -80,7 +80,7 @@
         <!-- /.info-box -->
       </a>
 
-      <a class="col-12 col-sm-6 col-md-3" href="#/client-project-user" v-if="display==4">
+      <a class="col-12 col-sm-6 col-md-3" href="#/project-user" v-if="display==0">
         <div class="info-box mb-3">
           <span class="info-box-icon bg-info elevation-1">
            <i class="fab fa-r-project"></i>
@@ -94,20 +94,20 @@
         <!-- /.info-box -->
       </a>
       <!-- /.col -->
-       <a class="col-12 col-sm-6 col-md-3" href="#/client-task" v-if="display==4 || display==2">
+       <a class="col-12 col-sm-6 col-md-3" href="#/todolist" v-if="display==4 || display==2">
         <div class="info-box">
           <span class="info-box-icon bg-info elevation-1">
             <i class="fas fa-tasks"></i>
           </span>
 
           <div class="info-box-content">
-            <span class="info-box-text">Task</span>
+            <span class="info-box-text">To Do List</span>
           </div>
           <!-- /.info-box-content -->
         </div>
         <!-- /.info-box -->
       </a>
-      <a class="col-12 col-sm-6 col-md-3" href="#/client-history" v-if="display==4 || display==2">
+      <a class="col-12 col-sm-6 col-md-3" href="#/history" v-if="display==4 || display==2">
         <div class="info-box mb-3">
           <span class="info-box-icon bg-info elevation-1">
             <i class="fas fa-thumbs-up"></i>
@@ -119,13 +119,13 @@
         </div>
         <!-- /.info-box -->
       </a>
-       <a class="col-12 col-sm-6 col-md-3" href="#/client-subscribe" v-if="display==4 || display==2">
+       <a class="col-12 col-sm-6 col-md-3" href="#/follow" v-if="display==4 || display==2">
         <div class="info-box mb-3">
           <span class="info-box-icon bg-info elevation-1">
             <i class="fas fa-thumbs-up"></i>
           </span>
 
-          <div class="info-box-content">Subscribe</span>
+          <div class="info-box-content">Followed</span>
           </div>
           <!-- /.info-box-content -->
         </div>

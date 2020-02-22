@@ -9,8 +9,12 @@ var AuthPlugin = {
   destroyToken: function() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("authTokenExpiration");
-
+    localStorage.removeItem("Role");
+    localStorage.removeItem("UserID");
     localStorage.removeItem("User");
+    localStorage.removeItem("Level");
+    localStorage.removeItem("IsLeader");
+    localStorage.removeItem("ListOCs");
   },
 
   getToken: function() {

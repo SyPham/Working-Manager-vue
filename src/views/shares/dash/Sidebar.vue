@@ -3,7 +3,7 @@
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="#/home" class="brand-link">
+      <a href="#/todolist" class="brand-link">
         <img
           src="../../../assets/AdminLTELogo.png"
           alt="AdminLTE Logo"
@@ -24,7 +24,7 @@
             />
           </div>
           <div class="info">
-            <a href="#" class="d-block">{{username}}</a>
+            <a href="#/todolist" class="d-block">{{username}}</a>
           </div>
         </div>
 
@@ -75,33 +75,41 @@
               </ul>
             </li>
             <li class="nav-item" v-if="display==4">
-              <a href="#/client-project" class="nav-link">
+              <a href="#/project" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Project</p>
               </a>
             </li>
-            <li class="nav-item" v-if="display==4">
-              <a href="#/client-project-user" class="nav-link">
+            <li class="nav-item" v-if="display==4 || display == 2">
+              <a href="#/routine" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Routine Job</p>
+              </a>
+            </li>
+
+            <li class="nav-item" v-if="display==4 || display == 2">
+              <a href="#/todolist" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>To Do List</p>
+              </a>
+            </li>
+            <li class="nav-item" v-if="1>2">
+              <a href="#/project-user" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Project User</p>
               </a>
             </li>
+
             <li class="nav-item" v-if="display==4 || display == 2">
-              <a href="#/client-task" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>Task</p>
-              </a>
-            </li>
-            <li class="nav-item" v-if="display==4 || display == 2">
-              <a href="#/client-history" class="nav-link">
+              <a href="#/history" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                 <p>History</p>
               </a>
             </li>
             <li class="nav-item" v-if="display==4 || display == 2">
-              <a href="#/client-subscribe" class="nav-link">
+              <a href="#/follow" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
-                <p>Subscribe</p>
+                <p>Followed</p>
               </a>
             </li>
           </ul>

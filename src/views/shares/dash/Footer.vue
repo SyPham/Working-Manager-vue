@@ -1,13 +1,20 @@
 <template>
-  <footer class="main-footer" id="appFooter">
-    <div class="float-right d-none d-sm-block">
-      <b>Online</b> 1
-    </div>
+  <footer class="main-footer">
+    <!-- To the right -->
+    <div class="float-right d-none d-sm-inline"></div>
+    <!-- Default to the left -->
     <strong>
-      Copyright &copy; 2019-2020
-      <a href="http://adminlte.io">by Lab Team</a>.
-    </strong>
-    All rights reserved.
+      Copyright © 2019-2020
+      <a href="http://10.4.4.92:93/">By Lab Team</a>.
+    </strong> All rights reserved.
+    <!-- <div
+      class="zalo-chat-widget"
+      data-oaid="1017730148801262105"
+      data-welcome-message="Glad to support you!"
+      data-autopopup="0"
+      data-width="350"
+      data-height="420"
+    ></div>-->
   </footer>
 </template>
 
