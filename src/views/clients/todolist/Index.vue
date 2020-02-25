@@ -13,16 +13,18 @@
         </button>
       </div>
       <div class="col-md-12">
-        <h5 class="text-primary">Sort:</h5>
+        <h5 class="text-primary">Sort By:</h5>
       </div>
-      <div class="col-lg-5 col-xs-12 col-12 pb-4">
+      <div class="col-lg-12 col-xs-12 col-12 pb-4">
         <button type="button" @click="sortProject" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-tasks"></i> Project
         </button>
         <button type="button" @click="sortRoutine" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-book-open"></i> Routine Job
         </button>
-
+        <button type="button" @click="sortAbnormal" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-book-open"></i> Abnormal
+        </button>
         <button type="button" @click="sortHigh" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-exclamation"></i> High
         </button>
@@ -32,11 +34,35 @@
         <button type="button" @click="sortLow" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-low-vision"></i> Low
         </button>
-        <button type="button" @click="getTasks" class="btn bg-gradient-secondary btn-sm">
-          <i class="fas fa-sync-alt"></i> All
+        <button type="button" @click="clearSearch" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-sync-alt"></i> Reset Sort
         </button>
       </div>
-      <div class="col-lg-4 col-xs-6 col-6 pb-4">
+      <div class="col-lg-2 col-xs-6 col-6 pb-4">
+        <div class="form-group EveryDay">
+          <select class="form-control" v-model="selectedEveryday">
+            <option disabled value="reset">Sort by weekdays</option>
+            <option v-for="(day,index) in everydays" :value="day.substring(0,3)">{{day}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-lg-2 col-xs-6 col-6 pb-4">
+        <div class="form-group EveryDay">
+          <select class="form-control" v-model="selectedMonthly">
+            <option disabled value="reset">Sort by monthly</option>
+            <option v-for="(month,index) in monthly" :value="month.substring(0,3)">{{month}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-lg-2 col-xs-6 col-6 pb-4">
+        <div class="form-group EveryDay">
+          <select class="form-control" v-model="selectedQuarterly">
+            <option disabled value="reset">Sort by quarterly</option>
+            <option v-for="(quarter,index) in quarterly" :value="quarter.substring(0,3)">{{quarter}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-lg-3 col-xs-6 col-6 pb-4">
         <v-md-date-range-picker
           max-year="2050"
           min-year="2019"
@@ -47,14 +73,7 @@
           @change="handleChange"
         ></v-md-date-range-picker>
       </div>
-      <div class="col-lg-3 col-xs-6 col-6 pb-4">
-        <div class="form-group EveryDay">
-          <select class="form-control" v-model="selectedEveryday">
-            <option disabled value="reset">Filter weekdays</option>
-            <option v-for="(day,index) in everydays" :value="day.substring(0,3)">{{day}}</option>
-          </select>
-        </div>
-      </div>
+
       <div class="col-md-12">
         <div class="card">
           <div class="card-header">
@@ -94,7 +113,7 @@
               ref="treegrid"
               :dataSource="data"
               childMapping="children"
-              :treeColumnIndex="1"
+              :treeColumnIndex="3"
               :allowPaging="true"
               :pageSettings="pageSettings"
               :allowSorting="true"
@@ -108,6 +127,13 @@
               :allowPdfExport="true"
             >
               <e-columns>
+                <e-column
+                  field="Follow"
+                  :template="optionFollowTemplate"
+                  headerText="Follow"
+                  width="130"
+                  textAlign="Center"
+                ></e-column>
                 <e-column
                   field="Priority"
                   :template="priorityTemplate"
@@ -141,7 +167,11 @@
                   textAlign="Center"
                 ></e-column>
                 <e-column field="PIC" headerText="PIC" width="180" format="yMd" textAlign="Right"></e-column>
+                <e-column field="DeputyName" headerText="Deputies" width="180" textAlign="Center"></e-column>
                 <e-column field="DueDate" headerText="DueDate" width="160" textAlign="Center"></e-column>
+                 <e-column field="EveryDay" headerText="Every Day" width="160" textAlign="Center"></e-column>
+                  <e-column field="Monthly" headerText="Monthly" width="160" textAlign="Center"></e-column>
+                   <e-column field="Quarterly" headerText="Quarterly" width="160" textAlign="Center"></e-column>
                 <e-column field="Remark" headerText="Remark" width="180" textAlign="Center"></e-column>
                 <e-column
                   field="state"
@@ -163,13 +193,6 @@
                   width="150"
                   textAlign="Center"
                 ></e-column>-->
-                <e-column
-                  field="Follow"
-                  :template="optionFollowTemplate"
-                  headerText="Follow"
-                  width="130"
-                  textAlign="Center"
-                ></e-column>
               </e-columns>
             </ejs-treegrid>
           </div>
@@ -537,6 +560,9 @@ export default {
     return {
       //-----------------datetime range
       selectedEveryday: "reset",
+      selectedMonthly: "reset",
+      selectedQuarterly: "reset",
+
       startDate: this.$common.dateNow("-"),
       endDate: this.$common.dateNow("-"),
 
@@ -647,6 +673,26 @@ export default {
         "Friday",
         "Saturday"
       ],
+      monthly: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      quarterly: [
+        "First quarter",
+        "Second quarter",
+        "Third quarter",
+        "Fourth quarter"
+      ],
       pageSettings: { pageSize: 15 },
       toolbar: [
         "Search",
@@ -725,6 +771,12 @@ export default {
   computed: {},
 
   methods: {
+    clearSearch() {
+      this.selectedEveryday = "reset";
+      this.selectedMonthly = "reset";
+      this.selectedQuarterly = "reset";
+      this.getTasks();
+    },
     handleChange(values) {
       console.log(values);
       var self = this;
@@ -788,6 +840,34 @@ export default {
         self.data = res.data;
         console.log(self.tasks);
       });
+    },
+    sortAbnormal() {
+      var self = this;
+      self.$api.get(`api/Tasks/GetListTreeTask/abnormal`).then(res => {
+        self.tasks = res.data;
+        self.data = res.data;
+        console.log(self.tasks);
+      });
+    },
+    sortMonthly(month) {
+      var self = this;
+      self.$api
+        .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/%20/${month}`)
+        .then(res => {
+          self.tasks = res.data;
+          self.data = res.data;
+          console.log(self.tasks);
+        });
+    },
+    sortQuarterly(quarter) {
+      var self = this;
+      self.$api
+        .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/%20/%20/${quarter}`)
+        .then(res => {
+          self.tasks = res.data;
+          self.data = res.data;
+          console.log(self.tasks);
+        });
     },
     sortHigh() {
       var self = this;
@@ -1123,16 +1203,24 @@ export default {
     date: function(newVal, oldVal) {
       this.task.deadline = this.dateFormat(newVal);
     },
-    selectedEveryday: function(newOld) {
+    selectedEveryday: function(newVal) {
       var self = this;
       self.$api
-        .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/${newOld}`)
+        .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/${newVal}`)
         .then(res => {
           self.tasks = res.data;
           self.data = res.data;
           console.log(self.tasks);
         });
-    }
+    },
+      selectedMonthly: function(newVal) {
+      var self = this;
+      self.sortMonthly(newVal)
+    },
+      selectedQuarterly: function(newVal) {
+      var self = this;
+      self.sortQuarterly(newVal)
+    },
   },
   provide: {
     treegrid: [

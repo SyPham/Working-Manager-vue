@@ -71,7 +71,7 @@
             <ejs-treegrid
               :dataSource="data"
               childMapping="children"
-              :treeColumnIndex="1"
+              :treeColumnIndex="3"
               :allowPaging="true"
               :pageSettings="pageSettings"
               :allowExcelExport="true"
@@ -82,6 +82,13 @@
               :contextMenuItems="contextMenuItems"
             >
               <e-columns>
+                   <e-column
+                  field="Option"
+                  :template="optionTemplate"
+                  headerText="Option"
+                  width="120"
+                  textAlign="Center"
+                ></e-column>
                 <e-column
                   field="Priority"
                   :template="priorityTemplate"
@@ -130,13 +137,7 @@
                   width="160"
                   textAlign="Center"
                 ></e-column>
-                <e-column
-                  field="Option"
-                  :template="optionTemplate"
-                  headerText="Option"
-                  width="120"
-                  textAlign="Center"
-                ></e-column>
+             
               </e-columns>
             </ejs-treegrid>
             <!-- <table class="table table-hover">

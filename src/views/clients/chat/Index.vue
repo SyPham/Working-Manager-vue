@@ -3,12 +3,8 @@
     <div class="row no-gutters">
       <div class="col-md-4 border-right">
         <div class="settings-tray">
-          <img class="profile-image" src="../../../assets/user2-160x160.jpg" alt="Profile img" />
-          <span class="settings-tray--right">
-            <i class="fas fa-sync-alt"></i>
-            <i class="fas fa-comment-dots"></i>
-            <i class="fas fa-bars"></i>
-          </span>
+          <img class="profile-image" src="../../../assets/default-150x150.png" alt="Profile img" />
+          <span class="settings-tray--right">List Project</span>
         </div>
         <div class="search-box">
           <div class="input-wrapper">
@@ -16,58 +12,16 @@
             <input placeholder="Search here" type="text" />
           </div>
         </div>
-        <div class="friend-drawer friend-drawer--onhover">
-          <img class="profile-image" src="../../../assets/user2-160x160.jpg" alt />
-          <div class="text">
-            <h6>Robo Cop</h6>
-            <p class="text-muted">Hey, you're arrested!</p>
+        <div v-for="(item, key,index) in ListProject" :key="index">
+          <div class="friend-drawer friend-drawer--onhover" @click="joinGroup(item)">
+            <img class="profile-image" src="../../../assets/default-150x150.png" alt />
+            <div class="text">
+              <h6>{{item.Name}}</h6>
+              <!-- <p class="text-muted">Hey, you're arrested!</p> -->
+            </div>
+            <!-- <span class="time text-muted small">13:21</span> -->
           </div>
-          <span class="time text-muted small">13:21</span>
-        </div>
-        <hr />
-        <div class="friend-drawer friend-drawer--onhover">
-          <img class="profile-image" src="../../../assets/user2-160x160.jpg" alt />
-          <div class="text">
-            <h6>Optimus</h6>
-            <p class="text-muted">Wanna grab a beer?</p>
-          </div>
-          <span class="time text-muted small">00:32</span>
-        </div>
-        <hr />
-        <div class="friend-drawer friend-drawer--onhover">
-          <img class="profile-image" src="../../../assets/user2-160x160.jpg" alt />
-          <div class="text">
-            <h6>Skynet</h6>
-            <p class="text-muted">Seen that canned piece of s?</p>
-          </div>
-          <span class="time text-muted small">13:21</span>
-        </div>
-        <hr />
-        <div class="friend-drawer friend-drawer--onhover">
-          <img class="profile-image" src="../../../assets/user2-160x160.jpg" alt />
-          <div class="text">
-            <h6>Termy</h6>
-            <p class="text-muted">Im studying spanish...</p>
-          </div>
-          <span class="time text-muted small">13:21</span>
-        </div>
-        <hr />
-        <div class="friend-drawer friend-drawer--onhover">
-          <img class="profile-image" src="../../../assets/user2-160x160.jpg" alt />
-          <div class="text">
-            <h6>Richard</h6>
-            <p class="text-muted">I'm not sure...</p>
-          </div>
-          <span class="time text-muted small">13:21</span>
-        </div>
-        <hr />
-        <div class="friend-drawer friend-drawer--onhover">
-          <img class="profile-image" src="../../../assets/user2-160x160.jpg" alt />
-          <div class="text">
-            <h6>XXXXX</h6>
-            <p class="text-muted">Hi, wanna see something?</p>
-          </div>
-          <span class="time text-muted small">13:21</span>
+          <hr />
         </div>
       </div>
       <div class="col-md-8">
@@ -75,8 +29,8 @@
           <div class="friend-drawer no-gutters friend-drawer--grey">
             <img class="profile-image" src="../../../assets/user2-160x160.jpg" alt />
             <div class="text">
-              <h6>Robo Cop</h6>
-              <p class="text-muted">Layin' down the law since like before Christ...</p>
+              <h6>{{projectName}}</h6>
+              <!-- <p class="text-muted">Layin' down the law since like before Christ...</p> -->
             </div>
             <span class="settings-tray--right">
               <i class="fas fa-sync-alt"></i>
@@ -86,48 +40,20 @@
           </div>
         </div>
         <div class="chat-panel">
-          <div class="row no-gutters">
-            <div class="col-md-3">
-              <div class="chat-bubble chat-bubble--left">Hello dude!</div>
-            </div>
-          </div>
-          <div class="row no-gutters">
-            <div class="col-md-3 offset-md-9">
-              <div class="chat-bubble chat-bubble--right">Hello dude!</div>
-            </div>
-          </div>
-          <div class="row no-gutters">
-            <div class="col-md-3 offset-md-9">
-              <div class="chat-bubble chat-bubble--right">Hello dude!</div>
-            </div>
-          </div>
-          <div class="row no-gutters">
-            <div class="col-md-3">
-              <div class="chat-bubble chat-bubble--left">Hello dude!</div>
-            </div>
-          </div>
-          <div class="row no-gutters">
-            <div class="col-md-3">
-              <div class="chat-bubble chat-bubble--left">Hello dude!</div>
-            </div>
-          </div>
-          <div class="row no-gutters">
-            <div class="col-md-3">
-              <div class="chat-bubble chat-bubble--left">Hello dude!</div>
-            </div>
-          </div>
-          <div class="row no-gutters">
-            <div class="col-md-3 offset-md-9">
-              <div class="chat-bubble chat-bubble--right">Hello dude!</div>
-            </div>
+          <div id="chat-content">
+            <!-- <div class="row no-gutters">
+              <div class="col-md-3">
+                <div class="chat-bubble chat-bubble--left">sdasdas</div>
+              </div>
+            </div>-->
           </div>
           <div class="row">
             <div class="col-12">
               <div class="chat-box-tray">
-                <i class="far fa-grin-beam"></i>
-                <input type="text" placeholder="Type your message here..." />
-                <i class="fas fa-microphone"></i>
-                <i class="fas fa-reply"></i>
+                <!-- <i class="far fa-grin-beam"></i> -->
+                <input type="text" v-model="message" placeholder="Type your message here..." />
+                <!-- <i class="fas fa-microphone"></i> -->
+                <i class="fas fa-reply" @click="sendToGroup"></i>
               </div>
             </div>
           </div>
@@ -144,24 +70,101 @@ export default {
   name: "chat",
   data() {
     return {
-      connection: []
+      connection: [],
+      keyword: "%20",
+      ListProject: [],
+      totalPage: 0,
+      projectName: "Please select project to chat group!",
+      message: "",
+
+      room: 0
     };
   },
   methods: {
+    joinGroup(item) {
+      let self = this;
+      let currentUser = Number(localStorage.getItem("UserID"));
+      let managers = item.Manager || [];
+      let members = item.Members || [];
+      if (managers.concat(members).includes(currentUser)) {
+        self.room = item.Room;
+        self.projectName = item.Name;
+        self.connection
+          .invoke("JoinGroup", item.Room.toString())
+          .catch(function(err) {
+            return console.error(err.toString());
+          });
+      } else {
+        self.room = 0;
+        self.$swal("Waring!", "You do not belong in this group!", "warning");
+      }
+    },
+    sendToGroup() {
+      let self = this;
+      self.connection
+        .invoke("SendMessageToGroup", self.room.toString(), self.message)
+        .catch(function(err) {
+          return console.error(err.toString());
+        });
+      let sendMessage = `
+       <div class="row no-gutters">
+            <div class="col-md-3">
+              <div class="chat-bubble chat-bubble--left">${this.message}</div>
+            </div>
+          </div>
+      `;
+      $("#chat-content").append(sendMessage);
+      this.$forceUpdate();
+      this.message = "";
+    },
+    getProject() {
+      let self = this;
+      this.$api
+        .get(`api/Projects/GetAllPaging/1/1000/${self.keyword}`)
+        .then(res => {
+          console.log(res);
+          self.ListProject = res.data.data;
+          self.totalPage = res.data.total;
+          console.log("self.ListProject");
+          console.log(self.ListProject);
+        });
+    },
     reciveConnection(conn) {
       this.connection = conn;
     }
   },
   mounted() {
-    EventBus.$on("reciveConnection", this.reciveConnection);
+    this.connection.on("ReceiveMessageGroup", function(message) {
+      this.message = message;
+      let receiveMessage = `
+      <div class="row no-gutters">
+            <div class="col-md-3 offset-md-9">
+              <div class="chat-bubble chat-bubble--right">${this.message}</div>
+            </div>
+          </div>
+      `;
+      $("#chat-content").append(receiveMessage);
+    });
   },
   created() {
-    EventBus.$on("reciveConnection", this.reciveConnection);
+    this.getProject();
+    this.connection = new signalR.HubConnectionBuilder()
+      .withUrl("http://10.4.4.224:93/working-management-hub")
+      .configureLogging(signalR.LogLevel.Information)
+      .build();
+
+    this.connection
+      .start()
+      .then(function() {
+        console.log("Connected working-management-hub detail ");
+        /// EventBus.$emit("reciveConnection", self.connection);
+      })
+      .catch(error => {
+        console.log("working-management-hub error detail!! ");
+        console.log(error);
+      });
   },
-  destroyed() {
-    // Stop listening the event hello with handler
-    EventBus.$off("reciveConnection", this.reciveConnection);
-  }
+  destroyed() {}
 };
 </script>
 

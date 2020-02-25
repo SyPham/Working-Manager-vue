@@ -58,13 +58,13 @@
               <div class="col-sm-12 pb-2" v-if="isHideAdd">
                 <small
                   class="text-danger"
-                >* Note: Please click on project manager or team member to edit or add it.</small>
+                >(*) Note: Please click on project manager or team member to edit or add it.</small>
               </div>
             </div>
             <div class="row">
               <div class="col-12">
                 <h4>Project Task</h4>
-                <div class="col-md-12 pb-4">
+                <!-- <div class="col-md-12 pb-4">
                   <button
                     type="button"
                     class="btn bg-gradient-secondary btn-sm"
@@ -75,10 +75,10 @@
                   >
                     <i class="fas fa-plus"></i> New Project Task
                   </button>
-                </div>
-                <div class="col-md-12">
+                </div>-->
+                <!-- <div class="col-md-12">
                   <h5>Sort:</h5>
-                </div>
+                </div>-->
                 <div class="col-md-12 pb-4">
                   <!-- <button
                     type="button"
@@ -111,7 +111,7 @@
                   <button type="button" @click="getTasks" class="btn bg-gradient-secondary btn-sm">
                     <i class="fas fa-sync-alt"></i> All
                   </button>
-                  <a @click="joinGroup" class="btn bg-gradient-secondary btn-sm">
+                  <a href="#/client-chat" class="btn bg-gradient-secondary btn-sm">
                     <i class="fas fa-comment-dots"></i> Chat Room
                   </a>
                 </div>
@@ -119,7 +119,7 @@
                   ref="treegrid"
                   :dataSource="data"
                   childMapping="children"
-                  :treeColumnIndex="1"
+                  :treeColumnIndex="3"
                   :allowPaging="true"
                   :height="'auto'"
                   :pageSettings="pageSettings"
@@ -133,13 +133,30 @@
                   :toolbarClick="toolbarClick"
                   :allowExcelExport="true"
                   :allowPdfExport="true"
+                  :editSettings="editSettings"
                 >
                   <e-columns>
+                    <e-column
+                      field="Follow"
+                      :template="optionFollowTemplate"
+                      headerText="Follow"
+                      width="130"
+                      textAlign="Center"
+                    ></e-column>
+                  
                     <e-column
                       field="Priority"
                       :template="priorityTemplate"
                       headerText="Priority"
                       width="110"
+                      textAlign="Center"
+                    ></e-column>
+                      <e-column
+                      field="Add Sub-Task"
+                      :template="optionSubTaskTemplate"
+                      headerText="Add Sub-Task"
+                      width="150"
+                      v-if="isHideAdd"
                       textAlign="Center"
                     ></e-column>
                     <!-- <e-column field="Level" headerText="Level" width="150" textAlign="Center"></e-column> -->
@@ -159,6 +176,8 @@
                     <e-column
                       field="Description"
                       headerText="Description"
+                      :template="templateDescripton"
+                      :disableHtmlEncode="false"
                       width="180"
                       textAlign="Center"
                     ></e-column>
@@ -170,6 +189,19 @@
                       textAlign="Right"
                     ></e-column>
                     <e-column field="DueDate" headerText="DueDate" width="160" textAlign="Center"></e-column>
+                    <e-column
+                      field="EveryDay"
+                      headerText="Every Day"
+                      width="160"
+                      textAlign="Center"
+                    ></e-column>
+                    <e-column field="Monthly" headerText="Monthly" width="160" textAlign="Center"></e-column>
+                    <e-column
+                      field="Quarterly"
+                      headerText="Quarterly"
+                      width="160"
+                      textAlign="Center"
+                    ></e-column>
                     <e-column field="Remark" headerText="Remark" width="180" textAlign="Center"></e-column>
                     <e-column
                       field="state"
@@ -182,21 +214,6 @@
                       field="CreatedDate"
                       headerText="CreatedDate"
                       width="160"
-                      textAlign="Center"
-                    ></e-column>
-                    <e-column
-                      field="Add Sub-Task"
-                      :template="optionSubTaskTemplate"
-                      headerText="Add Sub-Task"
-                      width="150"
-                      v-if="isHideAdd"
-                      textAlign="Center"
-                    ></e-column>
-                    <e-column
-                      field="Follow"
-                      :template="optionFollowTemplate"
-                      headerText="Follow"
-                      width="130"
                       textAlign="Center"
                     ></e-column>
                   </e-columns>
@@ -232,7 +249,6 @@
                 :searchable="true"
                 :multiple="true"
                 :allow-empty="false"
-                @select="onSelectManager"
               ></multiselect>
             </div>
           </div>
@@ -269,7 +285,6 @@
                 :multiple="true"
                 :searchable="true"
                 :taggable="true"
-                @select="onSelectMember"
               ></multiselect>
             </div>
           </div>
@@ -357,10 +372,7 @@
                       >
                         <div class="form-group">
                           <label for="JobType">Who?</label>
-                          <small
-                            v-if="!editStatus"
-                            class="text-danger"
-                          >(*) Require (Default is yourself!)</small>
+                          <small v-if="!editStatus" class="text-danger">(*) Default is yourself!</small>
                           <multiselect
                             v-model="whoSelected"
                             deselect-label="Can't remove this value"
@@ -370,7 +382,6 @@
                             :options="whoOptions"
                             :searchable="true"
                             :allow-empty="false"
-                            @select="onSelectWho"
                           ></multiselect>
                         </div>
                       </div>
@@ -392,8 +403,6 @@
                             :options="ocOptions"
                             :searchable="false"
                             :allow-empty="false"
-                            @tag="addTagOC"
-                            @select="onSelectOC"
                           ></multiselect>
                         </div>
                       </div>
@@ -405,7 +414,6 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="Assigned">Be Assigned</label>
-                  <small v-if="!editStatus" class="text-danger">(*) Require</small>
                   <multiselect
                     v-model="selected"
                     tag-placeholder="Add this as new tag"
@@ -415,8 +423,6 @@
                     :options="options"
                     :multiple="true"
                     :taggable="true"
-                    @tag="addTag"
-                    @select="onSelectTask"
                   ></multiselect>
                 </div>
               </div>
@@ -438,9 +444,12 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="Period">Period</label>
+                      <small v-if="!editStatus" class="text-danger">(*) Require</small>
                       <select id="Period" v-model="selectedPeriodMain" class="form-control">
                         <option value="reset">Choose period</option>
                         <option value="EveryDay">Every day</option>
+                        <option value="Monthly">Monthly</option>
+                        <option value="Quarterly">Quarterly</option>
                         <option value="SpecificDay">Specific Day</option>
                       </select>
                     </div>
@@ -450,7 +459,8 @@
                       <label for="Description">Specific Day</label>
                       <small v-if="!editStatus" class="text-danger">(*) Require</small>
                       <datetime
-                        v-model="date"
+                        ref="deadline"
+                        v-model="task.deadline"
                         input-class="form-control"
                         placeholder="Select date"
                         type="date"
@@ -460,9 +470,36 @@
                   <div class="col-md-12">
                     <div class="form-group box EveryDay">
                       <label for="Description">Every day</label>
+                      <small v-if="!editStatus" class="text-danger">(*) Require</small>
                       <select class="form-control" v-model="selectedPeriod">
                         <option disabled value>Please select one</option>
                         <option v-for="(day,index) in everydays" :value="day.substring(0,3)">{{day}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="form-group box Monthly">
+                      <label for="Description">Monthly</label>
+                      <small v-if="!editStatus" class="text-danger">(*) Require</small>
+                      <select class="form-control" v-model="task.monthly">
+                        <option disabled value>Please select one</option>
+                        <option
+                          v-for="(month,index) in monthly"
+                          :value="month.substring(0,3)"
+                        >{{month}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="form-group box Quarterly">
+                      <label for="Description">Quarterly</label>
+                      <small v-if="!editStatus" class="text-danger">(*) Require</small>
+                      <select class="form-control" v-model="task.quarterly">
+                        <option disabled value>Please select one</option>
+                        <option
+                          v-for="(quarter,index) in quarterly"
+                          :value="quarter.substring(0,3)"
+                        >{{quarter}}</option>
                       </select>
                     </div>
                   </div>
@@ -471,7 +508,7 @@
 
               <div class="col-md-6">
                 <label>Priority</label>
-                <small v-if="!editStatus" class="text-danger">(*) Require (Default is medium)</small>
+                <small v-if="!editStatus" class="text-danger">(*) Default is medium</small>
 
                 <div class="form-group">
                   <div class="custom-control custom-radio">
@@ -638,7 +675,7 @@ export default {
           template: Vue.component("optionTemplate", {
             template: `<div id="optionTemplate">
                       <div class="btn-group">
-                        <button type="button" @click="addSubscribe(data)"class="btn btn-danger btn-xs" v-if="data.Level == 1" ><i :class="!data.Subscribe ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{!data.Subscribe?'Follow':'Followed'}}</button>
+                        <button type="button" @click="addSubscribe(data)"class="btn btn-danger btn-xs" v-if="data.Level == 1" ><i :class="!data.Follow ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{!data.Follow?'Follow':'Followed'}}</button>
                       </div>
                     </div>`,
             data: function() {
@@ -648,7 +685,26 @@ export default {
             },
             methods: {
               addSubscribe(data) {
-                EventBus.$emit("subscribe", data);
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
+      templateDescripton: function() {
+        return {
+          template: Vue.component("optionTemplate", {
+            template: `<span id="templateDescripton" data-toggle="tooltip" data-placement="top" :title="data.Description">
+                      {{data.Description}}
+                      </span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
               }
             }
           })
@@ -663,9 +719,44 @@ export default {
       ],
       modalTitle: "Add New Project Task",
       sort: "",
-      contextMenuItems: [],
+      contextMenuItems: [
+        {
+            text: "Add Sub-Task",
+            iconCss: " e-icons e-add",
+            target: ".e-content",
+            id: "Add-Sub-Task"
+          },
+          {
+            text: "Add Remark",
+            iconCss: " e-icons e-add",
+            target: ".e-content",
+            id: "Remark"
+          },
+          {
+            text: "Finish Task",
+            iconCss: " e-icons e-edit",
+            target: ".e-content",
+            id: "Done"
+          },
+          {
+            text: "Edit",
+            iconCss: " e-icons e-edit",
+            target: ".e-content",
+            id: "EditTask"
+          },
+          {
+            text: "Delete",
+            iconCss: " e-icons e-delete",
+            target: ".e-content",
+            id: "DeleteTask"
+          }
+      ],
       pageSettings: { pageSize: 15 },
+      editSettings: {
+        allowAdding: true
+      },
       toolbar: [
+        "Add",
         "Search",
         "ExpandAll",
         "CollapseAll",
@@ -711,6 +802,8 @@ export default {
         status: false,
         fromWhoID: 0,
         everyday: "",
+        monthly: "",
+        quarterly: "",
         priority: "M",
         pic: [],
         JobTypeID: 1
@@ -727,6 +820,26 @@ export default {
         "Thursday",
         "Friday",
         "Saturday"
+      ],
+      monthly: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      quarterly: [
+        "First quarter",
+        "Second quarter",
+        "Third quarter",
+        "Fourth quarter"
       ],
       selectedPeriodMain: "reset",
       //----------------------------------------------------To Do List Params
@@ -759,6 +872,9 @@ export default {
     };
   },
   created() {
+    $(document).ready(function() {
+      $('[data-toggle="tooltip"]').tooltip();
+    });
     // EventBus.$on("reciveConnection", this.reciveConnection);
     this.getProjects();
     this.getFrom();
@@ -785,19 +901,6 @@ export default {
       });
   },
   methods: {
-    joinGroup() {
-      var self = this;
-      self.connection.invoke("JoinGroup", "2").catch(function(err) {
-        return console.error(err.toString());
-      });
-    },
-    sendToGroup() {
-      this.connection
-        .invoke("SendMessageToGroup", "PrivateGroup", "message")
-        .catch(function(err) {
-          return console.error(err.toString());
-        });
-    },
     reciveConnection(conn) {
       this.connection = conn;
     },
@@ -808,7 +911,6 @@ export default {
       console.log(taskItem);
       self.editStatus = false;
       self.clearForm();
-      self.date = "";
 
       self.modalTitle = "Add New Project Sub-Task";
       self.task.parentID = taskItem.ID;
@@ -825,7 +927,7 @@ export default {
     },
     addSubscribe(data) {
       var self = this;
-      self.$api.get(`api/Tasks/Subscribe/${data.ID}`).then(res => {
+      self.$api.get(`api/Tasks/Follow/${data.ID}`).then(res => {
         console.log("addSubscribe");
         console.log(res);
         if (res) {
@@ -917,6 +1019,10 @@ export default {
         case "Excel Export":
           self.$refs.treegrid.excelExport();
           break;
+        case "Add":
+          $("#modal-task").modal("show");
+          self.newTaskInfo();
+          break;
       }
     },
     remark() {
@@ -948,8 +1054,10 @@ export default {
       self.$api.delete("api/Tasks/Delete/" + id).then(res => {
         if (res.data) {
           self.dataSourceChanged();
+          this.$swal("Success !", "Delete Successfully!", "success");
+        }else{
+          this.$swal("Warning !", "You did not create this task!", "warning");
         }
-        this.$swal("Success !", "Delete", "success");
       });
     },
     dataSourceChanged() {
@@ -963,7 +1071,6 @@ export default {
         case "Add-Sub-Task":
           self.editStatus = false;
           self.clearForm();
-          self.date = "";
           self.getUser();
 
           self.modalTitle = "Add New Project Sub-Task";
@@ -999,18 +1106,28 @@ export default {
             description: args.rowInfo.rowData.Description,
             jobName: args.rowInfo.rowData.JobName,
             everyday: args.rowInfo.rowData.EveryDay,
+            monthly: args.rowInfo.rowData.Monthly,
+            quarterly: args.rowInfo.rowData.Quarterly,
+            deadline: args.rowInfo.rowData.Deadline,
 
             remark: args.rowInfo.rowData.Remark,
             priority: args.rowInfo.rowData.PriorityID,
             id: args.rowInfo.rowData.ID,
             pic: args.rowInfo.rowData.PIC || []
           };
-          if (args.rowInfo.rowData.EveryDay !== "") {
+     
+          if (args.rowInfo.rowData.EveryDay !== "#N/A") {
             self.selectedPeriodMain = "EveryDay";
-            self.selectedPeriod = args.rowInfo.rowData.EveryDay;
-          } else if (args.rowInfo.rowData.Deadline !== "0001-01-01T00:00:00") {
+            self.selectedPeriod = args.rowInfo.rowData.EveryDay.substring(0,3);
+          } else if (args.rowInfo.rowData.Monthly !== "#N/A") {
+            self.selectedPeriodMain = "Monthly";
+            self.task.monthly = args.rowInfo.rowData.Monthly.substring(0,3);
+          } else if (args.rowInfo.rowData.Quarterly !== "#N/A") {
+            self.selectedPeriodMain = "Quarterly";
+            self.task.quarterly = args.rowInfo.rowData.Quarterly.substring(0,3);
+          } else if (args.rowInfo.rowData.DueDate !== "#N/A") {
             self.selectedPeriodMain = "SpecificDay";
-            self.date = args.rowInfo.rowData.Deadline;
+            self.task.deadline = args.rowInfo.rowData.Deadline;
           }
           self.selected = args.rowInfo.rowData.BeAssigneds;
 
@@ -1039,29 +1156,6 @@ export default {
       });
       console.log(this.task.projectID);
     },
-    addTagOC(newTag) {
-      const tag = {
-        ID: newTag,
-        Name: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000)
-      };
-      this.ocOptions.push(tag);
-      this.ocSelected.push(tag);
-      this.ocSelected.map(item => {
-        this.task.OCID = item.ID;
-      });
-      console.log(this.task.OCID);
-    },
-    addTag(newTag) {
-      const tag = {
-        ID: newTag,
-        Username: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000)
-      };
-      this.options.push(tag);
-      this.selected.push(tag);
-      this.selected.map(item => {
-        this.task.pic.push(item.ID);
-      });
-    },
     getUser(flag = false) {
       let self = this;
       let projectid;
@@ -1080,13 +1174,6 @@ export default {
         console.log(res);
       });
     },
-    // clearForm() {
-    //   var self = this;
-    //   self.date = "";
-    //   self.projectSelected = {};
-    //   self.task = [];
-    //   self.selected = [];
-    // },
     getTasks() {
       var self = this;
       self.$api
@@ -1096,24 +1183,6 @@ export default {
           self.data = res.data;
           console.log(self.data);
         });
-    },
-    onSelectOC(option) {
-      this.task.OCID = option.ID;
-      console.log(this.task.OCID);
-    },
-    onSelectTask(option) {
-      this.task.pic.push(option.ID);
-      console.log(this.task.pic);
-    },
-    onSelectProject(option) {
-      this.task.projectID = option.ID;
-      console.log(this.task.projectID);
-      console.log("projectSelected da thay doi load lai user");
-      this.getUser();
-    },
-    onSelectWho(option) {
-      this.task.fromWhoID = option.ID;
-      console.log(this.task.fromWhoID);
     },
     getProjects() {
       var self = this;
@@ -1133,15 +1202,17 @@ export default {
     },
     newTaskInfo() {
       var self = this;
+      self.editStatus = false;
+      self.clearForm();
       self.selectedPeriodMain = "reset";
       self.modalTitle = "Add New Project Task";
       self.whoSelected = {
         ID: Number(localStorage.getItem("UserID")),
         Username: localStorage.getItem("User")
       };
-      // self.task = self.selectedPeriod;
+
+      //Chi duoc add nhung user la teammember
       self.getUser();
-      self.clearForm();
     },
     clearForm() {
       this.task = {
@@ -1158,40 +1229,82 @@ export default {
         fromWhoID: 0,
         priority: "M",
         everyday: "",
+        monthly: "",
+        quarterly: "",
         pic: [],
         JobTypeID: 1
       };
+      this.selectedPeriodMain = "reset";
       this.selectedPeriod = "";
       this.projectSelected = [];
       this.selected = [];
       this.date = "";
+    },
+    valid() {
+      if (this.task.jobName === "") {
+        this.$swal("Warning!", "Please enter the job name!", "warning");
+        return false;
+      }
+      if (this.selectedPeriodMain === "reset") {
+        this.$swal("Warning!", "Please select on preiod!", "warning");
+        return false;
+      } else {
+        switch (this.selectedPeriodMain) {
+          case "EveryDay":
+            if (this.task.everyday === "") {
+              this.$swal("Warning!", "Please select on every day!", "warning");
+              return false;
+            }
+            break;
+          case "Monthly":
+            if (this.task.monthly === "") {
+              this.$swal("Warning!", "Please select on monthly!", "warning");
+              return false;
+            }
+            break;
+
+          case "Quarterly":
+            if (this.task.quarterly === "") {
+              this.$swal("Warning!", "Please select on quarterly!", "warning");
+              return false;
+            }
+            break;
+        }
+      }
+      return true;
     },
     createTask() {
       var self = this;
       console.log("createTask");
       console.log(self.task);
       if (self.task.parentID > 0) {
-        self.task.fromWhoID = self.whoSelected.ID;
-        self.$api.post("api/Tasks/CreateSubTask", self.task).then(res => {
-          if (res.data) {
-            self.clearForm();
-            $("#modal-task").modal("hide");
-            self.dataSourceChanged();
-          }
-          self.$swal("Success!", "Add Sub-Tasks successfully!", "success");
-          console.log(res);
-        });
+        var check = self.valid();
+        if (check) {
+          self.task.fromWhoID = self.whoSelected.ID;
+          self.$api.post("api/Tasks/CreateSubTask", self.task).then(res => {
+            if (res.data) {
+              self.clearForm();
+              $("#modal-task").modal("hide");
+              self.dataSourceChanged();
+            }
+            self.$swal("Success!", "Add Sub-Tasks successfully!", "success");
+            console.log(res);
+          });
+        }
       } else {
-        self.task.fromWhoID = self.whoSelected.ID;
-        self.$api.post("api/Tasks/CreateTask", self.task).then(res => {
-          if (res.data) {
-            self.clearForm();
-            $("#modal-task").modal("hide");
-            self.dataSourceChanged();
-          }
-          self.$swal("Success!", "Add Tasks successfully!", "success");
-          console.log(res);
-        });
+        var check = self.valid();
+        if (check) {
+          self.task.fromWhoID = self.whoSelected.ID;
+          self.$api.post("api/Tasks/CreateTask", self.task).then(res => {
+            if (res.data) {
+              self.clearForm();
+              $("#modal-task").modal("hide");
+              self.dataSourceChanged();
+            }
+            self.$swal("Success!", "Add Tasks successfully!", "success");
+            console.log(res);
+          });
+        }
       }
     },
     dateFormat(date) {
@@ -1258,10 +1371,6 @@ export default {
       // this.manager.UserID = option.ID;
       // console.log(this.manager.UserID);
     },
-    onSelectMember(option) {
-      // this.member.users.push(option.ID);
-      // console.log(this.member.users);
-    },
     getListUser() {
       var self = this;
       self.$api.get(`api/Projects/GetUsers`).then(res => {
@@ -1275,90 +1384,93 @@ export default {
       let self = this;
       let user = Number(localStorage.getItem("UserID"));
       if (createdBy == user)
-        self.contextMenuItems = [
-          {
-            text: "Add Sub-Task",
-            iconCss: " e-icons e-add",
-            target: ".e-content",
-            id: "Add-Sub-Task"
-          },
-          {
-            text: "Add Remark",
-            iconCss: " e-icons e-add",
-            target: ".e-content",
-            id: "Remark"
-          },
-          {
-            text: "Finish Task",
-            iconCss: " e-icons e-edit",
-            target: ".e-content",
-            id: "Done"
-          },
-          {
-            text: "Edit",
-            iconCss: " e-icons e-edit",
-            target: ".e-content",
-            id: "EditTask"
-          },
-          {
-            text: "Delete",
-            iconCss: " e-icons e-delete",
-            target: ".e-content",
-            id: "DeleteTask"
-          }
-        ];
+        // self.contextMenuItems = [
+        //   {
+        //     text: "Add Sub-Task",
+        //     iconCss: " e-icons e-add",
+        //     target: ".e-content",
+        //     id: "Add-Sub-Task"
+        //   },
+        //   {
+        //     text: "Add Remark",
+        //     iconCss: " e-icons e-add",
+        //     target: ".e-content",
+        //     id: "Remark"
+        //   },
+        //   {
+        //     text: "Finish Task",
+        //     iconCss: " e-icons e-edit",
+        //     target: ".e-content",
+        //     id: "Done"
+        //   },
+        //   {
+        //     text: "Edit",
+        //     iconCss: " e-icons e-edit",
+        //     target: ".e-content",
+        //     id: "EditTask"
+        //   },
+        //   {
+        //     text: "Delete",
+        //     iconCss: " e-icons e-delete",
+        //     target: ".e-content",
+        //     id: "DeleteTask"
+        //   }
+        // ];
+        self.isHideAdd = true;
       else if (managers.includes(user)) {
-        self.contextMenuItems = [
-          {
-            text: "Add Sub-Task",
-            iconCss: " e-icons e-add",
-            target: ".e-content",
-            id: "Add-Sub-Task"
-          },
-          {
-            text: "Add Remark",
-            iconCss: " e-icons e-add",
-            target: ".e-content",
-            id: "Remark"
-          },
-          {
-            text: "Finish Task",
-            iconCss: " e-icons e-edit",
-            target: ".e-content",
-            id: "Done"
-          },
-          {
-            text: "Edit",
-            iconCss: " e-icons e-edit",
-            target: ".e-content",
-            id: "EditTask"
-          },
-          {
-            text: "Delete",
-            iconCss: " e-icons e-delete",
-            target: ".e-content",
-            id: "DeleteTask"
-          }
-        ];
+        // self.contextMenuItems = [
+        //   {
+        //     text: "Add Sub-Task",
+        //     iconCss: " e-icons e-add",
+        //     target: ".e-content",
+        //     id: "Add-Sub-Task"
+        //   },
+        //   {
+        //     text: "Add Remark",
+        //     iconCss: " e-icons e-add",
+        //     target: ".e-content",
+        //     id: "Remark"
+        //   },
+        //   {
+        //     text: "Finish Task",
+        //     iconCss: " e-icons e-edit",
+        //     target: ".e-content",
+        //     id: "Done"
+        //   },
+        //   {
+        //     text: "Edit",
+        //     iconCss: " e-icons e-edit",
+        //     target: ".e-content",
+        //     id: "EditTask"
+        //   },
+        //   {
+        //     text: "Delete",
+        //     iconCss: " e-icons e-delete",
+        //     target: ".e-content",
+        //     id: "DeleteTask"
+        //   }
+        // ];
+        self.isHideAdd = true;
+
       } else if (members.includes(user)) {
         self.isHideAdd = false;
-        console.log("checkRole");
+        // console.log("checkRole");
 
-        console.log(self.$refs.treegrid);
-        self.contextMenuItems = [
-          {
-            text: "Add Remark",
-            iconCss: " e-icons e-add",
-            target: ".e-content",
-            id: "Remark"
-          },
-          {
-            text: "Finish Task",
-            iconCss: " e-icons e-edit",
-            target: ".e-content",
-            id: "Done"
-          }
-        ];
+        // console.log(self.$refs.treegrid);
+        // self.contextMenuItems = [
+        //   {
+        //     text: "Add Remark",
+        //     iconCss: " e-icons e-add",
+        //     target: ".e-content",
+        //     id: "Remark"
+        //   },
+        //   {
+        //     text: "Finish Task",
+        //     iconCss: " e-icons e-edit",
+        //     target: ".e-content",
+        //     id: "Done"
+        //   }
+        // ];
       }
     },
     GetUserByProjectID(id) {
@@ -1398,7 +1510,7 @@ export default {
   },
   mounted() {
     // EventBus.$on("reciveConnection", this.reciveConnection);
-    EventBus.$on("subscribe", this.addSubscribe);
+    EventBus.$on("follow", this.addSubscribe);
     EventBus.$on("taskItem", this.infoEdit);
     $(document).ready(function() {
       $("#Period")
@@ -1423,10 +1535,22 @@ export default {
   destroyed() {
     // Stop listening the event hello with handler
     EventBus.$off("taskItem", this.infoEdit);
-    EventBus.$off("subscribe", this.addSubscribe);
+    EventBus.$off("follow", this.addSubscribe);
     // EventBus.$off("reciveConnection", this.reciveConnection);
   },
   watch: {
+    whoSelected: function(newVal, oldVal) {
+      var self = this;
+      let who = newVal;
+      this.task.fromWhoID = who.ID;
+    },
+    selected: function(newVal, oldVal) {
+      var self = this;
+      let pics = newVal;
+      self.task.pic = pics.map((pic, index, pics) => {
+        return pic.ID;
+      });
+    },
     selectedMember: function(newVal, oldVal) {
       var self = this;
       let members = newVal;
@@ -1444,9 +1568,6 @@ export default {
     selectedPeriod: function(newVal, oldVal) {
       var self = this;
       self.task.everyday = newVal;
-    },
-    date: function(newVal, oldVal) {
-      this.task.deadline = this.dateFormat(newVal);
     },
     selectedPeriodMain: function(newOld) {
       $(document).ready(function() {

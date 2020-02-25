@@ -217,8 +217,8 @@ export default {
       console.log("actionComplete");
       console.log(args);
       var self = this;
-
       if (args.requestType == "save") {
+        self.edit.title = args.previousData.title;
         self.$api.post("api/Ocs/Rename", self.edit).then(res => {
           this.$swal("Success !", "Edit Successfully!", "success");
         });
@@ -231,6 +231,10 @@ export default {
       self.edit = {
         key: args.data.key,
         title: args.data.title
+      };
+       self.oc = {
+        id: args.data.key,
+        name: args.data.title
       };
     },
     remark() {

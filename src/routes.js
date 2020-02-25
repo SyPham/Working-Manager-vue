@@ -202,7 +202,7 @@ const router = new VueRouter({
       children: [
         {
           path: "/client-chat",
-          name: "Client-chat",
+          name: "Chat Group",
           component: Chat,
           meta: { requiresAuth: true }
         }

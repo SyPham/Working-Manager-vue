@@ -25,7 +25,7 @@
               :searchSettings="searchSettingsLeft"
               :allowTextWrap="true"
             >
-              <e-columns>
+              <e-columns @click="showModal">
                 <e-column
                   field="levelnumber"
                   width="90"
@@ -47,7 +47,7 @@
         </div>
       </div>
       <div class="col-md-9">
-        <div class="col-md-12 pb-4">
+        <div class="col-md-12 pb-4 d-none">
           <button
             type="button"
             class="btn bg-gradient-secondary btn-sm"
@@ -124,7 +124,7 @@
                   ref="treegrid"
                   :dataSource="data"
                   childMapping="children"
-                  :treeColumnIndex="1"
+                  :treeColumnIndex="3"
                   :allowPaging="true"
                   :pageSettings="pageSettings"
                   :allowSorting="true"
@@ -139,8 +139,17 @@
                   :allowPdfExport="true"
                   :allowTextWrap="true"
                   :contextMenuOpen="contextMenuOpen"
+                  :editSettings="editSettings"
                 >
                   <e-columns>
+                    <e-column
+                      field="Follow"
+                      :template="optionFollowTemplate"
+                      headerText="Follow"
+                      width="130"
+                      textAlign="Center"
+                    ></e-column>
+
                     <e-column
                       field="Priority"
                       :template="priorityTemplate"
@@ -149,6 +158,14 @@
                       textAlign="Center"
                     ></e-column>
                     <!-- <e-column field="Level" headerText="Level" width="150" textAlign="Center"></e-column> -->
+                    <e-column
+                      field="Add Sub-Task"
+                      :template="optionSubTaskTemplate"
+                      headerText="Add Sub-Task"
+                      width="150"
+                      v-if="IsHideAdd"
+                      textAlign="Center"
+                    ></e-column>
                     <!-- <e-column
                     field="ProjectName"
                     headerText="Project name"
@@ -181,6 +198,19 @@
                       textAlign="Right"
                     ></e-column>
                     <e-column field="DueDate" headerText="DueDate" width="160" textAlign="Center"></e-column>
+                     <e-column
+                      field="EveryDay"
+                      headerText="Every Day"
+                      width="160"
+                      textAlign="Center"
+                    ></e-column>
+                    <e-column field="Monthly" headerText="Monthly" width="160" textAlign="Center"></e-column>
+                    <e-column
+                      field="Quarterly"
+                      headerText="Quarterly"
+                      width="160"
+                      textAlign="Center"
+                    ></e-column>
                     <e-column field="Remark" headerText="Remark" width="180" textAlign="Center"></e-column>
                     <e-column
                       field="state"
@@ -193,21 +223,6 @@
                       field="CreatedDate"
                       headerText="CreatedDate"
                       width="160"
-                      textAlign="Center"
-                    ></e-column>
-                    <e-column
-                      field="Add Sub-Task"
-                      :template="optionSubTaskTemplate"
-                      headerText="Add Sub-Task"
-                      width="150"
-                      v-if="IsHideAdd"
-                      textAlign="Center"
-                    ></e-column>
-                    <e-column
-                      field="Follow"
-                      :template="optionFollowTemplate"
-                      headerText="Follow"
-                      width="130"
                       textAlign="Center"
                     ></e-column>
                   </e-columns>
@@ -255,8 +270,8 @@
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="JobType">Who?</label>
-                  <small v-if="!editStatus" class="text-danger">(*) Require (Default is yourself!)</small>
+                  <label for="JobType">From</label>
+                  <small v-if="!editStatus" class="text-danger">(*) Default is yourself!</small>
                   <multiselect
                     v-model="whoSelected"
                     deselect-label="Can't remove this value"
@@ -273,7 +288,7 @@
               <div class="col-md-12">
                 <div class="form-group">
                   <label for="Description">Description</label>
-                  <input
+                  <textarea
                     type="text"
                     id="Description"
                     v-model="task.description"
@@ -285,7 +300,6 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="Assigned">Be Assigned</label>
-                  <small v-if="!editStatus" class="text-danger">(*) Require</small>
                   <multiselect
                     v-model="selected"
                     tag-placeholder="Add this as new tag"
@@ -319,8 +333,10 @@
                     <div class="form-group">
                       <label for="Period">Period</label>
                       <select id="Period" v-model="selectedPeriodMain" class="form-control">
-                        <option value="reset">Choose period</option>
+                       <option value="reset">Choose period</option>
                         <option value="EveryDay">Every day</option>
+                        <option value="Monthly">Monthly</option>
+                        <option value="Quarterly">Quarterly</option>
                         <option value="SpecificDay">Specific Day</option>
                       </select>
                     </div>
@@ -344,7 +360,7 @@
                       <label for="Description">Specific Day</label>
                       <small v-if="!editStatus" class="text-danger">(*) Require</small>
                       <datetime
-                        v-model="date"
+                        v-model="task.deadline"
                         input-class="form-control"
                         placeholder="Select date"
                         type="date"
@@ -360,11 +376,37 @@
                       </select>
                     </div>
                   </div>
+                    <div class="col-md-12">
+                    <div class="form-group box Monthly">
+                      <label for="Description">Monthly</label>
+                      <small v-if="!editStatus" class="text-danger">(*) Require</small>
+                      <select class="form-control" v-model="task.monthly">
+                        <option disabled value>Please select one</option>
+                        <option
+                          v-for="(month,index) in monthly"
+                          :value="month.substring(0,3)"
+                        >{{month}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="form-group box Quarterly">
+                      <label for="Description">Quarterly</label>
+                      <small v-if="!editStatus" class="text-danger">(*) Require</small>
+                      <select class="form-control" v-model="task.quarterly">
+                        <option disabled value>Please select one</option>
+                        <option
+                          v-for="(quarter,index) in quarterly"
+                          :value="quarter.substring(0,3)"
+                        >{{quarter}}</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="col-md-12">
                 <label>Priority</label>
-                <small v-if="!editStatus" class="text-danger">(*) Require (Default is medium)</small>
+                <small v-if="!editStatus" class="text-danger">(*) Default is medium</small>
 
                 <div class="form-group">
                   <div class="custom-control custom-radio">
@@ -523,6 +565,9 @@ export default {
         // "PdfExport"
       ],
       editingLeft: { allowDeleting: true, allowEditing: true, mode: "Row" },
+      editSettings: {
+        allowAdding: true
+      },
       pageSettingsLeft: { pageSize: 10 },
       searchSettingsLeft: { hierarchyMode: "Parent" },
       // --------------------------------------------------------------------
@@ -566,7 +611,7 @@ export default {
           template: Vue.component("optionTemplate", {
             template: `<div id="optionTemplate">
                       <div class="btn-group">
-                        <button type="button" @click="addSubscribe(data)"class="btn btn-danger btn-xs" v-if="data.Level == 1" ><i :class="!data.Subscribe ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{!data.Subscribe?'Follow':'Followed'}}</button>
+                        <button type="button" @click="addFollow(data)"class="btn btn-danger btn-xs" v-if="data.Level == 1" ><i :class="!data.Follow ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{!data.Follow?'Follow':'Followed'}}</button>
                       </div>
                     </div>`,
             data: function() {
@@ -575,8 +620,8 @@ export default {
               };
             },
             methods: {
-              addSubscribe(data) {
-                EventBus.$emit("subscribe", data);
+              addFollow(data) {
+                EventBus.$emit("follow", data);
               }
             }
           })
@@ -625,6 +670,7 @@ export default {
       ],
       pageSettings: { pageSize: 15 },
       toolbar: [
+        "Add",
         "Search",
         "ExpandAll",
         "CollapseAll",
@@ -645,6 +691,26 @@ export default {
         "Thursday",
         "Friday",
         "Saturday"
+      ],
+       monthly: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      quarterly: [
+        "First quarter",
+        "Second quarter",
+        "Third quarter",
+        "Fourth quarter"
       ],
       PIC: [],
       expanded: {},
@@ -679,6 +745,8 @@ export default {
         fromWhoID: 0,
         priority: "M",
         everyday: "",
+        monthly: "",
+        quarterly: "",
         JobTypeID: 3,
         pic: []
       },
@@ -697,7 +765,7 @@ export default {
   mounted() {
     console.log("this.$refs.treegrid");
     console.log(this.$refs.treegrid);
-    EventBus.$on("subscribe", this.addSubscribe);
+    EventBus.$on("follow", this.addFollow);
     EventBus.$on("taskItem", this.infoEdit);
     $(document).ready(function() {
       $("#Period")
@@ -722,7 +790,7 @@ export default {
   destroyed() {
     // Stop listening the event hello with handler
     EventBus.$off("taskItem", this.infoEdit);
-    EventBus.$off("subscribe", this.addSubscribe);
+    EventBus.$off("follow", this.addFollow);
   },
   created() {
     this.getProjects();
@@ -734,11 +802,16 @@ export default {
     this.checkRole();
   },
   methods: {
+    showModal(){
+      alert(1)
+      $("#modal-remark").modal("show");
+    },
     checkRole() {
       let userLevel = Number(localStorage.getItem("Level"));
       //Neu user co level la 3 va khong fai la leader thi se
       if (userLevel >= 3 && !this.IsLeader) {
         this.IsHideAdd = false;
+        this.editSettings.allowAdding = false;
       }
     },
     getDeputies() {
@@ -850,8 +923,6 @@ export default {
       console.log(taskItem);
       self.editStatus = false;
       self.clearForm();
-      self.date = "";
-
       self.modalTitle = "Add Sub-Task";
       self.task.parentID = taskItem.ID;
       self.task.projectID = taskItem.ProjectID;
@@ -865,13 +936,13 @@ export default {
         ID: localStorage.getItem("UserID")
       };
     },
-    addSubscribe(data) {
+    addFollow(data) {
       var self = this;
-      self.$api.get(`api/Tasks/Subscribe/${data.ID}`).then(res => {
-        console.log("addSubscribe");
+      self.$api.get(`api/Tasks/Follow/${data.ID}`).then(res => {
+        console.log("addFollow");
         console.log(res);
         if (res) {
-          self.$alertify.success("You have already subscribed this one!");
+          self.$alertify.success("You have already followd this one!");
           self.dataSourceChanged();
         }
       });
@@ -939,6 +1010,10 @@ export default {
         case "Excel Export":
           self.$refs.treegrid.excelExport();
           break;
+        case "Add":
+          $("#modal-task").modal("show");
+          self.newTaskInfo();
+          break;
       }
     },
     remark() {
@@ -987,7 +1062,6 @@ export default {
           self.getDeputies();
 
           self.clearForm();
-          self.date = "";
           self.getUser(args.rowInfo.rowData.ProjectID);
 
           self.modalTitle = "Add Sub-Task";
@@ -1026,11 +1100,26 @@ export default {
             remark: args.rowInfo.rowData.Remark,
             priority: args.rowInfo.rowData.PriorityID,
             id: args.rowInfo.rowData.ID,
-            pic: args.rowInfo.rowData.PIC || []
+            pic: args.rowInfo.rowData.PIC || [],
+            deadline: args.rowInfo.rowData.Deadline
           };
           self.selected = args.rowInfo.rowData.BeAssigneds;
-          self.date = args.rowInfo.rowData.Deadline;
-
+          if (args.rowInfo.rowData.EveryDay !== "#N/A") {
+            self.selectedPeriodMain = "EveryDay";
+            self.selectedPeriod = args.rowInfo.rowData.EveryDay.substring(0, 3);
+          } else if (args.rowInfo.rowData.Monthly !== "#N/A") {
+            self.selectedPeriodMain = "Monthly";
+            self.task.monthly = args.rowInfo.rowData.Monthly.substring(0, 3);
+          } else if (args.rowInfo.rowData.Quarterly !== "#N/A") {
+            self.selectedPeriodMain = "Quarterly";
+            self.task.quarterly = args.rowInfo.rowData.Quarterly.substring(
+              0,
+              3
+            );
+          } else if (args.rowInfo.rowData.DueDate !== "#N/A") {
+            self.selectedPeriodMain = "SpecificDay";
+            self.task.deadline = args.rowInfo.rowData.Deadline;
+          }
           break;
         case "Remark":
           self.task.remark = "";
@@ -1247,9 +1336,6 @@ export default {
     },
     task: function(newVal, oldVal) {
       console.log(newVal);
-    },
-    date: function(newVal, oldVal) {
-      this.task.deadline = this.dateFormat(newVal);
     },
     ocid: function(newVal) {
       this.ocid = newVal;

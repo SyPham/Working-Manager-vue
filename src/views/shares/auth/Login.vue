@@ -103,7 +103,8 @@ export default {
             "/history",
             "/project-detail",
             "/abnormal",
-            "/routine"
+            "/routine",
+            "/follow"
           ];
           var routerArrAdmin = [
             "/admin-oc",
@@ -114,7 +115,11 @@ export default {
           ];
           var uri = self.$route.query.redirect || "";
           if (self.$route.query.redirect.length != 0) {
+         
             var roleUser = routerArrUser.includes(uri);
+            routerArrUser.forEach((item, index)=>{
+               if(uri.includes(item)) roleUser = true;
+            });
             var roleAdmin = routerArrAdmin.includes(uri);
             if (Number(localStorage.getItem("Role")) == 2 && roleUser) {
               self.$router.push(uri);
