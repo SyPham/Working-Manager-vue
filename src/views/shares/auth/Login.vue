@@ -90,7 +90,7 @@ export default {
             res.data.user.User.Role
           ); // + 4 hours
           localStorage.setItem("Role", res.data.user.User.Role);
-
+          localStorage.setItem("ImageProfile", res.data.user.User.image);
           localStorage.setItem("UserID", res.data.user.User.ID);
           localStorage.setItem("ListOCs", res.data.user.User.ListOCs);
           localStorage.setItem("Level", res.data.user.User.OCLevel);
@@ -104,7 +104,8 @@ export default {
             "/project-detail",
             "/abnormal",
             "/routine",
-            "/follow"
+            "/follow",
+            "/client-chat"
           ];
           var routerArrAdmin = [
             "/admin-oc",
@@ -122,9 +123,17 @@ export default {
             });
             var roleAdmin = routerArrAdmin.includes(uri);
             if (Number(localStorage.getItem("Role")) == 2 && roleUser) {
+              if(uri.includes("project-detail")){
+              self.$router.push("/");
+              }else{
               self.$router.push(uri);
+              }
             } else if (Number(localStorage.getItem("Role")) == 2 && roleAdmin) {
-              self.$router.push("/todolist");
+              if(uri.includes("project-detail")){
+              self.$router.push("/");
+              }else{
+              self.$router.push(uri);
+              }
             } else if (Number(localStorage.getItem("Role")) == 1 && roleAdmin) {
               self.$router.push(uri);
             } else if (Number(localStorage.getItem("Role")) == 1 && roleUser) {
@@ -139,11 +148,7 @@ export default {
           }
         })
         .catch(res => {
-          self.$swal(
-            "Sign-In Failed!",
-            "Username and password are incorrect, please try again!",
-            "error"
-          );
+          self.$alertify.error("Username and password are incorrect, please try again!",true);
         });
     }
   }

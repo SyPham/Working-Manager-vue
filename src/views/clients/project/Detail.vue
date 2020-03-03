@@ -143,7 +143,7 @@
                       width="130"
                       textAlign="Center"
                     ></e-column>
-                  
+
                     <e-column
                       field="Priority"
                       :template="priorityTemplate"
@@ -151,7 +151,7 @@
                       width="110"
                       textAlign="Center"
                     ></e-column>
-                      <e-column
+                    <e-column
                       field="Add Sub-Task"
                       :template="optionSubTaskTemplate"
                       headerText="Add Sub-Task"
@@ -163,24 +163,20 @@
 
                     <e-column
                       field="JobName"
-                      headerText="Job Name"
+                      headerText="Task Name"
                       :disableHtmlEncode="false"
+                      :template="jobNameTemplate"
                       width="240"
                     ></e-column>
-                    <e-column
-                      field="From"
-                      headerText="From Where? / From Who?"
-                      :disableHtmlEncode="false"
-                      width="230"
-                    ></e-column>
-                    <e-column
+                    <e-column field="From" headerText="From" :disableHtmlEncode="false" width="230"></e-column>
+                    <!-- <e-column
                       field="Description"
                       headerText="Description"
                       :template="templateDescripton"
                       :disableHtmlEncode="false"
                       width="180"
                       textAlign="Center"
-                    ></e-column>
+                    ></e-column>-->
                     <e-column
                       field="PIC"
                       headerText="PIC"
@@ -188,7 +184,15 @@
                       format="yMd"
                       textAlign="Right"
                     ></e-column>
+                    <!-- <e-column field="Remark" :template="remarkTemplate" headerText="Remark" width="180" textAlign="Center"></e-column> -->
                     <e-column field="DueDate" headerText="DueDate" width="160" textAlign="Center"></e-column>
+                    <e-column
+                      field="state"
+                      :disableHtmlEncode="false"
+                      headerText="Status"
+                      width="100"
+                      textAlign="Center"
+                    ></e-column>
                     <e-column
                       field="EveryDay"
                       headerText="Every Day"
@@ -202,14 +206,7 @@
                       width="160"
                       textAlign="Center"
                     ></e-column>
-                    <e-column field="Remark" headerText="Remark" width="180" textAlign="Center"></e-column>
-                    <e-column
-                      field="state"
-                      :disableHtmlEncode="false"
-                      headerText="Status"
-                      width="100"
-                      textAlign="Center"
-                    ></e-column>
+
                     <e-column
                       field="CreatedDate"
                       headerText="CreatedDate"
@@ -311,9 +308,9 @@
           </div>
           <div class="modal-body">
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-8">
                 <div class="form-group">
-                  <label for="JobType">Job Name</label>
+                  <label for="JobType">Task Name</label>
                   <small v-if="!editStatus" class="text-danger">(*) Require</small>
                   <input
                     type="text"
@@ -323,10 +320,26 @@
                   />
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="Assigned">Be Assigned</label>
+                  <multiselect
+                    v-model="selected"
+                    tag-placeholder="Add this as new tag"
+                    placeholder="Search or add a tag"
+                    label="Username"
+                    track-by="ID"
+                    :options="options"
+                    :searchable="true"
+                    :multiple="true"
+                    :taggable="true"
+                  ></multiselect>
+                </div>
+              </div>
+              <div class="col-md-12 d-none">
                 <div class="form-group">
                   <label for="Description">Description</label>
-                  <input
+                  <textarea
                     type="text"
                     id="Description"
                     v-model="task.description"
@@ -411,23 +424,8 @@
                   <!-- /.card -->
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="Assigned">Be Assigned</label>
-                  <multiselect
-                    v-model="selected"
-                    tag-placeholder="Add this as new tag"
-                    placeholder="Search or add a tag"
-                    label="Username"
-                    track-by="ID"
-                    :options="options"
-                    :multiple="true"
-                    :taggable="true"
-                  ></multiselect>
-                </div>
-              </div>
 
-              <div class="col-md-6">
+              <div class="col-md-6 d-none">
                 <div class="form-group">
                   <label for="Description">Remark</label>
                   <input
@@ -694,9 +692,47 @@ export default {
       templateDescripton: function() {
         return {
           template: Vue.component("optionTemplate", {
-            template: `<span id="templateDescripton" data-toggle="tooltip" data-placement="top" :title="data.Description">
+            template: `<div id="templateDescripton" data-toggle="tooltip" data-placement="top" :title="data.Description">
                       {{data.Description}}
-                      </span>`,
+                      </div>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
+      jobNameTemplate: function() {
+        return {
+          template: Vue.component("jobNameTemplate", {
+            template: `<a id="jobNameTemplate" data-toggle="tooltip" :title="data.JobName">
+                      {{data.JobName}}
+                      </a>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
+      remarkTemplate: function() {
+        return {
+          template: Vue.component("remarkTemplate", {
+            template: `<a id="remarkTemplate" data-toggle="tooltip" :title="data.Remark">
+                      {{data.Remark}}
+                      </a>`,
             data: function() {
               return {
                 data: {}
@@ -721,35 +757,35 @@ export default {
       sort: "",
       contextMenuItems: [
         {
-            text: "Add Sub-Task",
-            iconCss: " e-icons e-add",
-            target: ".e-content",
-            id: "Add-Sub-Task"
-          },
-          {
-            text: "Add Remark",
-            iconCss: " e-icons e-add",
-            target: ".e-content",
-            id: "Remark"
-          },
-          {
-            text: "Finish Task",
-            iconCss: " e-icons e-edit",
-            target: ".e-content",
-            id: "Done"
-          },
-          {
-            text: "Edit",
-            iconCss: " e-icons e-edit",
-            target: ".e-content",
-            id: "EditTask"
-          },
-          {
-            text: "Delete",
-            iconCss: " e-icons e-delete",
-            target: ".e-content",
-            id: "DeleteTask"
-          }
+          text: "Add Sub-Task",
+          iconCss: " e-icons e-add",
+          target: ".e-content",
+          id: "Add-Sub-Task"
+        },
+        {
+          text: "Add Remark",
+          iconCss: " e-icons e-add",
+          target: ".e-content",
+          id: "Remark"
+        },
+        {
+          text: "Finish Task",
+          iconCss: " e-icons e-edit",
+          target: ".e-content",
+          id: "Done"
+        },
+        {
+          text: "Edit",
+          iconCss: " e-icons e-edit",
+          target: ".e-content",
+          id: "EditTask"
+        },
+        {
+          text: "Delete",
+          iconCss: " e-icons e-delete",
+          target: ".e-content",
+          id: "DeleteTask"
+        }
       ],
       pageSettings: { pageSize: 15 },
       editSettings: {
@@ -781,6 +817,7 @@ export default {
       ocOptions: [],
       userSelected: [],
       userOptions: [],
+      PICs: [],
       who: "",
       tasks: [],
       primaryKey: 0,
@@ -872,24 +909,27 @@ export default {
     };
   },
   created() {
+    let self = this;
+    //Kiem tra xem neu tren router co search thi seach
     $(document).ready(function() {
       $('[data-toggle="tooltip"]').tooltip();
+      self.getTasks();
     });
     // EventBus.$on("reciveConnection", this.reciveConnection);
-    this.getProjects();
-    this.getFrom();
-    this.getUserForWho();
-    this.getTasks();
-    this.who = localStorage.getItem("User");
-    this.getListUser();
-    this.GetUserByProjectID(this.$route.params.id);
+    self.getProjects();
+    self.getFrom();
+    self.getUserForWho();
+    // self.getTasks();
+    self.who = localStorage.getItem("User");
+    self.getListUser();
+    self.GetUserByProjectID(self.$route.params.id);
 
-    this.connection = new signalR.HubConnectionBuilder()
+    self.connection = new signalR.HubConnectionBuilder()
       .withUrl("http://10.4.4.224:93/working-management-hub")
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
-    this.connection
+    self.connection
       .start()
       .then(function() {
         console.log("Connected working-management-hub detail ");
@@ -1031,16 +1071,14 @@ export default {
       self.$api.post("api/Tasks/Remark", self.remarkObj).then(res => {
         if (res.data) {
           $("#modal-remark").modal("hide");
-
           self.dataSourceChanged();
+          self.$swal("Success !", "Remark", "success");
         }
-        this.$swal("Success !", "Remark", "success");
       });
     },
     done(id) {
       var self = this;
-
-      self.$api.get("api/Tasks/Done/" + id).then(res => {
+      self.$api.get(`api/Tasks/Done/${id}`).then(res => {
         if (res.data) {
           self.dataSourceChanged();
           self.$alertify.success("You have already finished this one!");
@@ -1055,7 +1093,7 @@ export default {
         if (res.data) {
           self.dataSourceChanged();
           this.$swal("Success !", "Delete Successfully!", "success");
-        }else{
+        } else {
           this.$swal("Warning !", "You did not create this task!", "warning");
         }
       });
@@ -1066,6 +1104,7 @@ export default {
     },
     contextMenuClick: function(args) {
       var self = this;
+      console.log("contextMenuClick");
       console.log(args);
       switch (args.item.id) {
         case "Add-Sub-Task":
@@ -1098,10 +1137,13 @@ export default {
           self.getUser();
           self.task.priority = args.rowInfo.rowData.PriorityID;
           self.whoSelected = args.rowInfo.rowData.FromWho;
+          self.PICs = args.rowInfo.rowData.PICs || [];
+          
           self.projectSelected = {
             ID: args.rowInfo.rowData.ProjectID,
             Name: args.rowInfo.rowData.ProjectName
           };
+
           self.task = {
             description: args.rowInfo.rowData.Description,
             jobName: args.rowInfo.rowData.JobName,
@@ -1109,23 +1151,28 @@ export default {
             monthly: args.rowInfo.rowData.Monthly,
             quarterly: args.rowInfo.rowData.Quarterly,
             deadline: args.rowInfo.rowData.Deadline,
-
             remark: args.rowInfo.rowData.Remark,
             priority: args.rowInfo.rowData.PriorityID,
             id: args.rowInfo.rowData.ID,
+            level: args.rowInfo.rowData.Level,
             pic: args.rowInfo.rowData.PIC || []
           };
-     
-          if (args.rowInfo.rowData.EveryDay !== "#N/A") {
+
+          let everyday = args.rowInfo.rowData.EveryDay;
+          let monthly = args.rowInfo.rowData.Monthly;
+          let quarterly = args.rowInfo.rowData.Quarterly;
+          let deadline = args.rowInfo.rowData.DueDate;
+
+          if (everyday != "#N/A" && everyday != "") {
             self.selectedPeriodMain = "EveryDay";
-            self.selectedPeriod = args.rowInfo.rowData.EveryDay.substring(0,3);
-          } else if (args.rowInfo.rowData.Monthly !== "#N/A") {
+            self.selectedPeriod = everyday.substring(0, 3);
+          } else if (monthly !== "#N/A" && monthly !== "") {
             self.selectedPeriodMain = "Monthly";
-            self.task.monthly = args.rowInfo.rowData.Monthly.substring(0,3);
-          } else if (args.rowInfo.rowData.Quarterly !== "#N/A") {
+            self.task.monthly = monthly.substring(0, 3);
+          } else if (quarterly !== "#N/A" && quarterly !== "") {
             self.selectedPeriodMain = "Quarterly";
-            self.task.quarterly = args.rowInfo.rowData.Quarterly.substring(0,3);
-          } else if (args.rowInfo.rowData.DueDate !== "#N/A") {
+            self.task.quarterly = quarterly.substring(0, 3);
+          } else if (deadline !== "#N/A" && deadline !== "") {
             self.selectedPeriodMain = "SpecificDay";
             self.task.deadline = args.rowInfo.rowData.Deadline;
           }
@@ -1225,18 +1272,22 @@ export default {
         parentID: 0,
         remark: "",
         deadline: "",
+        departmentid: 0,
         status: false,
         fromWhoID: 0,
         priority: "M",
         everyday: "",
         monthly: "",
         quarterly: "",
+        level: 0,
         pic: [],
         JobTypeID: 1
       };
+      this.PICs = [];
       this.selectedPeriodMain = "reset";
       this.selectedPeriod = "";
       this.projectSelected = [];
+      this.ocSelected = [];
       this.selected = [];
       this.date = "";
     },
@@ -1295,6 +1346,26 @@ export default {
         var check = self.valid();
         if (check) {
           self.task.fromWhoID = self.whoSelected.ID;
+          if (self.task.id > 0) {
+            if (self.task.pic.length > 0 && self.task.level > 1 ) {
+              let flag = false;
+              for (let i of self.task.pic) {
+                if (self.PICs.includes(i)) {
+                  flag = true;
+                  break;
+                }
+              }
+              // if (self.PICs.length == 0 && self.task.pic.length == 0) flag = false; 
+              // else if (self.PICs.length == 0 && self.task.pic.length > 0) flag = false;           
+              if (!flag) {
+                self.$alertify.warning(
+                  "You should add the pic for main task!",
+                  true
+                );
+                return;
+              }
+            }
+          }
           self.$api.post("api/Tasks/CreateTask", self.task).then(res => {
             if (res.data) {
               self.clearForm();
@@ -1451,7 +1522,6 @@ export default {
         //   }
         // ];
         self.isHideAdd = true;
-
       } else if (members.includes(user)) {
         self.isHideAdd = false;
         // console.log("checkRole");
@@ -1503,6 +1573,14 @@ export default {
           });
 
           self.createdBy = res.data.createdBy;
+          let currentUser = Number(localStorage.getItem("UserID"));
+          if (
+            !self.listMangerID.includes(currentUser) &&
+            !self.listMemberID.includes(currentUser)
+          ) {
+            self.$router.push("/todolist");
+            return;
+          }
           self.checkRole(self.createdBy, self.listMangerID, self.listMemberID);
         }
       });
@@ -1510,6 +1588,11 @@ export default {
   },
   mounted() {
     // EventBus.$on("reciveConnection", this.reciveConnection);
+    // this.GetUserByProjectID(this.$route.params.id);
+    // if(!this.listMangerID.includes(localStorage.getItem("UserID"))||!this.listMemberID.includes(localStorage.getItem("UserID"))){
+    //    this.$router.push("/todolist");
+    // }
+    //  this.dataSourceChanged();
     EventBus.$on("follow", this.addSubscribe);
     EventBus.$on("taskItem", this.infoEdit);
     $(document).ready(function() {
@@ -1543,6 +1626,11 @@ export default {
       var self = this;
       let who = newVal;
       this.task.fromWhoID = who.ID;
+    },
+    ocSelected: function(newVal, oldVal) {
+      var self = this;
+      let dept = newVal;
+      this.task.departmentid = dept.ID;
     },
     selected: function(newVal, oldVal) {
       var self = this;

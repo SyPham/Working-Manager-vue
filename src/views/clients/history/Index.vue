@@ -21,7 +21,9 @@
         <button type="button" @click="sortRoutine" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-book-open"></i> Routine Job
         </button>
-
+        <button type="button" @click="sortAbnormal" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-book-open"></i> Abnormal Job
+        </button>
         <button type="button" @click="sortHigh" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-exclamation"></i> High
         </button>
@@ -69,7 +71,7 @@
           <!-- /.card-header -->
           <div class="card-body table-responsive p-0">
             <ejs-treegrid
-              :dataSource="data"
+              :dataSource="filterData"
               childMapping="children"
               :treeColumnIndex="3"
               :allowPaging="true"
@@ -81,7 +83,7 @@
               :dataSourceChanged="dataSourceChanged"
             >
               <e-columns>
-                 <e-column
+                <e-column
                   field="Option"
                   :template="optionTemplate"
                   headerText="Option"
@@ -104,7 +106,7 @@
                 ></e-column>
                 <e-column
                   field="JobName"
-                  headerText="Job Name"
+                  headerText="Task Name"
                   :disableHtmlEncode="false"
                   width="240"
                 ></e-column>
@@ -136,7 +138,6 @@
                   width="160"
                   textAlign="Center"
                 ></e-column>
-               
               </e-columns>
             </ejs-treegrid>
             <!-- <table class="table table-hover">
@@ -287,7 +288,9 @@ export default {
       expanded: {},
       selected: [],
       options: [],
+      search: "",
       date: "",
+      jobTypeID: 0,
       data: [],
       toolbar: [
         // "Search",
@@ -308,45 +311,45 @@ export default {
   created() {
     this.getTasks();
   },
+  computed: {
+    filterData() {
+      return this.data.filter(element => {
+        if (this.search != "")
+          return element.Priority.toLowerCase().match(
+            this.search.toLowerCase()
+          );
+        else if (this.jobTypeID > 0) return element.JobTypeID == this.jobTypeID;
+        else return this.data;
+      });
+    }
+  },
   methods: {
     sortProject() {
       var self = this;
-      self.$api.get(`api/Tasks/GetListTreeHistory/project`).then(res => {
-        self.data = res.data;
-        console.log("sortProject");
-        console.log(self.data);
-      });
+      self.search = "";
+      self.jobTypeID = 1;
     },
     sortRoutine() {
       var self = this;
-      self.$api.get(`api/Tasks/GetListTreeHistory/routine`).then(res => {
-        self.data = res.data;
-        console.log(self.data);
-      });
+      self.search = "";
+      self.jobTypeID = 2;
+    },
+    sortAbnormal() {
+      var self = this;
+      self.search = "";
+      self.jobTypeID = 3;
     },
     sortHigh() {
       var self = this;
-      self.$api.get(`api/Tasks/GetListTreeHistory/H/%20`).then(res => {
-        self.data = res.data;
-        console.log("sortHigh");
-        console.log(self.data);
-      });
+      self.search = "High";
     },
     sortMedium() {
       var self = this;
-      self.$api.get(`api/Tasks/GetListTreeHistory/M/%20`).then(res => {
-        self.data = res.data;
-        console.log("sortMedium");
-        console.log(self.tasks);
-      });
+      self.search = "Medium";
     },
     sortLow() {
       var self = this;
-      self.$api.get(`api/Tasks/GetListTreeHistory/L/%20`).then(res => {
-        self.data = res.data;
-        console.log("sortLow");
-        console.log(self.data);
-      });
+      self.search = "Low";
     },
     undo(taskid) {
       var self = this;
@@ -368,6 +371,8 @@ export default {
     getTasks() {
       var self = this;
       self.$api.get(`api/Tasks/GetListTreeHistory`).then(res => {
+        self.search = "";
+        self.jobTypeID = 0;
         self.data = res.data;
         console.log(self.data);
       });

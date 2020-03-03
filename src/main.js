@@ -13,6 +13,15 @@ import Paginate from "vuejs-paginate";
 import Auth from "./assets/plugins/auth";
 import Alertify from "./assets/plugins/alertify";
 import CommonPlugin from "./assets/plugins/common";
+
+// import VueSocketio from "vue-socket.io";
+
+// Vue.use(
+//   new VueSocketio({
+//     debug: true,
+//     connection: "http://localhost:5000"
+//   })
+// );
 Vue.component("paginate", Paginate);
 Vue.use(Datetime);
 Vue.use(VueSweetalert2);
@@ -41,6 +50,18 @@ Vue.use({
     );
     Vue.prototype.$api = instance;
   }
+});
+
+Vue.filter("capitalize", function(val) {
+  return val.charAt(0).toUpperCase() + val.slice(1);
+});
+
+Vue.filter("toTitleCase", function (val) {
+  let arrTemp = val.split(" ") || [];
+  return arrTemp
+    .map(element => element[0].toUpperCase() + element.substr(1).toLowerCase())
+    .join(" ");
+  
 });
 
 Vue.use(Alertify);

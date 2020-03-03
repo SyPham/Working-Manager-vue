@@ -2,7 +2,7 @@
   <div>
     <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
       <div class="container-fluid">
-        <a href="#/todolist" class="navbar-brand">
+        <a :href="homePageUrl" class="navbar-brand">
           <img
             src="../../../assets/AdminLTELogo.png"
             alt="AdminLTE Logo"
@@ -30,70 +30,70 @@
             <!-- Router client -->
 
             <li
-              :class="routerName != 'Project'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="routerName !== 'Project'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1"
             >
               <a href="#/project" class="nav-link">Project</a>
-            </li>
+            </template>
             <li
-              :class="routerName != 'Routine Job'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="routerName !== 'Routine Job'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1 "
             >
               <a href="#/routine" class="nav-link">Routine</a>
-            </li>
+            </template>
             <li
-              :class="routerName != 'Abnormal'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="routerName !== 'Abnormal'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1 "
             >
               <a href="#/abnormal" class="nav-link">Abnormal</a>
-            </li>
+            </template>
             <li
-              :class="routerName != 'To Do List'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="routerName !== 'To Do List'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1"
             >
               <a href="#/todolist" class="nav-link">To Do List</a>
-            </li>
+            </template>
             <li
-              :class="routerName != 'History'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="routerName !== 'History'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1 "
             >
               <a href="#/history" class="nav-link">History</a>
-            </li>
+            </template>
             <li
-              :class="routerName != 'Follow'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="(routerName !== 'Follow' && routerName !== 'Follow Search') ? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1"
             >
               <a href="#/follow" class="nav-link">Followed</a>
-            </li>
+            </template>
             <!--End Router client -->
             <!-- Router admin -->
             <li
-              :class="routerName != 'Dashboard Admin'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="routerName !== 'Dashboard Admin'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission == 1"
             >
               <a href="#/dashboard-admin" class="nav-link">Home</a>
-            </li>
+            </template>
             <li
-              :class="routerName != 'OC'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="routerName !== 'OC'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission == 1"
             >
               <a href="#/admin-oc" class="nav-link">OC</a>
-            </li>
+            </template>
             <li
-              :class="routerName != 'User'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="routerName !== 'User'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission == 1"
             >
               <a href="#/admin-user" class="nav-link">User</a>
             </li>
             <li
-              :class="routerName != 'OC User'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="routerName !== 'OC User'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission == 1"
             >
               <a href="#/admin-oc-user" class="nav-link">OC User</a>
             </li>
 
             <li
-              :class="routerName != 'Role'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="routerName !== 'Role'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission == 1"
             >
               <a href="#/admin-role" class="nav-link">Role</a>
@@ -105,11 +105,28 @@
 
         <!-- Right navbar links -->
         <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
-          <li class="nav-item">
-            <a class="nav-link">
+          <li class="nav-item user-menu">
+            <a class="nav-link" @click="toggleShow">
               <i class="fa fa-sign-out"></i>
-              <span class="font-weight-bold text-danger">{{ $common.toTitleCase(username) }}</span>
+              <!-- <img src="../../../assets/default-150x150.png" class="user-image img-circle elevation-2" alt="User Image"> -->
+              <img :src="imageProfile" class="user-image img-circle elevation-2" alt="User Image" />
+              <span class="font-weight-bold text-danger">{{ username | capitalize }}</span>
             </a>
+            <my-upload
+              field="UploadedFile"
+              @crop-success="cropSuccess"
+              @crop-upload-success="cropUploadSuccess"
+              @crop-upload-fail="cropUploadFail"
+              v-model="show"
+              lang-type="en"
+              :width="100"
+              :height="100"
+              url="http://10.4.4.224:93/api/Users/UploapProfile"
+              :params="params"
+              :noSquare="false"
+              :headers="headers"
+              img-format="png"
+            ></my-upload>
           </li>
           <!-- Messages Dropdown Menu -->
           <li class="nav-item">
@@ -118,17 +135,66 @@
               <span class="font-weight-bold text-info">{{currentTime}}</span>
             </a>
           </li>
-          <!-- Notifications Dropdown Menu -->
+          <!-- -------------------- -->
           <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
+            <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false">
+              <i class="far fa-bell"></i>
+              <span class="badge badge-danger navbar-badge" v-show="total>= 1">{{total}}</span>
+            </a>
+            <div
+              id="infinite-list"
+              class="dropdown-menu dropdown-menu-lg dropdown-menu-right fix-notify"
+            >
+              <span
+                class="dropdown-item dropdown-header"
+              >{{totalCount > 1? totalCount+" Notifications":totalCount+" Notification"}}</span>
+              <div class="dropdown-divider"></div>
+              <a v-for="(item,key,index) in data" :key="index" @click.prevent="pushRouter(item)">
+                <a class="dropdown-item">
+                  <!-- Message Start -->
+                  <div class="media">
+                    <img
+                      :src="imageBase64(item.ImageBase64)"
+                      alt="User Avatar"
+                      class="img-size-50 mr-3 img-circle"
+                    />
+                    <div class="media-body">
+                      <h3 class="dropdown-item-title">
+                        {{ item.Sender | capitalize }}
+                        <!-- <span class="right badge badge-danger">New</span> -->
+                        <small class="float-right right badge badge-danger" v-show="!item.Seen">New</small>
+                      </h3>
+                      <p class="text-sm">{{item.Message}}</p>
+                      <p class="text-sm text-muted">
+                        <i class="far fa-clock mr-1"></i>
+                        {{$common.JSONDateWithTime(item.CreatedTime)}}
+                      </p>
+                    </div>
+                  </div>
+                  <!-- Message End -->
+                </a>
+
+                <div class="dropdown-divider"></div>
+              </a>
+              <a href="#/notification" class="dropdown-item dropdown-footer">See All Messages</a>
+            </div>
+
+            <!-- <div>
+               <div class="dropdown-divider"></div>
+              <a href="/" class="dropdown-item dropdown-footer">See All Notifications</a>
+            </div>-->
+          </li>
+          <!-- Notifications Dropdown Menu -->
+          <li class="nav-item dropdown d-none">
+            <a class="nav-link" data-toggle="dropdown" href="/">
               <i class="far fa-bell"></i>
               <span class="badge badge-warning navbar-badge">{{total}}</span>
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right fix-width">
               <span class="dropdown-header">{{total}} Notifications</span>
               <div class="dropdown-divider"></div>
-              <div v-for="(item,key,index) in data" :key="index">
-                <a href="#" class="dropdown-item">
+              <a v-for="(item,key,index) in data" :key="index" @click.prevent="pushRouter(item)">
+                <a class="dropdown-item">
                   <i class="fas fa-envelope mr-2"></i>
                   {{item.Message}}
                   <span
@@ -136,10 +202,12 @@
                   >{{$common.JSONDateWithTime(item.CreatedTime)}}</span>
                 </a>
                 <div class="dropdown-divider"></div>
-              </div>
-              <div class="dropdown-divider"></div>
-              <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+              </a>
             </div>
+            <!-- <div>
+               <div class="dropdown-divider"></div>
+              <a href="/" class="dropdown-item dropdown-footer">See All Notifications</a>
+            </div>-->
           </li>
           <li class="nav-item">
             <a class="nav-link" @click.prevent="logout">
@@ -155,11 +223,53 @@
 <script>
 import moment from "moment-timezone";
 import EventBus from "../../../EventBus";
-
+import Vue from "vue";
+import myUpload from "vue-image-crop-upload";
 export default {
   name: "navbar",
+  components: {
+    "my-upload": myUpload
+  },
   data() {
     return {
+      totalCount: 0,
+      loadMore: true,
+      page: 1,
+      pageSize: 10,
+      imgNotifyBase64:
+        "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEVsdX3////Hy86jqK1+ho2Ql521ur7a3N7s7e5YhiPTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg==", // the datebase64 url of created image,
+      imageProfile: "",
+      en: {
+        hint: "Click or drag the file here to upload",
+        loading: "Uploading…",
+        noSupported:
+          "Browser is not supported, please use IE10+ or other browsers",
+        success: "Upload success",
+        fail: "Upload failed",
+        preview: "Preview",
+        btn: {
+          off: "Cancel",
+          close: "Close",
+          back: "Back",
+          save: "Save"
+        },
+        error: {
+          onlyImg: "Image only",
+          outOfSize: "Image exceeds size limit: ",
+          lowestPx: "Image's size is too low. Expected at least: "
+        }
+      },
+      show: false,
+      params: {
+        token: localStorage.getItem("authToken"),
+        name: "UploadedFile"
+      },
+      headers: {
+        smail: "*_~",
+        Authorization: "Bearer " + localStorage.getItem("authToken")
+      },
+      imgDataUrl:
+        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEVsdX3////Hy86jqK1+ho2Ql521ur7a3N7s7e5YhiPTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg==", // the datebase64 url of created image,
       currentTime: null,
       username: "No Name",
       display: 0,
@@ -167,32 +277,98 @@ export default {
       routerName: "",
       data: [],
       total: 0,
+      homePageUrl: "",
       connection: []
     };
   },
 
   mounted() {
     let self = this;
+    // Detect when scrolled to bottom.
+    var lastScrollTop = 0;
+    const listElm = document.querySelector("#infinite-list");
+    listElm.addEventListener("scroll", e => {
+      var st = listElm.pageYOffset || listElm.scrollTop; // Credits: "https://github.com/qeremy/so/blob/master/so.dom.js#L426"
+
+      if (st > lastScrollTop) {
+        if (self.page <= self.pageSize) {
+          self.page++;
+          self.getAllNotificationCurrentUser();
+        }
+        // downscroll code
+      } else {
+        // upscroll code
+        if (self.page >= 2) self.page--;
+      }
+      lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
+      // if (listElm.scrollTop + listElm.clientHeight >= listElm.scrollHeight) {
+      //   self.page++;
+      //   this.loadMore = true;
+      // }
+    });
+
+    // Initially load some items.
+    //self.getAllNotificationCurrentUser();
+
+    let imgToken = localStorage.getItem("ImageProfile");
+    if (imgToken === "null") {
+      self.imageProfile =
+        "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEVsdX3////Hy86jqK1+ho2Ql521ur7a3N7s7e5YhiPTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg==";
+    } else {
+      self.imageProfile =
+        "data:image/png;base64, " + localStorage.getItem("ImageProfile");
+    }
     console.log("mounted");
 
     self.username = localStorage.getItem("User");
 
-    self.permission = Number(localStorage.getItem("Level"));
-
-    self.connection.on("ReceiveMessage", (user, message) => {
-      console.log("ReceiveMessage");
-      self.getAllNotificationCurrentUser();
-      self.$alertify.info("There is the new alert!");
-    });
+    self.permission = Number(localStorage.getItem("Role"));
+    if (self.permission == 1) {
+      self.homePageUrl = "#/dashboard-admin";
+    } else {
+      self.homePageUrl = "#/todolist";
+    }
+    // self.connection.on("ReceiveMessage", (user, message) => {
+    //   console.log("ReceiveMessage");
+    //   let users = user || "";
+    //   let currentUser = localStorage.getItem("UserID").toString();
+    //   if (users.length > 0 && users.includes(currentUser)) {
+    //     self.page = 1;
+    //     self.data = [];
+    //     self.getAllNotificationCurrentUser();
+    //     self.$alertify.info("There is the new alert!");
+    //   }
+    // });
+    console.log(
+      "mounted Navbar---------------------------------------------------------"
+    );
   },
   computed: {},
   created() {
-    let self = this;
-    console.log("created");
+    console.log(
+      "Created Navbar---------------------------------------------------------"
+    );
 
+    let self = this;
+    self.permission = Number(localStorage.getItem("Role"));
+    if (self.permission == 1) {
+      self.homePageUrl = "#/dashboard-admin";
+    } else {
+      self.homePageUrl = "#/todolist";
+    }
+    let imgToken = localStorage.getItem("ImageProfile");
+    if (imgToken === "null") {
+      self.imageProfile =
+        "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEVsdX3////Hy86jqK1+ho2Ql521ur7a3N7s7e5YhiPTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg==";
+    } else {
+      self.imageProfile =
+        "data:image/png;base64, " + localStorage.getItem("ImageProfile");
+    }
+    console.log("created");
+    self.page = 1;
+    self.data = [];
     self.getAllNotificationCurrentUser();
     self.routerName = self.$route.name;
-    self.permission = Number(localStorage.getItem("Level"));
     self.currentTime = moment().format("LTS");
     setInterval(() => this.updateCurrentTime(), 1 * 1000);
     self.connection = new signalR.HubConnectionBuilder()
@@ -213,30 +389,99 @@ export default {
 
     self.connection.on("ReceiveMessage", (user, message) => {
       console.log("ReceiveMessage");
-      self.getAllNotificationCurrentUser();
-      self.$alertify.info("There is the new alert!");
+      let users = user || "";
+      let currentUser = localStorage.getItem("UserID").toString();
+      if (users.length > 0 && users.includes(currentUser)) {
+        self.page = 1;
+        self.data = [];
+        self.getAllNotificationCurrentUser();
+        self.$alertify.info("There is the new alert!");
+      }
     });
   },
   methods: {
+    imageBase64(img) {
+      if (img == null) {
+        return "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEVsdX3////Hy86jqK1+ho2Ql521ur7a3N7s7e5YhiPTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg==";
+      } else {
+        return "data:image/png;base64, " + img;
+      }
+    },
+    toggleShow() {
+      this.show = !this.show;
+    },
+    /**
+     * crop success
+     *
+     * [param] imgDataUrl
+     * [param] field
+     */
+    cropSuccess(imgDataUrl, field) {
+      console.log("-------- crop success --------");
+      this.imgDataUrl = imgDataUrl;
+    },
+    /**
+     * upload success
+     *
+     * [param] jsonData  server api return data, already json encode
+     * [param] field
+     */
+    cropUploadSuccess(jsonData, field) {
+      console.log("-------- upload success --------");
+      console.log(jsonData);
+      console.log("field: " + field);
+    },
+    /**
+     * upload fail
+     *
+     * [param] status    server api return error status, like 500
+     * [param] field
+     */
+    cropUploadFail(status, field) {
+      console.log("-------- upload fail --------");
+      console.log(status);
+      console.log("field: " + field);
+    },
+    pushRouter(item) {
+      let self = this;
+      self.$api.get(`api/Home/Seen/${item.ID}`).then(res => {
+        self.page = 1;
+        self.data = [];
+        self.getAllNotificationCurrentUser();
+      });
+      let path = "/";
+      if (item.URL.includes("#")) {
+        path = item.URL.split("#")[1];
+      } else {
+        path = item.URL;
+      }
+      if (this.$route.name !== "Follow Search") self.$router.push(path);
+      else return;
+    },
     callServer() {
-      var self = this;
+      let self = this;
       self.connection
         .invoke("SendMessage", "henry", "Hello Hub")
         .catch(err => console.error(err.toString()));
     },
     getAllNotificationCurrentUser(data) {
-      var self = this;
-      self.$api.get(`api/Home/getAllNotificationCurrentUser`).then(res => {
+      let self = this;
+      let url = `api/Home/getAllNotificationCurrentUser/${self.page}/${self.pageSize}`;
+      self.$api.get(url).then(res => {
+        //self.data = res.data.model;
         console.log("getAllNotificationCurrentUser");
         console.log(res);
-
-        self.data = res.data.model;
         self.total = res.data.total;
+        self.data = [...self.data, ...res.data.model];
+        self.totalCount = res.data.TotalCount;
+        self.loadMore = true;
+        // Stop scroll-loader
+        //res.data.model.length < self.pageSize && (self.loadMore = false);
       });
     },
     checkRole(role, level) {
       if (role == 1) return 1;
-      else if (role != 1 && level >= 1 && level <= 2) return 2;
+      else if (role !== 1 && level >= 1 && level <= 2) return 2;
       else return 3;
     },
     updateCurrentTime() {
@@ -255,14 +500,53 @@ export default {
   watch: {
     "$route.name": function(name) {
       this.routerName = this.$route.name;
+    },
+    imgDataUrl: function(newVal) {
+      localStorage.setItem("ImageProfile", newVal);
+      this.imageProfile = "";
+      this.imageProfile = localStorage.getItem("ImageProfile");
+    },
+    page(value) {
+      this.loadMore = value > 10;
     }
   }
 };
 </script>
-
 <style scoped>
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 .fix-width {
   max-width: 800px !important;
   width: 800px !important;
+  height: 500px !important;
+  overflow-y: scroll !important;
+  text-overflow: ellipsis;
+}
+.fix-notify {
+  min-width: 800px !important;
+  max-height: 600px !important;
+  text-overflow: ellipsis;
+  overflow-y: scroll !important;
 }
 </style>

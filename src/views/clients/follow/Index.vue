@@ -21,7 +21,7 @@
         <button type="button" @click="sortLow" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-low-vision"></i> Low
         </button>
-        <button type="button" @click="getTasks" class="btn bg-gradient-secondary btn-sm">
+        <button type="button" @click="clearSearch" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-sync-alt"></i> All
         </button>
       </div>
@@ -69,6 +69,7 @@
           <!-- /.card-header -->
           <div class="card-body table-responsive p-0">
             <ejs-treegrid
+              ref="treegrid"
               :dataSource="data"
               childMapping="children"
               :treeColumnIndex="3"
@@ -78,11 +79,12 @@
               :allowPdfExport="true"
               :allowSorting="true"
               :toolbar="toolbar"
+              :searchSettings="searchSettings"
               :dataSourceChanged="dataSourceChanged"
               :contextMenuItems="contextMenuItems"
             >
               <e-columns>
-                   <e-column
+                <e-column
                   field="Option"
                   :template="optionTemplate"
                   headerText="Option"
@@ -101,43 +103,50 @@
                   field="ProjectName"
                   headerText="Project name"
                   :disableHtmlEncode="false"
+                  :template="projectTemplate"
                   width="240"
                 ></e-column>
                 <e-column
                   field="JobName"
                   headerText="Job Name"
                   :disableHtmlEncode="false"
+                  :template="jobNameTemplate"
                   width="240"
                 ></e-column>
-                <e-column
-                  field="From"
-                  headerText="From Where? / From Who?"
-                  :disableHtmlEncode="false"
-                  width="230"
-                ></e-column>
+                <e-column field="From" headerText="From" :disableHtmlEncode="false" width="230"></e-column>
                 <e-column
                   field="Description"
+                  :template="templateDescripton"
                   headerText="Description"
                   width="180"
                   textAlign="Center"
                 ></e-column>
                 <e-column field="PIC" headerText="PIC" width="180" format="yMd" textAlign="Right"></e-column>
-                <e-column field="DueDate" headerText="DueDate" width="160" textAlign="Center"></e-column>
-                <e-column field="Remark" headerText="Remark" width="180" textAlign="Center"></e-column>
+                <e-column
+                  field="Remark"
+                  :template="remarkTemplate"
+                  headerText="Remark"
+                  width="180"
+                  textAlign="Center"
+                ></e-column>
                 <e-column
                   field="state"
                   :disableHtmlEncode="false"
                   headerText="Status"
+                  :template="statusTemplate"
                   width="100"
                   textAlign="Center"
                 ></e-column>
+                <e-column field="DueDate" headerText="DueDate" width="160" textAlign="Center"></e-column>
+                <e-column field="EveryDay" headerText="EveryDay" width="160" textAlign="Center"></e-column>
+                <e-column field="Monthly" headerText="Monthly" width="160" textAlign="Center"></e-column>
+                <e-column field="Quarterly" headerText="Quarterly" width="160" textAlign="Center"></e-column>
                 <e-column
                   field="CreatedDate"
                   headerText="CreatedDate"
                   width="160"
                   textAlign="Center"
                 ></e-column>
-             
               </e-columns>
             </ejs-treegrid>
             <!-- <table class="table table-hover">
@@ -234,6 +243,7 @@ import EventBus from "../../../EventBus";
 import {
   TreeGridPlugin,
   Sort,
+  Filter,
   ContextMenu,
   ExcelExport,
   PdfExport,
@@ -251,6 +261,7 @@ export default {
   },
   data() {
     return {
+      searchSettings: { hierarchyMode: "Parent" },
       contextMenuItems: [
         {
           text: "Add Remark",
@@ -259,6 +270,18 @@ export default {
           id: "Remark"
         }
       ],
+      statusTemplate: function() {
+        return {
+          template: Vue.component("status", {
+            template: `<span id="status" :class="data.state == 'Undone' ? 'badge bg-danger' : 'badge bg-success'"  style="padding:4px;color:white">{{data.state}}</span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            }
+          })
+        };
+      },
       priorityTemplate: function() {
         return {
           template: Vue.component("priority", {
@@ -296,6 +319,82 @@ export default {
           })
         };
       },
+      templateDescripton: function() {
+        return {
+          template: Vue.component("optionTemplate", {
+            template: `<div id="templateDescripton" data-toggle="tooltip" data-placement="top" :title="data.Description">
+                      {{data.Description}}
+                      </div>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
+      jobNameTemplate: function() {
+        return {
+          template: Vue.component("jobNameTemplate", {
+            template: `<a id="jobNameTemplate" data-toggle="tooltip" :title="data.JobName">
+                      {{data.JobName}}
+                      </a>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
+      projectTemplate: function() {
+        return {
+          template: Vue.component("projectTemplate", {
+            template: `<a id="projectTemplate" data-toggle="tooltip" :title="data.ProjectName">
+                      {{data.ProjectName}}
+                      </a>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
+      remarkTemplate: function() {
+        return {
+          template: Vue.component("remarkTemplate", {
+            template: `<a id="remarkTemplate" data-toggle="tooltip" :title="data.Remark">
+                      {{data.Remark}}
+                      </a>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
       pageSettings: { pageSize: 10 },
       PIC: [],
       expanded: {},
@@ -304,7 +403,7 @@ export default {
       date: "",
       data: [],
       toolbar: [
-        // "Search",
+        "Search",
         "ExpandAll",
         "CollapseAll"
         // "ExcelExport",
@@ -320,12 +419,38 @@ export default {
     EventBus.$off("follow", this.unfollow);
   },
   created() {
+    this.searchTreeGrid();
     this.getTasks();
   },
   methods: {
+    clearSearch() {
+      let self = this;
+      self.getTasks();
+      self.searchSettings = {
+        hierarchyMode: "None",
+        fields: ["JobName"],
+        operator: "contains",
+        key: "",
+        ignoreCase: true
+      };
+    },
+    searchTreeGrid() {
+      let self = this;
+      let jobname = self.$route.params.jobname || "";
+      jobname = jobname
+        .split("-")
+        .join(" ")
+        .replace(/_/g, "-");
+      self.searchSettings = {
+        hierarchyMode: "None",
+        fields: ["JobName"],
+        operator: "contains",
+        key: jobname,
+        ignoreCase: true
+      };
+    },
     unfollow(data) {
       var self = this;
-
       self.$api.delete(`api/Follow/Unfollow/${data.ID}`).then(res => {
         console.log("unfollow");
         if (res) {
@@ -388,9 +513,16 @@ export default {
       });
     }
   },
-  watch: {},
+  watch: {
+    "$route.path": function(name) {
+      this.searchTreeGrid();
+    },
+    "$route.name": function(name) {
+      this.searchTreeGrid();
+    }
+  },
   provide: {
-    treegrid: [ContextMenu, Sort, ExcelExport, PdfExport, Page, Toolbar]
+    treegrid: [ContextMenu, Sort, ExcelExport, PdfExport, Filter, Page, Toolbar]
   }
 };
 </script>

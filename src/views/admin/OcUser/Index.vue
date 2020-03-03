@@ -81,7 +81,7 @@
         <div class="card">
           <div class="card-header">
             <h5 class="card-title">List User {{title}}</h5>
-
+            
             <div class="card-tools">
               <button type="button" class="btn btn-tool" data-card-widget="collapse">
                 <i class="fas fa-minus"></i>
@@ -90,6 +90,23 @@
               <button type="button" class="btn btn-tool" data-card-widget="remove">
                 <i class="fas fa-times"></i>
               </button>
+            </div>
+            <div class="card-tools pr-5">
+              <div class="input-group input-group-sm" style="width: 150px;">
+                <input
+                  type="text"
+                  name="table_search"
+                  v-model="search"
+                  class="form-control float-right"
+                  placeholder="Search"
+                />
+
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-default">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <!-- /.card-header -->
@@ -103,14 +120,14 @@
                 </tr>
               </thead>
               <tbody style="overflow-y:hidden">
-                <tr v-for="(user,key,index) in users" :key="index">
+                <tr v-for="(user,key,index) in filterUsers" :key="index">
                   <td>{{key + 1}}</td>
                   <td>
                     <div class="pretty p-switch">
                       <input
                         type="checkbox"
                         :checked="user.Status"
-                        @click="AddOrUpdate(user.ID)"
+                        @click="AddOrUpdate(user.ID,user.Status)"
                         name="switch1"
                       />
                       <div class="state p-success">
@@ -212,7 +229,8 @@ export default {
         id: 0,
         remark: ""
       },
-      users: []
+      users: [],
+      search: ""
     };
   },
   created() {
@@ -225,6 +243,13 @@ export default {
       this.modalTitle = "OC Add";
     });
   },
+  computed: {
+    filterUsers() {
+      return this.users.filter(element => {
+        return element.Username.toLowerCase().match(this.search.toLowerCase());
+      });
+    }
+  },
   methods: {
     rowSelected(args) {
       var self = this;
@@ -234,11 +259,10 @@ export default {
       console.log(args);
       self.isHide = true;
     },
-    AddOrUpdate(userid) {
+    AddOrUpdate(userid, status) {
       var self = this;
-
       self.$api
-        .get(`api/OCUsers/AddOrUpdate/${userid}/${self.ocid}`)
+        .get(`api/OCUsers/AddOrUpdate/${userid}/${self.ocid}/${status}`)
         .then(res => {
           console.log(res);
           if (res.data.status) {

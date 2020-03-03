@@ -12,15 +12,17 @@
           <i class="fas fa-plus"></i> New Task
         </button>
       </div>
-      <div class="col-md-12">
+    </div>
+    <div class="row sticky-top">
+      <div class="col-md-12 col-xs-12 col-12">
         <h5 class="text-primary">Sort By:</h5>
       </div>
-      <div class="col-lg-12 col-xs-12 col-12 pb-4">
+      <div class="col-lg-6 col-xs-12 col-12 pb-4">
         <button type="button" @click="sortProject" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-tasks"></i> Project
         </button>
         <button type="button" @click="sortRoutine" class="btn bg-gradient-secondary btn-sm">
-          <i class="fas fa-book-open"></i> Routine Job
+          <i class="fas fa-book-open"></i> Routine
         </button>
         <button type="button" @click="sortAbnormal" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-book-open"></i> Abnormal
@@ -62,7 +64,7 @@
           </select>
         </div>
       </div>
-      <div class="col-lg-3 col-xs-6 col-6 pb-4">
+      <div class="col-lg-3 col-xs-6 col-6 pb-4 d-none">
         <v-md-date-range-picker
           max-year="2050"
           min-year="2019"
@@ -73,7 +75,8 @@
           @change="handleChange"
         ></v-md-date-range-picker>
       </div>
-
+    </div>
+    <div class="row">
       <div class="col-md-12">
         <div class="card">
           <div class="card-header">
@@ -115,6 +118,7 @@
               childMapping="children"
               :treeColumnIndex="3"
               :allowPaging="true"
+              :height="'auto'"
               :pageSettings="pageSettings"
               :allowSorting="true"
               :contextMenuClick="contextMenuClick"
@@ -125,6 +129,9 @@
               :toolbarClick="toolbarClick"
               :allowExcelExport="true"
               :allowPdfExport="true"
+              :contextMenuItems="contextMenuItems"
+              :contextMenuOpen="contextMenuOpen"
+              :recordDoubleClick="recordDoubleClick"
             >
               <e-columns>
                 <e-column
@@ -146,33 +153,40 @@
                   field="ProjectName"
                   headerText="Project name"
                   :disableHtmlEncode="false"
+                  :template="projectTemplate"
                   width="240"
                 ></e-column>
                 <e-column
                   field="JobName"
-                  headerText="Job Name"
+                  headerText="Task Name"
                   :disableHtmlEncode="false"
+                  :template="jobNameTemplate"
                   width="240"
                 ></e-column>
-                <e-column
-                  field="From"
-                  headerText="From Where? / From Who?"
-                  :disableHtmlEncode="false"
-                  width="230"
-                ></e-column>
-                <e-column
+                <e-column field="From" headerText="From" :disableHtmlEncode="false" width="230"></e-column>
+                <!-- <e-column
                   field="Description"
+                  :template="templateDescripton"
                   headerText="Description"
                   width="180"
                   textAlign="Center"
-                ></e-column>
+                ></e-column>-->
                 <e-column field="PIC" headerText="PIC" width="180" format="yMd" textAlign="Right"></e-column>
                 <e-column field="DeputyName" headerText="Deputies" width="180" textAlign="Center"></e-column>
+                <!-- <e-column field="Remark" :template="remarkTemplate" headerText="Remark" width="180" textAlign="Center"></e-column>
+                -->
                 <e-column field="DueDate" headerText="DueDate" width="160" textAlign="Center"></e-column>
-                 <e-column field="EveryDay" headerText="Every Day" width="160" textAlign="Center"></e-column>
-                  <e-column field="Monthly" headerText="Monthly" width="160" textAlign="Center"></e-column>
-                   <e-column field="Quarterly" headerText="Quarterly" width="160" textAlign="Center"></e-column>
-                <e-column field="Remark" headerText="Remark" width="180" textAlign="Center"></e-column>
+                <e-column
+                  field="state"
+                  :disableHtmlEncode="false"
+                  headerText="Status"
+                  width="100"
+                  textAlign="Center"
+                ></e-column>
+                <e-column field="EveryDay" headerText="Every Day" width="160" textAlign="Center"></e-column>
+                <e-column field="Monthly" headerText="Monthly" width="160" textAlign="Center"></e-column>
+                <e-column field="Quarterly" headerText="Quarterly" width="160" textAlign="Center"></e-column>
+                <!-- <e-column field="Remark" headerText="Remark" width="180" textAlign="Center"></e-column> -->
                 <e-column
                   field="state"
                   :disableHtmlEncode="false"
@@ -524,6 +538,79 @@
       </div>
       <!-- /.modal-dialog -->
     </div>
+    <div class="modal fade" id="modal-comment" aria-hidden="true" style="display: none;">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="height:750px">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              <i class="fas fa-edit"></i>
+              {{taskName}}
+            </h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body" style="overflow-y: scroll;">
+            <div class="container">
+              <div class="row d-flex align-items-center">
+                <div class="col-md-12 comments-section">
+                  <!--====COMMENT AREA START====-->
+                  <div class="row">
+                    <div class="col-12">
+                      <!-- <h2>Comments</h2> -->
+                      <form class="comment-form" method="post" action>
+                        <textarea
+                          class="comment-area"
+                          v-model="comment.content"
+                          placeholder="Write your comment here"
+                        ></textarea>
+                        <button
+                          type="submit"
+                          @click.prevent="addComment"
+                          class="btn comment-btn"
+                        >Post</button>
+                      </form>
+                    </div>
+                  </div>
+
+                  <!-- =======COMMENTS START=======-->
+                  <div class="row">
+                    <div class="col-12">
+                      <div
+                        class="comment-box-wrapper"
+                        v-for="(item, key, index) in dataComment"
+                        :key="index"
+                      >
+                        <template v-if="key < totalShow">
+                          <tree :tree-data="item" @AddSub="isLoadComment" :taskID="comment.taskid"></tree>
+                        </template>
+                      </div>
+                      <template
+                        v-if="totalShow < dataComment.length || dataComment.length > totalShow"
+                      >
+                        <small
+                          style="cursor: pointer;"
+                          @click="totalShow += 3"
+                          class="text-center text-primary d-block"
+                        >
+                          Load more
+                          <i class="fas fa-chevron-down text-small"></i>
+                        </small>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
   </div>
 </template>
 
@@ -532,6 +619,7 @@ import Vue from "vue";
 import Multiselect from "vue-multiselect";
 import { Datetime } from "vue-datetime";
 import EventBus from "../../../EventBus";
+import Tree from "./Tree";
 import {
   TreeGridPlugin,
   ContextMenu,
@@ -554,10 +642,13 @@ export default {
   name: "todolist",
   components: {
     Multiselect,
-    Datetime
+    Datetime,
+    Tree
   },
   data() {
     return {
+      totalShow: 3,
+      taskName: "",
       //-----------------datetime range
       selectedEveryday: "reset",
       selectedMonthly: "reset",
@@ -607,8 +698,8 @@ export default {
         return {
           template: Vue.component("optionTemplate", {
             template: `<div id="optionTemplate">
-                      <div class="btn-group">
-                        <button type="button" @click="addFollow(data)"class="btn btn-danger btn-xs" v-if="data.Level == 1" ><i :class="!data.Follow ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{!data.Follow?'Follow':'Followed'}}</button>
+                        <div class="btn-group">
+                        <button type="button" :class="!data.Follow ? 'btn btn-success btn-xs':'btn btn-danger btn-xs'" @click="addFollow(data)" v-if="data.Level == 1" ><i :class="!data.Follow ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{!data.Follow?'Follow':'Unfollow'}}</button>
                       </div>
                     </div>`,
             data: function() {
@@ -624,6 +715,82 @@ export default {
           })
         };
       },
+      // templateDescripton: function() {
+      //   return {
+      //     template: Vue.component("optionTemplate", {
+      //       template: `<div id="templateDescripton" data-toggle="tooltip" data-placement="top" :title="data.Description">
+      //                 {{data.Description}}
+      //                 </div>`,
+      //       data: function() {
+      //         return {
+      //           data: {}
+      //         };
+      //       },
+      //       methods: {
+      //         addSubscribe(data) {
+      //           EventBus.$emit("follow", data);
+      //         }
+      //       }
+      //     })
+      //   };
+      // },
+      jobNameTemplate: function() {
+        return {
+          template: Vue.component("jobNameTemplate", {
+            template: `<a id="jobNameTemplate" data-toggle="tooltip" :title="data.JobName">
+                      {{data.JobName}}
+                      </a>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
+      projectTemplate: function() {
+        return {
+          template: Vue.component("projectTemplate", {
+            template: `<a id="projectTemplate" data-toggle="tooltip" :title="data.ProjectName">
+                      {{data.ProjectName}}
+                      </a>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
+      //  remarkTemplate: function() {
+      //   return {
+      //     template: Vue.component("remarkTemplate", {
+      //       template: `<a id="remarkTemplate" data-toggle="tooltip" :title="data.Remark">
+      //                 {{data.Remark}}
+      //                 </a>`,
+      //       data: function() {
+      //         return {
+      //           data: {}
+      //         };
+      //       },
+      //       methods: {
+      //         addSubscribe(data) {
+      //           EventBus.$emit("follow", data);
+      //         }
+      //       }
+      //     })
+      //   };
+      // },
       editStatus: true,
       commands: [
         {
@@ -634,36 +801,36 @@ export default {
       modalTitle: "Add New Task",
       sort: "",
       contextMenuItems: [
-        {
-          text: "Add Sub-Task",
-          iconCss: " e-icons e-add",
-          target: ".e-content",
-          id: "Add-Sub-Task"
-        },
-        {
-          text: "Add Remark",
-          iconCss: " e-icons e-add",
-          target: ".e-content",
-          id: "Remark"
-        },
+        // {
+        //   text: "Add Sub-Task",
+        //   iconCss: " e-icons e-add",
+        //   target: ".e-content",
+        //   id: "Add-Sub-Task"
+        // },
+        // {
+        //   text: "Add Remark",
+        //   iconCss: " e-icons e-add",
+        //   target: ".e-content",
+        //   id: "Remark"
+        // },
         {
           text: "Finish Task",
-          iconCss: " e-icons e-edit",
+          iconCss: " e-icons e-add",
           target: ".e-content",
           id: "Done"
-        },
-        {
-          text: "Edit",
-          iconCss: " e-icons e-edit",
-          target: ".e-content",
-          id: "EditTask"
-        },
-        {
-          text: "Delete",
-          iconCss: " e-icons e-delete",
-          target: ".e-content",
-          id: "DeleteTask"
         }
+        // {
+        //   text: "Edit",
+        //   iconCss: " e-icons e-edit",
+        //   target: ".e-content",
+        //   id: "EditTask"
+        // },
+        // {
+        //   text: "Delete",
+        //   iconCss: " e-icons e-delete",
+        //   target: ".e-content",
+        //   id: "DeleteTask"
+        // }
       ],
       everydays: [
         "Monday",
@@ -693,7 +860,7 @@ export default {
         "Third quarter",
         "Fourth quarter"
       ],
-      pageSettings: { pageSize: 15 },
+      pageSettings: { pageSize: 50 },
       toolbar: [
         "Search",
         "ExpandAll",
@@ -746,35 +913,131 @@ export default {
       whoOptions: [],
       whoSelected: [],
       start: "",
-      end: ""
+      end: "",
+      comment: {
+        content: "",
+        taskid: 0,
+        userid: Number(localStorage.getItem("UserID"))
+      },
+      dataComment: [],
+      contentReply: ""
     };
   },
   mounted() {
     console.log("this.$refs.treegrid");
     console.log(this.$refs.treegrid);
     EventBus.$on("follow", this.addFollow);
+    EventBus.$on("AddSub", this.AddSub);
     EventBus.$on("taskItem", this.infoEdit);
   },
   destroyed() {
     // Stop listening the event hello with handler
     EventBus.$off("taskItem", this.infoEdit);
     EventBus.$off("follow", this.addFollow);
+    EventBus.$off("AddSub", this.AddSub);
   },
   created() {
     this.getProjects();
     this.getFrom();
     this.getUserForWho();
-    console.log(this.task);
     this.getTasks();
+    this.searchTreeGrid();
     this.who = localStorage.getItem("User");
   },
   computed: {},
 
   methods: {
+    AddSub(data) {
+      this.getAllComment(data);
+    },
+    isLoadComment(data) {
+      this.getAllComment(data);
+    },
+    imageBase64CurrentUser() {
+      if (localStorage.getItem("ImageProfile") == "null") {
+        return "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEVsdX3////Hy86jqK1+ho2Ql521ur7a3N7s7e5YhiPTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg==";
+      } else {
+        return "data:image/png;base64, " + localStorage.getItem("ImageProfile");
+      }
+    },
+    imageBase64(img) {
+      if (img == null) {
+        return "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEVsdX3////Hy86jqK1+ho2Ql521ur7a3N7s7e5YhiPTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg==";
+      } else {
+        return "data:image/png;base64, " + img;
+      }
+    },
+    clearFormComment() {
+      var self = this;
+      self.comment = {
+        content: "",
+        taskid: 0,
+        userid: Number(localStorage.getItem("UserID"))
+      };
+    },
+    addComment() {
+      let self = this;
+      self.$api.post("api/Comments/Add", self.comment).then(res => {
+        if (res.data) {
+          self.dataComment = res.data;
+          self.getAllComment(self.comment.taskid);
+          self.$alertify.success("successfully!");
+          self.comment.content = "";
+        } else self.$alertify.error("Failed!");
+      });
+    },
+    addSubComment(parentid, content) {
+      let self = this;
+      if (event.keyCode === 13) {
+        let subComment = {
+          content: content,
+          taskid: self.comment.taskid,
+          parentid: parentid,
+          userid: Number(localStorage.getItem("UserID"))
+        };
+        self.$api.post("api/Comments/AddSub", subComment).then(res => {
+          if (res.data) {
+            self.getAllComment(self.comment.taskid);
+            self.$alertify.success("successfully!");
+          } else self.$alertify.error("Failed!");
+        });
+      }
+    },
+    getAllComment(taskid) {
+      let self = this;
+
+      let userid = Number(localStorage.getItem("UserID"));
+      self.$api.get(`api/Comments/GetAll/${taskid}/${userid}`).then(res => {
+        if (res.data) {
+          console.log("Comments");
+          console.log(res.data);
+          self.dataComment = [];
+          self.dataComment = res.data;
+        }
+      });
+    },
+    recordDoubleClick(args) {
+      console.log("recordDoubleClick");
+      console.log(args);
+      let data = args.rowData;
+      let self = this;
+      self.clearFormComment();
+      self.getAllComment(data.ID);
+      self.taskName = data.JobName;
+      self.comment.taskid = data.ID;
+      $("#modal-comment").modal("show");
+    },
     clearSearch() {
       this.selectedEveryday = "reset";
       this.selectedMonthly = "reset";
       this.selectedQuarterly = "reset";
+      this.searchSettings = {
+        hierarchyMode: "None",
+        fields: ["JobName"],
+        operator: "contains",
+        key: "",
+        ignoreCase: true
+      };
       this.getTasks();
     },
     handleChange(values) {
@@ -811,6 +1074,22 @@ export default {
       self.whoSelected = {
         Username: localStorage.getItem("User"),
         ID: localStorage.getItem("UserID")
+      };
+    },
+    searchTreeGrid() {
+      let self = this;
+      let jobname = self.$route.params.jobname || "";
+      jobname = jobname
+        .split("-")
+        .join(" ")
+        .replace(/_/g, "-");
+
+      self.searchSettings = {
+        hierarchyMode: "None",
+        fields: ["JobName"],
+        operator: "contains",
+        key: jobname,
+        ignoreCase: true
       };
     },
     addFollow(data) {
@@ -921,13 +1200,12 @@ export default {
     },
     done(id) {
       var self = this;
-
       self.$api.get("api/Tasks/Done/" + id).then(res => {
         if (res.data) {
           self.dataSourceChanged();
           self.$alertify.success("You have already finished this one!");
         } else {
-          this.$swal("Warning !", "Please finish all sub-tasks!", "warning");
+          self.$alertify.warning("Please finish all sub-tasks!", true);
         }
       });
     },
@@ -944,8 +1222,113 @@ export default {
       var self = this;
       self.getTasks();
     },
+    contextMenuOpen(arg) {
+      // console.log("contextMenuOpen");
+      // console.log(arg);
+      // debugger;
+      // let self = this;
+      // let currentUser = Number(localStorage.getItem("UserID"));
+      // let createdBy = arg.rowInfo.rowData.CreatedBy || 0;
+      // let beAssignedsTemp = arg.rowInfo.rowData.BeAssigneds || [];
+      // let beAssigneds = beAssignedsTemp.map(
+      //   (assign, index, beAssignedsTemp) => {
+      //     return assign.ID;
+      //   }
+      // );
+      // let deputiesListTemp = arg.rowInfo.rowData.DeputiesList || [];
+      // let deputiesList = deputiesListTemp.map(
+      //   (deputy, index, deputiesListTemp) => {
+      //     return deputy.ID;
+      //   }
+      // );
+      // console.log(createdBy);
+      // if (createdBy == currentUser) {
+      //   document
+      //     .querySelectorAll("li#Done")[0]
+      //     .setAttribute("style", "display: block;");
+      //   // document
+      //   //   .querySelectorAll("li#EditTask")[0]
+      //   //   .setAttribute("style", "display: block;");
+      //   // document
+      //   //   .querySelectorAll("li#DeleteTask")[0]
+      //   //   .setAttribute("style", "display: block;");
+      // } else if (
+      //   beAssigneds.includes(currentUser) ||
+      //   deputiesList.includes(currentUser)
+      // ) {
+      //   document
+      //     .querySelectorAll("li#Done")[0]
+      //     .setAttribute("style", "display: block;");
+      //   document
+      //     .querySelectorAll("li#EditTask")[0]
+      //     .setAttribute("style", "display: none;");
+      //   document
+      //     .querySelectorAll("li#DeleteTask")[0]
+      //     .setAttribute("style", "display: none;");
+      // } else {
+      //   document
+      //     .querySelectorAll("li#Done")[0]
+      //     .setAttribute("style", "display: none;");
+      //   document
+      //     .querySelectorAll("li#EditTask")[0]
+      //     .setAttribute("style", "display: none;");
+      //   document
+      //     .querySelectorAll("li#DeleteTask")[0]
+      //     .setAttribute("style", "display: none;");
+      // }
+      // let deputies = arg.rowInfo.rowData.Deputies || [];
+      // let beAssignedsTemp = arg.rowInfo.rowData.BeAssigneds || [];
+      // let beAssigneds = beAssignedsTemp.map(
+      //   (assign, index, beAssignedsTemp) => {
+      //     return assign.ID;
+      //   }
+      // );
+      //Neu khong fai la leader va level >= 3 thi chi hien 2 menu la done va remark
+      //Neu la an add va nguoi nay la deputy cua task nay thi van cho full quyen
+      // if (!self.IsHideAdd) {
+      //   if (deputies.includes(currentUser)) {
+      //     document
+      //       .querySelectorAll("li#Add-Sub-Task")[0]
+      //       .setAttribute("style", "display: none;");
+      //     document
+      //       .querySelectorAll("li#EditTask")[0]
+      //       .setAttribute("style", "display: none;");
+      //     document
+      //       .querySelectorAll("li#DeleteTask")[0]
+      //       .setAttribute("style", "display: none;");
+      //   } else if (beAssigneds.includes(currentUser)) {
+      //     document
+      //       .querySelectorAll("li#Add-Sub-Task")[0]
+      //       .setAttribute("style", "display: none;");
+      //     document
+      //       .querySelectorAll("li#EditTask")[0]
+      //       .setAttribute("style", "display: none;");
+      //     document
+      //       .querySelectorAll("li#DeleteTask")[0]
+      //       .setAttribute("style", "display: none;");
+      //   } else {
+      //     document
+      //       .querySelectorAll("li#Add-Sub-Task")[0]
+      //       .setAttribute("style", "display: none;");
+      //     document
+      //       .querySelectorAll("li#Remark")[0]
+      //       .setAttribute("style", "display: none;");
+      //     document
+      //       .querySelectorAll("li#Done")[0]
+      //       .setAttribute("style", "display: none;");
+      //     document
+      //       .querySelectorAll("li#EditTask")[0]
+      //       .setAttribute("style", "display: none;");
+      //     document
+      //       .querySelectorAll("li#DeleteTask")[0]
+      //       .setAttribute("style", "display: none;");
+      //     self.$swal("Warning!", "You are not assign this task!!!", "warning");
+      //   }
+      // }
+    },
     contextMenuClick: function(args) {
       var self = this;
+
       console.log(args);
       switch (args.item.id) {
         case "Add-Sub-Task":
@@ -1197,6 +1580,12 @@ export default {
     }
   },
   watch: {
+    "$route.path": function(name) {
+      this.searchTreeGrid();
+    },
+    "$route.name": function(name) {
+      this.searchTreeGrid();
+    },
     task: function(newVal, oldVal) {
       console.log(newVal);
     },
@@ -1213,14 +1602,14 @@ export default {
           console.log(self.tasks);
         });
     },
-      selectedMonthly: function(newVal) {
+    selectedMonthly: function(newVal) {
       var self = this;
-      self.sortMonthly(newVal)
+      self.sortMonthly(newVal);
     },
-      selectedQuarterly: function(newVal) {
+    selectedQuarterly: function(newVal) {
       var self = this;
-      self.sortQuarterly(newVal)
-    },
+      self.sortQuarterly(newVal);
+    }
   },
   provide: {
     treegrid: [
@@ -1239,6 +1628,30 @@ export default {
 
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style scoped>
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+</style>
 <style>
 .e-headertext {
   font-size: 14px;
@@ -1256,5 +1669,119 @@ export default {
 }
 .e-grid .e-unboundcelldiv .e-icons {
   color: #fff2f2 !important;
+}
+
+.comments-section {
+  background: #fff;
+}
+.comment-area {
+  background: none repeat scroll 0 0 #fff;
+  border: medium none;
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  -ms-border-radius: 4px 4px 0 0;
+  -o-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
+  color: #777777;
+  float: left;
+  font-family: Lato;
+  font-size: 14px;
+  height: 85px;
+  letter-spacing: 0.3px;
+  padding: 10px 20px;
+  width: 100%;
+  resize: vertical;
+  outline: none;
+  border: 1px solid #f2f2f2;
+}
+.comment-btn {
+  float: right;
+  background: #4caf50;
+  margin: 5px 0;
+  padding: 6px 15px;
+  color: #fff;
+  letter-spacing: 1.5px;
+  outline: none;
+  border-radius: 4px;
+  box-shadow: none;
+}
+.comment-btn:hover,
+.comment-btn:focus {
+  background: #2e7d32;
+  outline: none;
+  border-radius: 4px;
+  box-shadow: none;
+}
+.comment-box-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 5px 0px;
+}
+.comment-box {
+  display: flex;
+  width: 100%;
+}
+.comment-box a {
+  color: #242475;
+}
+.commenter-image {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+}
+.comment-content {
+  display: flex;
+  flex-direction: column;
+  background: #f2f3f5;
+  margin-left: 5px;
+  padding: 4px 20px;
+  border-radius: 10px;
+}
+
+.commenter-head {
+  display: block;
+}
+
+.commenter-head .commenter-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.comment-date {
+  font-size: 0.7rem;
+}
+.comment-date i {
+  margin: 0 5px 0 10px;
+}
+.comment-body {
+  padding: 0 0 0 5px;
+  display: flex;
+  font-size: 1rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+.comment-footer {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.comment-footer span {
+  margin: 0 15px 0 0;
+}
+.comment-footer span a {
+  margin: 0 0px 0 2px;
+}
+
+.comment-footer span.comment-likes .active .fa-heart {
+  color: black;
+  font-size: 1rem;
+}
+.comment-footer span.comment-likes .active .fa-heart {
+  color: red;
+}
+
+.nested-comments {
+  margin-left: 50px;
 }
 </style>

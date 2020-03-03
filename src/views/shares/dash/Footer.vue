@@ -4,9 +4,9 @@
     <div class="float-right d-none d-sm-inline"></div>
     <!-- Default to the left -->
     <strong>
-      Copyright © 2019-2020
+      Copyright © 2020-2021
       <a href="http://10.4.4.92:93/">By Lab Team</a>.
-    </strong> All rights reserved.
+    </strong> 
     <!-- <div
       class="zalo-chat-widget"
       data-oaid="1017730148801262105"

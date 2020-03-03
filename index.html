@@ -1,73 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Work Management System</title>
-    <!-- Tell the browser to be responsive to screen width -->
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Font Awesome -->
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Work Management System</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link
-      rel="stylesheet"
-      href="./node_modules/admin-lte/plugins/fontawesome-free/css/all.min.css"
-    />
-    <!-- Ionicons -->
-    <link
-      rel="stylesheet"
-      href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
-    />
-    <!-- overlayScrollbars -->
-    <link
-      rel="stylesheet"
-      href="./node_modules/admin-lte/dist/css/adminlte.min.css"
-    />
-    <!-- Google Font: Source Sans Pro -->
-    <link
-      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
-      rel="stylesheet"
-    />
-    <link
-      href="./node_modules/pretty-checkbox/dist/pretty-checkbox.css"
-      rel="stylesheet"
-    />
-    <link
-      href="./node_modules/tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4.min.css"
-      media="all"
-      rel="stylesheet"
-      type="text/css"
-    />
-  </head>
-  <style>
-    body{
-      padding-right: 0!important;
-    }
-  </style>
-  <body
-    class="layout-top-nav layout-footer-fixed"
-    style="height: auto;"
-  >
-    <!-- Site wrapper -->
-    <div id="app"></div>
-    <!-- ./wrapper -->
+  <!-- Font Awesome -->
 
-    <!-- jQuery -->
-    <script src="./node_modules/admin-lte/plugins/jquery/jquery.min.js"></script>
-    <!-- <script src="https://sp.zalo.me/plugins/sdk.js"></script> -->
-    <!-- Bootstrap 4 -->
-    <script src="./node_modules/admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- Singalr -->
-    <script src="./node_modules/@microsoft/signalr/dist/browser/signalr.min.js"></script>
-    <script src="./node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
-    <!-- AdminLTE App -->
-    <script src="./node_modules/admin-lte/dist/js/adminlte.min.js"></script>
-    <!-- AdminLTE for demo purposes -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.css"
-      rel="stylesheet"
-    />
+  <link rel="stylesheet" href="./node_modules/admin-lte/plugins/fontawesome-free/css/all.min.css" />
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="./node_modules/admin-lte/dist/css/adminlte.min.css" />
 
-    <script src="./dist/build.js"></script>
-  </body>
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet" />
+  <!-- <script src="./node_modules/sweetalert2/dist/sweetalert2.min.css"></script> -->
+
+  <link href="./node_modules/pretty-checkbox/dist/pretty-checkbox.css" rel="stylesheet" />
+  <link href="./node_modules/tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4.min.css" media="all"
+    rel="stylesheet" type="text/css" />
+  <link href="./src/assets/loading.css" rel="stylesheet" />
+  <link rel="stylesheet" href="./src/assets/cropper/croppie.css">
+</head>
+<style>
+  body {
+    padding-right: 0 !important;
+  }
+
+  .sticky-top {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    background-color: #f4f6f9;
+  }
+</style>
+
+<body class="layout-top-nav layout-footer-fixed" style="height: auto;">
+  <!-- Site wrapper -->
+  <div id="app"></div>
+  <!-- ./wrapper -->
+
+  <!-- jQuery -->
+  <script src="./node_modules/admin-lte/plugins/jquery/jquery.min.js"></script>
+  <!-- <script src="https://sp.zalo.me/plugins/sdk.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="./node_modules/admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Singalr -->
+  <script src="./node_modules/@microsoft/signalr/dist/browser/signalr.min.js"></script>
+  <!-- <script src="./node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script> -->
+  <!-- AdminLTE App -->
+  <script src="./node_modules/admin-lte/dist/js/adminlte.min.js"></script>
+  <!-- AdminLTE for demo purposes -->
+  <link href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.css" rel="stylesheet" />
+  <script src="./src/assets/cropper/croppie.min.js"></script>
+  <script src="./src/assets/cropper/imguploader.bs.js"></script>
+  <script>
+    $(document).ready(function () {
+      $("body").tooltip({ selector: '[data-toggle=tooltip]', placement: 'left' });
+    });
+  </script>
+  <script src="./dist/build.js"></script>
+</body>
+
 </html>

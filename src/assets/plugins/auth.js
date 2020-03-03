@@ -15,6 +15,7 @@ var AuthPlugin = {
     localStorage.removeItem("Level");
     localStorage.removeItem("IsLeader");
     localStorage.removeItem("ListOCs");
+    localStorage.removeItem("ImageProfile");
   },
 
   getToken: function() {

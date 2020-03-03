@@ -30,6 +30,7 @@
                 <input
                   type="text"
                   name="table_search"
+                  v-model="search"
                   class="form-control float-right"
                   placeholder="Search"
                 />
@@ -289,8 +290,9 @@ export default {
   data() {
     return {
       page: 1,
-      name: " ",
-      pageSize: 20,
+      name: "%20",
+      search:"",
+      pageSize: 3,
       totalPage: 0,
       ListUser: [],
       dataRole: [],
@@ -318,6 +320,13 @@ export default {
     this.getUser();
     this.getRole();
   },
+  computed:{
+    filterUsers (){
+      return this.ListUser.filter(element=>{
+        return element.Username.toLowerCase().match(this.search.toLowerCase());
+      })
+    }
+  },
   methods: {
     onSelect(option) {
       this.user.roleid = option.ID;
@@ -330,14 +339,13 @@ export default {
     },
     clickCallback(pageNum) {
       let self = this;
-
       self.page = pageNum;
       this.getUser();
     },
-    getUser() {
+    getUser(search = "%20") {
       let self = this;
       this.$api
-        .get(`api/Users/GetAllPaging/${self.page}/${self.pageSize}`)
+        .get(`api/Users/GetAllPaging/${self.page}/${self.pageSize}/${search}`)
         .then(res => {
           console.log(res.data.total);
           console.log(res);
@@ -365,6 +373,10 @@ export default {
         roleid: 0,
         isLeader: false
       };
+      this.selectedRole = {
+        ID: 0,
+        Name: ""
+      }
     },
 
     remove(id) {
@@ -380,7 +392,7 @@ export default {
       }).then(result => {
         if (result.value) {
           this.$api
-            .delete(`api/Users/DeleteUser/${id}`)
+            .delete(`api/Users/Delete/${id}`)
             .then(r => {
               this.getUser();
               this.$swal(
@@ -433,6 +445,11 @@ export default {
       console.log(newVal);
       let self = this;
       self.user.roleid = newVal.ID;
+    },
+    search: function(newVal, oldVal) {
+      console.log(newVal);
+      let self = this;
+      self.getUser(newVal);
     }
   }
 };

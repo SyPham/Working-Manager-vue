@@ -13,10 +13,15 @@ import ProjectUser from "./views/clients/projectUser/Index.vue";
 import ToDoList from "./views/clients/todolist/Index.vue";
 import History from "./views/clients/history/Index.vue";
 import Follow from "./views/clients/follow/Index.vue";
-import Chat from "./views/clients/chat/Index.vue";
+import Chat from "./views/clients/chat/index.vue";
 import Photo from "./views/clients/photo/Index.vue";
 import RoutineJob from "./views/clients/routine-job/Index.vue";
 import Abnormal from "./views/clients/abnormal/Index.vue";
+
+import Notification from "./views/clients/notification/Index.vue";
+
+import Profile from "./views/shares/dash/Profile.vue";
+
 
 // auth
 import Auth from "./views/shares/auth/Auth.vue";
@@ -56,6 +61,20 @@ const router = new VueRouter({
           path: "/dashboard-admin",
           name: "Dashboard Admin",
           component: Home,
+          meta: { requiresAuth: true }
+        }
+      ]
+    },
+    //adminoc
+    {
+      name: "profile",
+      path: "/profile",
+      component: Profile,
+      children: [
+        {
+          path: "/profile",
+          name: "profile",
+          component: Profile,
           meta: { requiresAuth: true }
         }
       ]
@@ -128,7 +147,7 @@ const router = new VueRouter({
         },
         {
           path: "/project-detail/:id",
-          name: "Project-Detail",
+          name: "Project Detail",
           component: ProjectDetail,
           meta: { requiresAuth: true }
         }
@@ -164,6 +183,12 @@ const router = new VueRouter({
           name: "To Do List",
           component: ToDoList,
           meta: { requiresAuth: true }
+        },
+        {
+          path: "/todolist/:jobname",
+          name: "To Do List Search",
+          component: ToDoList,
+          meta: { requiresAuth: true }
         }
       ]
     },
@@ -175,6 +200,12 @@ const router = new VueRouter({
         {
           path: "/follow",
           name: "Follow",
+          component: Follow,
+          meta: { requiresAuth: true }
+        },
+        {
+          path: "/follow/:jobname",
+          name: "Follow Search",
           component: Follow,
           meta: { requiresAuth: true }
         }
@@ -194,7 +225,19 @@ const router = new VueRouter({
         }
       ]
     },
-
+    //client notification
+    {
+      path: "/notification",
+      component: Dash,
+      children: [
+        {
+          path: "/notification",
+          name: "Notification",
+          component: Notification,
+          meta: { requiresAuth: true }
+        }
+      ]
+    },
     //client chat
     {
       path: "/client-chat",

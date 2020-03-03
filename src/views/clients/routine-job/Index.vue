@@ -172,8 +172,9 @@
                     ></e-column>-->
                     <e-column
                       field="JobName"
-                      headerText="Job Name"
+                      headerText="Task Name"
                       :disableHtmlEncode="false"
+                      :template="jobNameTemplate"
                       width="240"
                     ></e-column>
                     <e-column
@@ -183,14 +184,16 @@
                       :disableHtmlEncode="false"
                       width="230"
                     ></e-column>
-                   
-                    <e-column
+
+                    <!-- <e-column
                       field="Description"
                       headerText="Description"
+                      :template="templateDescripton"
+                      :disableHtmlEncode="false"
                       width="180"
                       textAlign="Center"
-                    ></e-column>
-                     <e-column
+                    ></e-column>-->
+                    <e-column
                       field="DeputyName"
                       headerText="Deputy"
                       :disableHtmlEncode="false"
@@ -203,7 +206,15 @@
                       format="yMd"
                       textAlign="Right"
                     ></e-column>
+                    <!-- <e-column field="Remark" :template="remarkTemplate" headerText="Remark" width="180" textAlign="Center"></e-column> -->
                     <e-column field="DueDate" headerText="DueDate" width="160" textAlign="Center"></e-column>
+                    <e-column
+                      field="state"
+                      :disableHtmlEncode="false"
+                      headerText="Status"
+                      width="100"
+                      textAlign="Center"
+                    ></e-column>
                     <e-column
                       field="EveryDay"
                       headerText="Every Day"
@@ -215,15 +226,6 @@
                       field="Quarterly"
                       headerText="Quarterly"
                       width="160"
-                      textAlign="Center"
-                    ></e-column>
-
-                    <e-column field="Remark" headerText="Remark" width="180" textAlign="Center"></e-column>
-                    <e-column
-                      field="state"
-                      :disableHtmlEncode="false"
-                      headerText="Status"
-                      width="100"
                       textAlign="Center"
                     ></e-column>
                     <e-column
@@ -265,7 +267,7 @@
             <div class="row">
               <div class="col-md-9">
                 <div class="form-group">
-                  <label for="JobType">Routine</label>
+                  <label for="JobType">Routine Name</label>
                   <small v-if="!editStatus" class="text-danger">(*) Require</small>
                   <input
                     type="text"
@@ -292,7 +294,7 @@
                   ></multiselect>
                 </div>
               </div>
-              <div class="col-md-12">
+              <div class="col-md-12 d-none">
                 <div class="form-group">
                   <label for="Description">Description</label>
                   <textarea
@@ -322,8 +324,22 @@
                   ></multiselect>
                 </div>
               </div>
-
               <div class="col-md-6">
+                <label for="Deputy">Deputy</label>
+
+                <multiselect
+                  v-model="selectedDeputies"
+                  tag-placeholder="Add this as new tag"
+                  placeholder="Search or add a tag"
+                  label="Username"
+                  track-by="ID"
+                  :options="deputies"
+                  :searchable="true"
+                  :multiple="true"
+                  :taggable="true"
+                ></multiselect>
+              </div>
+              <div class="col-md-6 d-none">
                 <div class="form-group">
                   <label for="Description">Remark</label>
                   <input
@@ -349,21 +365,7 @@
                       </select>
                     </div>
                   </div>
-                  <div class="col-md-6">
-                    <label for="Deputy">Deputy</label>
 
-                    <multiselect
-                      v-model="selectedDeputies"
-                      tag-placeholder="Add this as new tag"
-                      placeholder="Search or add a tag"
-                      label="Username"
-                      track-by="ID"
-                      :options="deputies"
-                      :searchable="true"
-                      :multiple="true"
-                      :taggable="true"
-                    ></multiselect>
-                  </div>
                   <div class="col-md-12">
                     <div class="form-group box SpecificDay">
                       <label for="Description">Specific Day</label>
@@ -619,8 +621,8 @@ export default {
         return {
           template: Vue.component("optionTemplate", {
             template: `<div id="optionTemplate">
-                      <div class="btn-group">
-                        <button type="button" @click="addFollow(data)"class="btn btn-danger btn-xs" v-if="data.Level == 1" ><i :class="!data.Follow ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{!data.Follow?'Follow':'Followed'}}</button>
+                        <div class="btn-group">
+                        <button type="button" :class="!data.Follow ? 'btn btn-success btn-xs':'btn btn-danger btn-xs'" @click="addFollow(data)" v-if="data.Level == 1" ><i :class="!data.Follow ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{!data.Follow?'Follow':'Unfollow'}}</button>
                       </div>
                     </div>`,
             data: function() {
@@ -630,6 +632,63 @@ export default {
             },
             methods: {
               addFollow(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
+      templateDescripton: function() {
+        return {
+          template: Vue.component("optionTemplate", {
+            template: `<div id="templateDescripton" data-toggle="tooltip" data-placement="top" :title="data.Description">
+                      {{data.Description}}
+                      </div>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
+      jobNameTemplate: function() {
+        return {
+          template: Vue.component("jobNameTemplate", {
+            template: `<a id="jobNameTemplate" data-toggle="tooltip" :title="data.JobName">
+                      {{data.JobName}}
+                      </a>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
+      remarkTemplate: function() {
+        return {
+          template: Vue.component("remarkTemplate", {
+            template: `<a id="remarkTemplate" data-toggle="tooltip" :title="data.Remark">
+                      {{data.Remark}}
+                      </a>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
                 EventBus.$emit("follow", data);
               }
             }
@@ -759,6 +818,7 @@ export default {
         pic: [],
         JobTypeID: 2
       },
+      PICs: [],
       projectOptions: [],
       projectSelected: [],
       whoOptions: [],
@@ -1040,13 +1100,48 @@ export default {
         }
       });
     },
+    valid() {
+      if (this.task.jobName === "") {
+        this.$swal("Warning!", "Please enter the job name!", "warning");
+        return false;
+      }
+      if (this.selectedPeriodMain === "reset") {
+        this.$swal("Warning!", "Please select on preiod!", "warning");
+        return false;
+      } else {
+        switch (this.selectedPeriodMain) {
+          case "EveryDay":
+            if (this.task.everyday === "") {
+              this.$swal("Warning!", "Please select on every day!", "warning");
+              return false;
+            }
+            break;
+          case "Monthly":
+            if (this.task.monthly === "") {
+              this.$swal("Warning!", "Please select on monthly!", "warning");
+              return false;
+            }
+            break;
+
+          case "Quarterly":
+            if (this.task.quarterly === "") {
+              this.$swal("Warning!", "Please select on quarterly!", "warning");
+              return false;
+            }
+            break;
+        }
+      }
+      return true;
+    },
     delete(id) {
       var self = this;
       self.$api.delete("api/Tasks/Delete/" + id).then(res => {
         if (res.data) {
           self.dataSourceChanged();
+          self.$swal("Success !", "Delete", "success");
+        } else {
+          self.$swal("Warning !", "You don't create this task!", "warning");
         }
-        this.$swal("Success !", "Delete", "success");
       });
     },
     dataSourceChanged() {
@@ -1091,6 +1186,7 @@ export default {
           self.getUser(args.rowInfo.rowData.ProjectID);
 
           self.whoSelected = args.rowInfo.rowData.FromWho;
+          self.PICs = args.rowInfo.rowData.PICs || [];
 
           self.projectSelected = {
             ID: args.rowInfo.rowData.ProjectID,
@@ -1103,24 +1199,27 @@ export default {
             priority: args.rowInfo.rowData.PriorityID,
             id: args.rowInfo.rowData.ID,
             pic: args.rowInfo.rowData.PIC || [],
+            level: args.rowInfo.rowData.Level,
             everyday: args.rowInfo.rowData.EveryDay,
             deadline: args.rowInfo.rowData.Deadline
           };
           self.selected = args.rowInfo.rowData.BeAssigneds;
           self.selectedDeputies = args.rowInfo.rowData.DeputiesList;
-          if (args.rowInfo.rowData.EveryDay !== "#N/A") {
+          let everyday = args.rowInfo.rowData.EveryDay;
+          let monthly = args.rowInfo.rowData.Monthly;
+          let quarterly = args.rowInfo.rowData.Quarterly;
+          let deadline = args.rowInfo.rowData.DueDate;
+
+          if (everyday != "#N/A" && everyday != "") {
             self.selectedPeriodMain = "EveryDay";
-            self.selectedPeriod = args.rowInfo.rowData.EveryDay.substring(0, 3);
-          } else if (args.rowInfo.rowData.Monthly !== "#N/A") {
+            self.selectedPeriod = everyday.substring(0, 3);
+          } else if (monthly !== "#N/A" && monthly !== "") {
             self.selectedPeriodMain = "Monthly";
-            self.task.monthly = args.rowInfo.rowData.Monthly.substring(0, 3);
-          } else if (args.rowInfo.rowData.Quarterly !== "#N/A") {
+            self.task.monthly = monthly.substring(0, 3);
+          } else if (quarterly !== "#N/A" && quarterly !== "") {
             self.selectedPeriodMain = "Quarterly";
-            self.task.quarterly = args.rowInfo.rowData.Quarterly.substring(
-              0,
-              3
-            );
-          } else if (args.rowInfo.rowData.DueDate !== "#N/A") {
+            self.task.quarterly = quarterly.substring(0, 3);
+          } else if (deadline !== "#N/A" && deadline !== "") {
             self.selectedPeriodMain = "SpecificDay";
             self.task.deadline = args.rowInfo.rowData.Deadline;
           }
@@ -1188,13 +1287,7 @@ export default {
         console.log(res);
       });
     },
-    // clearForm() {
-    //   var self = this;
-    //   self.date = "";
-    //   self.projectSelected = {};
-    //   self.task = [];
-    //   self.selected = [];
-    // },
+
     getTasks() {
       var self = this;
       self.$api.get(`api/Tasks/GetListTreeRoutine/${self.ocid}`).then(res => {
@@ -1266,6 +1359,7 @@ export default {
         remark: "",
         deadline: "",
         status: false,
+        level: 0,
         fromWhoID: 0,
         everyday: "",
         monthly: "",
@@ -1276,6 +1370,9 @@ export default {
         JobTypeID: 2,
         deputies: []
       };
+      this.PICs = [];
+      this.selectedPeriodMain = "reset";
+      this.selectedPeriod = "";
       this.projectSelected = [];
       this.selected = [];
       this.date = "";
@@ -1285,32 +1382,56 @@ export default {
       console.log("createTask");
       console.log(self.task);
       if (self.task.parentID > 0) {
-        self.task.fromWhoID = self.whoSelected.ID;
-        self.$api.post("api/Tasks/CreateSubTask", self.task).then(res => {
-          if (res.data) {
-            self.clearForm();
-            $("#modal-task").modal("hide");
-            self.dataSourceChanged();
-            self.$alertify.success("Add Sub-Tasks successfully!");
-          } else {
-            self.$swal("Error!", "Add Sub-Tasks failed!", "error");
-          }
-          console.log(res);
-        });
+        var check = self.valid();
+        if (check) {
+          self.task.fromWhoID = self.whoSelected.ID;
+          self.$api.post("api/Tasks/CreateSubTask", self.task).then(res => {
+            if (res.data) {
+              self.clearForm();
+              $("#modal-task").modal("hide");
+              self.dataSourceChanged();
+              self.$alertify.success("Add Sub-Tasks successfully!");
+            } else {
+              self.$swal("Error!", "Add Sub-Tasks failed!", "error");
+            }
+            console.log(res);
+          });
+        }
       } else {
-        self.task.fromWhoID = self.whoSelected.ID;
-        self.$api.post("api/Tasks/CreateTask", self.task).then(res => {
-          if (res.data) {
-            self.clearForm();
-            $("#modal-task").modal("hide");
-            self.dataSourceChanged();
-            self.$alertify.success("Add Tasks successfully!");
-          } else {
-            self.$swal("Error!", "Add Tasks failed!", "error");
+        var check = self.valid();
+        if (check) {
+          if (self.task.id > 0) {
+            if (self.task.pic.length > 0 && self.task.level > 1) {
+              let flag = false;
+              for (let i of self.task.pic) {
+                if (self.PICs.includes(i)) {
+                  flag = true;
+                  break;
+                }
+              }
+              if (!flag) {
+                self.$alertify.warning(
+                  "You should add the pic for main task!",
+                  true
+                );
+                return;
+              }
+            }
           }
+          self.task.fromWhoID = self.whoSelected.ID;
+          self.$api.post("api/Tasks/CreateTask", self.task).then(res => {
+            if (res.data) {
+              self.clearForm();
+              $("#modal-task").modal("hide");
+              self.dataSourceChanged();
+              self.$alertify.success("Add Tasks successfully!");
+            } else {
+              self.$swal("Error!", "Add Tasks failed!", "error");
+            }
 
-          console.log(res);
-        });
+            console.log(res);
+          });
+        }
       }
     },
     dateFormat(date) {
@@ -1330,7 +1451,7 @@ export default {
     whoSelected: function(newVal, oldVal) {
       var self = this;
       let who = newVal;
-      this.task.fromWhoID = who.ID;
+      self.task.fromWhoID = who.ID;
     },
     selected: function(newVal, oldVal) {
       var self = this;

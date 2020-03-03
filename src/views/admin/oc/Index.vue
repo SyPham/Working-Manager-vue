@@ -187,7 +187,7 @@ export default {
         "PdfExport"
       ],
       editing: { allowDeleting: true, allowEditing: true, mode: "Row" },
-      pageSettings: { pageSize: 10 },
+      pageSettings: { pageSize: 20 },
       editparams: { params: { format: "n" } },
       expanded: {},
       data: [],
@@ -264,8 +264,8 @@ export default {
       self.$api.delete("api/Ocs/Delete/" + id).then(res => {
         if (res.data) {
           self.dataSourceChanged();
+           self.$swal("Success !", "Delete", "success");
         }
-        this.$swal("Success !", "Delete", "success");
       });
     },
     dataSourceChanged() {
@@ -283,7 +283,7 @@ export default {
         self.delete(args.rowInfo.rowData.key);
       } else {
         self.modalTitle = "Add Sub-OC";
-        self.oc.parentid = args.rowInfo.rowData.key;
+         self.oc= { id: 0, name: "", level: 0, parentid: args.rowInfo.rowData.key },
         $("#modal-oc").modal("show");
         console.log(self.primaryKey);
       }
@@ -313,24 +313,26 @@ export default {
       console.log(self.oc);
       if (self.oc.parentid > 0) {
         self.$api.post("api/Ocs/CreateSubOC", self.oc).then(res => {
-          self.options = res.data;
           if (res.data) {
             self.clearFrom();
             $("#modal-oc").modal("hide");
             self.dataSourceChanged();
+            self.$alertify.success("Successfully!");
+          }else{
+            self.$swal("Error!","Failed!","error");
           }
-          alert("add sub-OC");
           console.log(res);
         });
       } else {
         self.$api.post("api/Ocs/CreateOC", self.oc).then(res => {
-          self.options = res.data;
           if (res.data) {
             self.clearFrom();
             $("#modal-oc").modal("hide");
             self.dataSourceChanged();
+            self.$alertify.success("Successfully!");
+          }else{
+            self.$swal("Error!","Failed!","error");
           }
-          console.log(res);
         });
       }
       this.modalTitle = "OC Add";
