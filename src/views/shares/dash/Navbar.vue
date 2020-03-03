@@ -34,37 +34,37 @@
               v-if="permission > 1"
             >
               <a href="#/project" class="nav-link">Project</a>
-            </template>
+            </li>
             <li
               :class="routerName !== 'Routine Job'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1 "
             >
               <a href="#/routine" class="nav-link">Routine</a>
-            </template>
+            </li>
             <li
               :class="routerName !== 'Abnormal'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1 "
             >
               <a href="#/abnormal" class="nav-link">Abnormal</a>
-            </template>
+            </li>
             <li
               :class="routerName !== 'To Do List'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1"
             >
               <a href="#/todolist" class="nav-link">To Do List</a>
-            </template>
+            </li>
             <li
               :class="routerName !== 'History'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1 "
             >
               <a href="#/history" class="nav-link">History</a>
-            </template>
+            </li>
             <li
               :class="(routerName !== 'Follow' && routerName !== 'Follow Search') ? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1"
             >
               <a href="#/follow" class="nav-link">Followed</a>
-            </template>
+            </li>
             <!--End Router client -->
             <!-- Router admin -->
             <li
@@ -72,13 +72,13 @@
               v-if="permission == 1"
             >
               <a href="#/dashboard-admin" class="nav-link">Home</a>
-            </template>
+            </li>
             <li
               :class="routerName !== 'OC'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission == 1"
             >
               <a href="#/admin-oc" class="nav-link">OC</a>
-            </template>
+            </li>
             <li
               :class="routerName !== 'User'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission == 1"
