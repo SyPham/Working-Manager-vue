@@ -37,7 +37,7 @@
           <i class="fas fa-low-vision"></i> Low
         </button>
         <button type="button" @click="clearSearch" class="btn bg-gradient-secondary btn-sm">
-          <i class="fas fa-sync-alt"></i> Reset Sort
+          <i class="fas fa-sync-alt"></i> All
         </button>
       </div>
       <div class="col-lg-2 col-xs-6 col-6 pb-4">
@@ -216,329 +216,14 @@
       </div>
       <!-- /.col -->
     </div>
-    <div class="modal fade" id="modal-task" aria-hidden="true" style="display: none;">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">
-              <i class="fas fa-plus"></i>
-              {{modalTitle}}
-            </h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="card card-primary card-outline card-outline-tabs">
-                  <div class="card-header p-0 border-bottom-0">
-                    <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
-                      <li class="nav-item">
-                        <a
-                          class="nav-link active"
-                          id="routine-tabs-three-home-tab"
-                          data-toggle="pill"
-                          href="#routine-tabs"
-                          role="tab"
-                          aria-controls="routine-tabs"
-                          aria-selected="true"
-                        >Routine</a>
-                      </li>
-                      <li class="nav-item">
-                        <a
-                          class="nav-link"
-                          id="project-tabs-tab"
-                          data-toggle="pill"
-                          href="#project-tabs"
-                          role="tab"
-                          aria-controls="project-tabs"
-                          aria-selected="false"
-                        >Project</a>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="card-body">
-                    <div class="tab-content" id="custom-tabs-three-tabContent">
-                      <div
-                        class="tab-pane fade active show"
-                        id="routine-tabs"
-                        role="tabpanel"
-                        aria-labelledby="routine-tabs-tab"
-                      >
-                        <div class="form-group">
-                          <label for="JobType">Routine</label>
-                          <small v-if="!editStatus" class="text-danger">(*) Require</small>
-                          <input
-                            type="text"
-                            id="JobType"
-                            v-model="task.jobName"
-                            class="form-control JobType"
-                          />
-                        </div>
-                      </div>
-                      <div
-                        class="tab-pane fade"
-                        id="project-tabs"
-                        role="tabpanel"
-                        aria-labelledby="project-tabs-tab"
-                      >
-                        <div class="form-group">
-                          <label class="typo__label">Project</label>
-                          <small v-if="!editStatus" class="text-danger">(*) Require</small>
-                          <multiselect
-                            v-model="projectSelected"
-                            deselect-label="Can't remove this value"
-                            track-by="ID"
-                            label="Name"
-                            placeholder="Select one"
-                            :options="projectOptions"
-                            :searchable="false"
-                            :allow-empty="false"
-                            @tag="addTagProject"
-                            @select="onSelectProject"
-                          ></multiselect>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- /.card -->
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="card card-primary card-outline card-outline-tabs">
-                  <div class="card-header p-0 border-bottom-0">
-                    <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
-                      <li class="nav-item">
-                        <a
-                          class="nav-link active"
-                          id="tabs-who-tab"
-                          data-toggle="pill"
-                          href="#tabs-who"
-                          role="tab"
-                          aria-controls="tabs-who"
-                          aria-selected="true"
-                        >From Who?</a>
-                      </li>
-                      <li class="nav-item">
-                        <a
-                          class="nav-link"
-                          id="tabs-where-tab"
-                          data-toggle="pill"
-                          href="#tabs-where"
-                          role="tab"
-                          aria-controls="tabs-where"
-                          aria-selected="false"
-                        >From Where?</a>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="card-body">
-                    <div class="tab-content" id="custom-tabs-three-tabContent">
-                      <div
-                        class="tab-pane fade active show"
-                        id="tabs-who"
-                        role="tabpanel"
-                        aria-labelledby="tabs-who"
-                      >
-                        <div class="form-group">
-                          <label for="JobType">Who?</label>
-                          <small
-                            v-if="!editStatus"
-                            class="text-danger"
-                          >(*) Require (Default is yourself!)</small>
-                          <multiselect
-                            v-model="whoSelected"
-                            deselect-label="Can't remove this value"
-                            track-by="ID"
-                            label="Username"
-                            placeholder="Select one"
-                            :options="whoOptions"
-                            :searchable="false"
-                            :allow-empty="false"
-                            @select="onSelectWho"
-                          ></multiselect>
-                        </div>
-                      </div>
-                      <div
-                        class="tab-pane fade"
-                        id="tabs-where"
-                        role="tabpanel"
-                        aria-labelledby="tabs-where"
-                      >
-                        <div class="form-group">
-                          <label class="typo__label">Where?</label>
-                          <small v-if="!editStatus" class="text-danger">(*) Require</small>
-                          <multiselect
-                            v-model="ocSelected"
-                            deselect-label="Can't remove this value"
-                            track-by="ID"
-                            label="Name"
-                            placeholder="Select one"
-                            :options="ocOptions"
-                            :searchable="false"
-                            :allow-empty="false"
-                            @tag="addTagOC"
-                            @select="onSelectOC"
-                          ></multiselect>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- /.card -->
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="Assigned">Be Assigned</label>
-                  <small v-if="!editStatus" class="text-danger">(*) Require</small>
-                  <multiselect
-                    v-model="selected"
-                    tag-placeholder="Add this as new tag"
-                    placeholder="Search or add a tag"
-                    label="Username"
-                    track-by="ID"
-                    :options="options"
-                    :multiple="true"
-                    :taggable="true"
-                    @tag="addTag"
-                    @select="onSelectTask"
-                  ></multiselect>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="Description">Description</label>
-                  <input
-                    type="text"
-                    id="Description"
-                    v-model="task.description"
-                    class="form-control Description"
-                  />
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="Description">Deadline</label>
-                  <small v-if="!editStatus" class="text-danger">(*) Require</small>
-                  <datetime
-                    v-model="dateDateTime"
-                    input-class="form-control"
-                    placeholder="Select date"
-                    type="date"
-                  ></datetime>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="Description">Remark</label>
-                  <input
-                    type="text"
-                    id="Description"
-                    v-model="task.remark"
-                    class="form-control Description"
-                  />
-                </div>
-              </div>
-              <div class="col-md-12">
-                <label>Priority</label>
-                <small v-if="!editStatus" class="text-danger">(*) Require (Default is medium)</small>
 
-                <div class="form-group">
-                  <div class="custom-control custom-radio">
-                    <input
-                      class="custom-control-input"
-                      v-model="task.priority"
-                      type="radio"
-                      id="priorityHigh"
-                      name="priority"
-                      value="H"
-                    />
-                    <label for="priorityHigh" class="custom-control-label">High</label>
-                  </div>
-
-                  <div class="custom-control custom-radio">
-                    <input
-                      class="custom-control-input"
-                      :checked="true"
-                      v-model="task.priority"
-                      type="radio"
-                      value="M"
-                      id="priorityMedium"
-                      name="priority"
-                    />
-                    <label for="priorityMedium" class="custom-control-label">Medium</label>
-                  </div>
-
-                  <div class="custom-control custom-radio">
-                    <input
-                      class="custom-control-input"
-                      v-model="task.priority"
-                      type="radio"
-                      id="priorityLow"
-                      name="priority"
-                      value="L"
-                    />
-                    <label for="priorityLow" class="custom-control-label">Low</label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-
-            <button type="button" class="btn btn-primary" @click="createTask">Save changes</button>
-          </div>
-        </div>
-        <!-- /.modal-content -->
-      </div>
-      <!-- /.modal-dialog -->
-    </div>
-
-    <div class="modal fade" id="modal-remark" aria-hidden="true" style="display: none;">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">
-              <i class="fas fa-plus"></i> Remark Add
-            </h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label for="remarkID">Remark Content</label>
-                  <input
-                    style="display:none"
-                    type="text"
-                    id="remarkID"
-                    v-model="remarkObj.ID"
-                    class="form-control remarkID"
-                  />
-                  <textarea
-                    type="text"
-                    id="remarkName"
-                    v-model="remarkObj.remark"
-                    class="form-control remarkName"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" @click="remark">Save changes</button>
-          </div>
-        </div>
-        <!-- /.modal-content -->
-      </div>
-      <!-- /.modal-dialog -->
-    </div>
-    <div class="modal fade" id="modal-comment" aria-hidden="true" style="display: none;">
+    <div
+      class="modal fade"
+      id="modal-comment"
+      ref="modalComment"
+      aria-hidden="true"
+      style="display: none;"
+    >
       <div class="modal-dialog modal-lg">
         <div class="modal-content" style="height:750px">
           <div class="modal-header">
@@ -715,25 +400,6 @@ export default {
           })
         };
       },
-      // templateDescripton: function() {
-      //   return {
-      //     template: Vue.component("optionTemplate", {
-      //       template: `<div id="templateDescripton" data-toggle="tooltip" data-placement="top" :title="data.Description">
-      //                 {{data.Description}}
-      //                 </div>`,
-      //       data: function() {
-      //         return {
-      //           data: {}
-      //         };
-      //       },
-      //       methods: {
-      //         addSubscribe(data) {
-      //           EventBus.$emit("follow", data);
-      //         }
-      //       }
-      //     })
-      //   };
-      // },
       jobNameTemplate: function() {
         return {
           template: Vue.component("jobNameTemplate", {
@@ -772,25 +438,6 @@ export default {
           })
         };
       },
-      //  remarkTemplate: function() {
-      //   return {
-      //     template: Vue.component("remarkTemplate", {
-      //       template: `<a id="remarkTemplate" data-toggle="tooltip" :title="data.Remark">
-      //                 {{data.Remark}}
-      //                 </a>`,
-      //       data: function() {
-      //         return {
-      //           data: {}
-      //         };
-      //       },
-      //       methods: {
-      //         addSubscribe(data) {
-      //           EventBus.$emit("follow", data);
-      //         }
-      //       }
-      //     })
-      //   };
-      // },
       editStatus: true,
       commands: [
         {
@@ -929,6 +576,11 @@ export default {
     EventBus.$on("follow", this.addFollow);
     EventBus.$on("AddSub", this.AddSub);
     EventBus.$on("taskItem", this.infoEdit);
+    let self = this;
+    $(this.$refs.modalComment).on("hidden.bs.modal", () => {
+      self.$router.push("/todolist");
+    });
+    this.searchTreeGrid();
   },
   destroyed() {
     // Stop listening the event hello with handler
@@ -1025,7 +677,7 @@ export default {
       self.getAllComment(data.ID);
       self.taskName = data.JobName;
       self.comment.taskid = data.ID;
-      $("#modal-comment").modal("show");
+      $(self.$refs.modalComment).modal("show");
     },
     clearSearch() {
       this.selectedEveryday = "reset";
@@ -1039,6 +691,9 @@ export default {
         ignoreCase: true
       };
       this.getTasks();
+      if (name === "To Do List Search") {
+        self.$router.push("/todolist");
+      }
     },
     handleChange(values) {
       console.log(values);
@@ -1078,19 +733,34 @@ export default {
     },
     searchTreeGrid() {
       let self = this;
-      let jobname = self.$route.params.jobname || "";
-      jobname = jobname
-        .split("-")
-        .join(" ")
-        .replace(/_/g, "-");
+      let name = self.$route.name;
+      if (name === "To Do List Comment") {
+        let taskid = self.$route.params.taskid || 0;
+        let jobname = self.$route.params.jobname || "";
+        jobname = jobname
+          .split("-")
+          .join(" ")
+          .replace(/_/g, "-");
+        self.clearFormComment();
+        self.getAllComment(Number(taskid));
+        self.taskName = jobname;
+        self.comment.taskid = Number(taskid);
+        $(self.$refs.modalComment).modal("show");
+      } else if (name === "To Do List Search") {
+        let jobname = self.$route.params.jobname || "";
+        jobname = jobname
+          .split("-")
+          .join(" ")
+          .replace(/_/g, "-");
 
-      self.searchSettings = {
-        hierarchyMode: "None",
-        fields: ["JobName"],
-        operator: "contains",
-        key: jobname,
-        ignoreCase: true
-      };
+        self.searchSettings = {
+          hierarchyMode: "None",
+          fields: ["JobName"],
+          operator: "contains",
+          key: jobname,
+          ignoreCase: true
+        };
+      }
     },
     addFollow(data) {
       var self = this;
@@ -1185,18 +855,6 @@ export default {
           self.$refs.treegrid.excelExport();
           break;
       }
-    },
-    remark() {
-      var self = this;
-
-      self.$api.post("api/Tasks/Remark", self.remarkObj).then(res => {
-        if (res.data) {
-          $("#modal-remark").modal("hide");
-
-          self.dataSourceChanged();
-        }
-        this.$swal("Success !", "Remark", "success");
-      });
     },
     done(id) {
       var self = this;
@@ -1390,41 +1048,6 @@ export default {
           break;
       }
     },
-    addTagProject(newTag) {
-      const tag = {
-        ID: newTag,
-        Name: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000)
-      };
-      this.projectOptions.push(tag);
-      this.projectSelected.push(tag);
-      this.selected.map(item => {
-        this.task.projectID = item.ID;
-      });
-      console.log(this.task.projectID);
-    },
-    addTagOC(newTag) {
-      const tag = {
-        ID: newTag,
-        Name: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000)
-      };
-      this.ocOptions.push(tag);
-      this.ocSelected.push(tag);
-      this.ocSelected.map(item => {
-        this.task.OCID = item.ID;
-      });
-      console.log(this.task.OCID);
-    },
-    addTag(newTag) {
-      const tag = {
-        ID: newTag,
-        Username: newTag.substring(0, 2) + Math.floor(Math.random() * 10000000)
-      };
-      this.options.push(tag);
-      this.selected.push(tag);
-      this.selected.map(item => {
-        this.task.pic.push(item.ID);
-      });
-    },
     getUser(projectID = 0) {
       var self = this;
       self.$api.get(`api/Tasks/GetListUser/${projectID}`).then(res => {
@@ -1440,13 +1063,6 @@ export default {
         console.log(res);
       });
     },
-    clearForm() {
-      var self = this;
-      self.dateDateTime = "";
-      self.projectSelected = {};
-      self.task = [];
-      self.selected = [];
-    },
     getTasks() {
       var self = this;
 
@@ -1457,24 +1073,6 @@ export default {
           self.data = res.data;
           console.log(self.data);
         });
-    },
-    onSelectOC(option) {
-      this.task.OCID = option.ID;
-      console.log(this.task.OCID);
-    },
-    onSelectTask(option) {
-      this.task.pic.push(option.ID);
-      console.log(this.task.pic);
-    },
-    onSelectProject(option) {
-      this.task.projectID = option.ID;
-      console.log(this.task.projectID);
-      console.log("projectSelected da thay doi load lai user");
-      this.getUser(option.ID);
-    },
-    onSelectWho(option) {
-      this.task.fromWhoID = option.ID;
-      console.log(this.task.fromWhoID);
     },
     getProjects() {
       var self = this;
@@ -1522,34 +1120,6 @@ export default {
       this.selected = [];
       this.dateDateTime = "";
     },
-    createTask() {
-      var self = this;
-      console.log("createTask");
-      console.log(self.task);
-      if (self.task.parentID > 0) {
-        self.task.fromWhoID = self.whoSelected.ID;
-        self.$api.post("api/Tasks/CreateSubTask", self.task).then(res => {
-          if (res.data) {
-            self.clearForm();
-            $("#modal-task").modal("hide");
-            self.dataSourceChanged();
-          }
-          self.$swal("Success!", "Add Sub-Tasks successfully!", "success");
-          console.log(res);
-        });
-      } else {
-        self.task.fromWhoID = self.whoSelected.ID;
-        self.$api.post("api/Tasks/CreateTask", self.task).then(res => {
-          if (res.data) {
-            self.clearForm();
-            $("#modal-task").modal("hide");
-            self.dataSourceChanged();
-          }
-          self.$swal("Success!", "Add Tasks successfully!", "success");
-          console.log(res);
-        });
-      }
-    },
     dateNow(ch = "/") {
       function pad(s) {
         return s < 10 ? "0" + s : s;
@@ -1591,24 +1161,6 @@ export default {
     },
     date: function(newVal, oldVal) {
       this.task.deadline = this.dateFormat(newVal);
-    },
-    selectedEveryday: function(newVal) {
-      var self = this;
-      self.$api
-        .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/${newVal}`)
-        .then(res => {
-          self.tasks = res.data;
-          self.data = res.data;
-          console.log(self.tasks);
-        });
-    },
-    selectedMonthly: function(newVal) {
-      var self = this;
-      self.sortMonthly(newVal);
-    },
-    selectedQuarterly: function(newVal) {
-      var self = this;
-      self.sortQuarterly(newVal);
     }
   },
   provide: {

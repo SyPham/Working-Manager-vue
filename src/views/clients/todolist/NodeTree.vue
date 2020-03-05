@@ -2,7 +2,7 @@
   <div>
     <div class="comment-box-wrapper">
       <div class="comment-box">
-        <img :src="imageBase64CurrentUser()" class="commenter-image" alt="commenter_image" />
+        <img :src="imageBase64(node.ImageBase64)" class="commenter-image" alt="commenter_image" />
         <div class="comment-content">
           <div class="commenter-head">
             <span class="commenter-name">
@@ -30,7 +30,7 @@
                 class="comment-action"
                 style="cursor: pointer;"
                 @click.prevent="clickReply"
-              >{{ node.HasChildren ? "Replies" : "Reply" }}</a>
+              >{{ node.HasChildren && node.children.length > 1 ? "Replies" : "Reply" }}</a>
             </span>
           </div>
         </div>

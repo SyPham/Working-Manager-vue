@@ -116,23 +116,23 @@ export default {
           ];
           var uri = self.$route.query.redirect || "";
           if (self.$route.query.redirect.length != 0) {
-         
             var roleUser = routerArrUser.includes(uri);
-            routerArrUser.forEach((item, index)=>{
-               if(uri.includes(item)) roleUser = true;
+            routerArrUser.forEach((item, index) => {
+              if (uri.includes(item)) roleUser = true;
             });
             var roleAdmin = routerArrAdmin.includes(uri);
+            //Neu la user va thuoc nhung router cua user
             if (Number(localStorage.getItem("Role")) == 2 && roleUser) {
-              if(uri.includes("project-detail")){
-              self.$router.push("/");
-              }else{
-              self.$router.push(uri);
+              if (uri.includes("project-detail")) {
+                self.$router.push("/");
+              } else {
+                self.$router.push(uri);
               }
             } else if (Number(localStorage.getItem("Role")) == 2 && roleAdmin) {
-              if(uri.includes("project-detail")){
-              self.$router.push("/");
-              }else{
-              self.$router.push(uri);
+              if (uri.includes("project-detail")) {
+                self.$router.push("/");
+              } else {
+                self.$router.push("/");
               }
             } else if (Number(localStorage.getItem("Role")) == 1 && roleAdmin) {
               self.$router.push(uri);
@@ -148,7 +148,10 @@ export default {
           }
         })
         .catch(res => {
-          self.$alertify.error("Username and password are incorrect, please try again!",true);
+          self.$alertify.error(
+            "Username and password are incorrect, please try again!",
+            true
+          );
         });
     }
   }

@@ -623,7 +623,6 @@ import {
   Toolbar
 } from "@syncfusion/ej2-vue-treegrid";
 Vue.use(TreeGridPlugin);
-
 export default {
   name: "project-detail",
   components: {
@@ -915,6 +914,7 @@ export default {
       $('[data-toggle="tooltip"]').tooltip();
       self.getTasks();
     });
+
     // EventBus.$on("reciveConnection", this.reciveConnection);
     self.getProjects();
     self.getFrom();
@@ -1138,7 +1138,7 @@ export default {
           self.task.priority = args.rowInfo.rowData.PriorityID;
           self.whoSelected = args.rowInfo.rowData.FromWho;
           self.PICs = args.rowInfo.rowData.PICs || [];
-          
+
           self.projectSelected = {
             ID: args.rowInfo.rowData.ProjectID,
             Name: args.rowInfo.rowData.ProjectName
@@ -1226,7 +1226,7 @@ export default {
       self.$api
         .get(`api/Projects/GetListTreeProjectDetail/${self.$route.params.id}`)
         .then(res => {
-          self.tasks = res.data;
+          // self.tasks = res.data;
           self.data = res.data;
           console.log(self.data);
         });
@@ -1235,7 +1235,11 @@ export default {
       var self = this;
       self.$api.get("api/Tasks/GetListProject").then(res => {
         self.projectOptions = res.data;
-        console.log(res);
+        if (res.data) {
+          console.log(res);
+        } else {
+          self.$alertify.warning("This project deleted!!!", true);
+        }
       });
     },
     getFrom() {
@@ -1347,7 +1351,7 @@ export default {
         if (check) {
           self.task.fromWhoID = self.whoSelected.ID;
           if (self.task.id > 0) {
-            if (self.task.pic.length > 0 && self.task.level > 1 ) {
+            if (self.task.pic.length > 0 && self.task.level > 1) {
               let flag = false;
               for (let i of self.task.pic) {
                 if (self.PICs.includes(i)) {
@@ -1355,8 +1359,8 @@ export default {
                   break;
                 }
               }
-              // if (self.PICs.length == 0 && self.task.pic.length == 0) flag = false; 
-              // else if (self.PICs.length == 0 && self.task.pic.length > 0) flag = false;           
+              // if (self.PICs.length == 0 && self.task.pic.length == 0) flag = false;
+              // else if (self.PICs.length == 0 && self.task.pic.length > 0) flag = false;
               if (!flag) {
                 self.$alertify.warning(
                   "You should add the pic for main task!",
@@ -1545,45 +1549,56 @@ export default {
     },
     GetUserByProjectID(id) {
       var self = this;
-      self.$api.get(`api/Projects/GetUserByProjectID/${id}`).then(res => {
-        if (res.data.status) {
-          console.log(res.data);
-          self.selectedMember = res.data.selectedMember;
-          self.selectedManager = res.data.selectedManager;
-          self.projectName = res.data.title;
-          self.room = res.data.room;
-          let members = res.data.selectedMember;
-          let managers = res.data.selectedManager;
+      let projectid = id || 0;
+      let api = self.$api
+        .get(`api/Projects/GetUserByProjectID/${projectid}`)
+        .then(res => {
+          if (res.data.status) {
+            console.log(res.data);
 
-          self.member.users = members.map((member, index, members) => {
-            return member.ID;
-          });
-          self.membersName = members.map((member, index, members) => {
-            return this.$common.toTitleCase(member.Username);
-          });
-          self.mamagersName = managers.map((manager, index, managers) => {
-            return this.$common.toTitleCase(manager.Username);
-          });
+            self.selectedMember = res.data.selectedMember;
+            self.selectedManager = res.data.selectedManager;
+            self.projectName = res.data.title;
+            self.room = res.data.room;
+            let members = res.data.selectedMember;
+            let managers = res.data.selectedManager;
 
-          self.listMemberID = members.map((member, index, members) => {
-            return member.ID;
-          });
-          self.listMangerID = managers.map((manager, index, managers) => {
-            return manager.ID;
-          });
+            self.member.users = members.map((member, index, members) => {
+              return member.ID;
+            });
+            self.membersName = members.map((member, index, members) => {
+              return this.$common.toTitleCase(member.Username);
+            });
+            self.mamagersName = managers.map((manager, index, managers) => {
+              return this.$common.toTitleCase(manager.Username);
+            });
 
-          self.createdBy = res.data.createdBy;
-          let currentUser = Number(localStorage.getItem("UserID"));
-          if (
-            !self.listMangerID.includes(currentUser) &&
-            !self.listMemberID.includes(currentUser)
-          ) {
-            self.$router.push("/todolist");
-            return;
+            self.listMemberID = members.map((member, index, members) => {
+              return member.ID;
+            });
+            self.listMangerID = managers.map((manager, index, managers) => {
+              return manager.ID;
+            });
+
+            self.createdBy = res.data.createdBy;
+            let currentUser = Number(localStorage.getItem("UserID"));
+            if (
+              !self.listMangerID.includes(currentUser) &&
+              !self.listMemberID.includes(currentUser)
+            ) {
+              self.$router.push("/todolist");
+              return;
+            }
+            self.checkRole(
+              self.createdBy,
+              self.listMangerID,
+              self.listMemberID
+            );
+          } else {
+            // self.$router.push("/todolist");
+            // return;
           }
-          self.checkRole(self.createdBy, self.listMangerID, self.listMemberID);
-        }
-      });
+        });
     }
   },
   mounted() {
@@ -1592,7 +1607,18 @@ export default {
     // if(!this.listMangerID.includes(localStorage.getItem("UserID"))||!this.listMemberID.includes(localStorage.getItem("UserID"))){
     //    this.$router.push("/todolist");
     // }
-    //  this.dataSourceChanged();
+
+    let self = this;
+    console.log(
+      "--------------------------------------------------------------------------"
+    );
+    setTimeout(() => {
+      self.getTasks();
+      console.log("Nua giay load lai data");
+    }, 500);
+    console.log(
+      "--------------------------------------------------------------------------"
+    );
     EventBus.$on("follow", this.addSubscribe);
     EventBus.$on("taskItem", this.infoEdit);
     $(document).ready(function() {
@@ -1622,6 +1648,9 @@ export default {
     // EventBus.$off("reciveConnection", this.reciveConnection);
   },
   watch: {
+    "$route.path": function(name) {
+      alert(name);
+    },
     whoSelected: function(newVal, oldVal) {
       var self = this;
       let who = newVal;

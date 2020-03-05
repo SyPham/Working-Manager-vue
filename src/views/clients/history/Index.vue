@@ -33,7 +33,7 @@
         <button type="button" @click="sortLow" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-low-vision"></i> Low
         </button>
-        <button type="button" @click="getTasks" class="btn bg-gradient-secondary btn-sm">
+        <button type="button" @click="clearSearch" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-sync-alt"></i> All
         </button>
       </div>
@@ -71,6 +71,7 @@
           <!-- /.card-header -->
           <div class="card-body table-responsive p-0">
             <ejs-treegrid
+              ref="treegrid"
               :dataSource="filterData"
               childMapping="children"
               :treeColumnIndex="3"
@@ -80,6 +81,7 @@
               :allowPdfExport="true"
               :allowSorting="true"
               :toolbar="toolbar"
+              :searchSettings="searchSettings"
               :dataSourceChanged="dataSourceChanged"
             >
               <e-columns>
@@ -237,6 +239,7 @@ import {
   ExcelExport,
   PdfExport,
   Toolbar,
+  Filter,
   Page
 } from "@syncfusion/ej2-vue-treegrid";
 Vue.use(TreeGridPlugin);
@@ -283,6 +286,13 @@ export default {
           })
         };
       },
+      searchSettings: {
+        hierarchyMode: "Parent",
+        fields: ["JobName"],
+        operator: "contains",
+        key: "task",
+        ignoreCase: true
+      },
       pageSettings: { pageSize: 10 },
       PIC: [],
       expanded: {},
@@ -293,7 +303,7 @@ export default {
       jobTypeID: 0,
       data: [],
       toolbar: [
-        // "Search",
+        "Search",
         "ExpandAll",
         "CollapseAll"
         // "ExcelExport",
@@ -310,6 +320,7 @@ export default {
   },
   created() {
     this.getTasks();
+    this.searchTreeGrid();
   },
   computed: {
     filterData() {
@@ -324,6 +335,32 @@ export default {
     }
   },
   methods: {
+    searchTreeGrid() {
+      let self = this;
+      let jobname = self.$route.params.jobname || "";
+      jobname = jobname
+        .split("-")
+        .join(" ")
+        .replace(/_/g, "-");
+      self.searchSettings = {
+        hierarchyMode: "None",
+        fields: ["JobName"],
+        operator: "contains",
+        key: jobname,
+        ignoreCase: true
+      };
+    },
+    clearSearch() {
+      let self = this;
+      self.searchSettings = {
+        hierarchyMode: "None",
+        fields: ["JobName"],
+        operator: "contains",
+        key: "",
+        ignoreCase: true
+      };
+      self.getTasks();
+    },
     sortProject() {
       var self = this;
       self.search = "";
@@ -378,9 +415,16 @@ export default {
       });
     }
   },
-  watch: {},
+  watch: {
+    "$route.path": function(name) {
+      this.searchTreeGrid();
+    },
+    "$route.name": function(name) {
+      this.searchTreeGrid();
+    }
+  },
   provide: {
-    treegrid: [Sort, ExcelExport, PdfExport, Page, Toolbar]
+    treegrid: [Sort, ExcelExport, PdfExport, Filter, Page, Toolbar]
   }
 };
 </script>

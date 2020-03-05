@@ -189,6 +189,12 @@ const router = new VueRouter({
           name: "To Do List Search",
           component: ToDoList,
           meta: { requiresAuth: true }
+        },
+        {
+          path: "/todolist-comment/:taskid/:jobname",
+          name: "To Do List Comment",
+          component: ToDoList,
+          meta: { requiresAuth: true }
         }
       ]
     },
@@ -220,6 +226,12 @@ const router = new VueRouter({
         {
           path: "/history",
           name: "History",
+          component: History,
+          meta: { requiresAuth: true }
+        },
+        {
+          path: "/history/:jobname",
+          name: "History Search",
           component: History,
           meta: { requiresAuth: true }
         }

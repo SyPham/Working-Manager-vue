@@ -261,7 +261,9 @@ export default {
   },
   data() {
     return {
-      searchSettings: { hierarchyMode: "Parent" },
+      searchSettings: {
+        hierarchyMode: "Parent"
+      },
       contextMenuItems: [
         {
           text: "Add Remark",

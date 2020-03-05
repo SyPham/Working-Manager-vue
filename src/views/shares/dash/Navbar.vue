@@ -48,13 +48,13 @@
               <a href="#/abnormal" class="nav-link">Abnormal</a>
             </li>
             <li
-              :class="routerName !== 'To Do List'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="routerName !== 'To Do List' && routerName !== 'To Do List Search' && routerName !== 'To Do List Comment'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1"
             >
               <a href="#/todolist" class="nav-link">To Do List</a>
             </li>
             <li
-              :class="routerName !== 'History'? 'nav-item':'nav-item bg-info rounded-pill'"
+              :class="routerName !== 'History'&& routerName !== 'History Search'? 'nav-item':'nav-item bg-info rounded-pill'"
               v-if="permission > 1 "
             >
               <a href="#/history" class="nav-link">History</a>
@@ -455,7 +455,11 @@ export default {
       } else {
         path = item.URL;
       }
-      if (this.$route.name !== "Follow Search") self.$router.push(path);
+      if (
+        self.$route.name !== "Follow Search" &&
+        self.routerName !== "Project Detail"
+      )
+        self.$router.push(path);
       else return;
     },
     callServer() {

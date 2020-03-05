@@ -292,7 +292,7 @@ export default {
       page: 1,
       name: "%20",
       search:"",
-      pageSize: 3,
+      pageSize: 20,
       totalPage: 0,
       ListUser: [],
       dataRole: [],

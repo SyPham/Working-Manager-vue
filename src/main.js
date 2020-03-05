@@ -14,14 +14,7 @@ import Auth from "./assets/plugins/auth";
 import Alertify from "./assets/plugins/alertify";
 import CommonPlugin from "./assets/plugins/common";
 
-// import VueSocketio from "vue-socket.io";
 
-// Vue.use(
-//   new VueSocketio({
-//     debug: true,
-//     connection: "http://localhost:5000"
-//   })
-// );
 Vue.component("paginate", Paginate);
 Vue.use(Datetime);
 Vue.use(VueSweetalert2);
@@ -34,7 +27,7 @@ Vue.use({
       "application/json; charset=utf-8";
     var instance = axios.create();
     instance.interceptors.request.use(
-      function(config) {
+      function (config) {
         config.headers = {
           Authorization: "Bearer " + Vue.auth.getToken()
         };
@@ -43,7 +36,7 @@ Vue.use({
         };
         return config;
       },
-      function(error) {
+      function (error) {
         // Do something with request error
         return Promise.reject(error);
       }
@@ -52,7 +45,7 @@ Vue.use({
   }
 });
 
-Vue.filter("capitalize", function(val) {
+Vue.filter("capitalize", function (val) {
   return val.charAt(0).toUpperCase() + val.slice(1);
 });
 
@@ -61,16 +54,16 @@ Vue.filter("toTitleCase", function (val) {
   return arrTemp
     .map(element => element[0].toUpperCase() + element.substr(1).toLowerCase())
     .join(" ");
-  
+
 });
 
 Vue.use(Alertify);
 Vue.use(CommonPlugin);
 //configure route guards
-Router.beforeEach(function(to, from, next) {
+Router.beforeEach(function (to, from, next) {
   //prevent access to 'requiresGuest' routes;
   if (
-    to.matched.some(function(record) {
+    to.matched.some(function (record) {
       return record.meta.requiresGuest;
     }) &&
     Vue.auth.loggedIn()
@@ -79,7 +72,7 @@ Router.beforeEach(function(to, from, next) {
       path: "/home"
     });
   } else if (
-    to.matched.some(function(record) {
+    to.matched.some(function (record) {
       return record.meta.requiresAuth;
     }) &&
     !Vue.auth.loggedIn()
