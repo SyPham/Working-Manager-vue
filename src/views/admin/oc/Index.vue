@@ -64,6 +64,8 @@
               :rowSelected="rowSelected "
               :actionComplete="actionComplete"
               :searchSettings="searchSettings"
+              :allowRowDragAndDrop="true"
+              :rowDropSettings="rowDrop"
               :toolbar="toolbar"
             >
               <e-columns>
@@ -141,6 +143,7 @@ import {
   ExcelExport,
   PdfExport,
   Page,
+  RowDD,
   Resize,
   Toolbar
 } from "@syncfusion/ej2-vue-treegrid";
@@ -155,6 +158,8 @@ export default {
   },
   data() {
     return {
+    
+      rowDrop: { targetID: "destTree" },
       searchSettings: { hierarchyMode: "Parent" },
       oc: { id: 0, name: "", level: 0, parentid: 0 },
       modalTitle: "Add OC",
@@ -232,7 +237,7 @@ export default {
         key: args.data.key,
         title: args.data.title
       };
-       self.oc = {
+      self.oc = {
         id: args.data.key,
         name: args.data.title
       };
@@ -261,10 +266,20 @@ export default {
     },
     delete(id) {
       var self = this;
-      self.$api.delete("api/Ocs/Delete/" + id).then(res => {
-        if (res.data) {
-          self.dataSourceChanged();
-           self.$swal("Success !", "Delete", "success");
+      self.$alertify.confirm().then(res => {
+        if (res.value) {
+          self.$api.delete("api/Ocs/Delete/" + id).then(res => {
+            if (res.data) {
+              self.dataSourceChanged();
+              self.$alertify.info("Successfully!");
+            }
+          });
+        } else {
+          self.$alertify.info(
+            "Your project is still intact",
+            true,
+            "Cancelled"
+          );
         }
       });
     },
@@ -283,8 +298,13 @@ export default {
         self.delete(args.rowInfo.rowData.key);
       } else {
         self.modalTitle = "Add Sub-OC";
-         self.oc= { id: 0, name: "", level: 0, parentid: args.rowInfo.rowData.key },
-        $("#modal-oc").modal("show");
+        (self.oc = {
+          id: 0,
+          name: "",
+          level: 0,
+          parentid: args.rowInfo.rowData.key
+        }),
+          $("#modal-oc").modal("show");
         console.log(self.primaryKey);
       }
     },
@@ -318,8 +338,8 @@ export default {
             $("#modal-oc").modal("hide");
             self.dataSourceChanged();
             self.$alertify.success("Successfully!");
-          }else{
-            self.$swal("Error!","Failed!","error");
+          } else {
+            self.$swal("Error!", "Failed!", "error");
           }
           console.log(res);
         });
@@ -330,8 +350,8 @@ export default {
             $("#modal-oc").modal("hide");
             self.dataSourceChanged();
             self.$alertify.success("Successfully!");
-          }else{
-            self.$swal("Error!","Failed!","error");
+          } else {
+            self.$swal("Error!", "Failed!", "error");
           }
         });
       }
@@ -359,6 +379,7 @@ export default {
       ExcelExport,
       PdfExport,
       Page,
+      RowDD,
       Filter,
       Resize,
       Toolbar

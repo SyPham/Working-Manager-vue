@@ -88,7 +88,7 @@
             <i class="fab fa-instagram-square"></i>
           </div>
         </div>
-    
+
         <div class="messages" ref="messageBox">
           <ul>
             <li
@@ -150,14 +150,14 @@ export default {
       user: localStorage.getItem("UserID"),
       typing: "",
       joinGroupMesasge: "",
-      isHide:false
+      isHide: false
     };
   },
   methods: {
-    imageBase64(img){
-      if(img == null){
+    imageBase64(img) {
+      if (img == null) {
         return "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEVsdX3////Hy86jqK1+ho2Ql521ur7a3N7s7e5YhiPTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg==";
-      }else{
+      } else {
         return "data:image/png;base64, " + img;
       }
     },
@@ -255,7 +255,7 @@ export default {
   mounted() {
     var self = this;
     self.connection.on("ReceiveJoinGroup", function(user, username) {
-      if (Number(localStorage.getItem("UserID")) !== Number(user)){
+      if (Number(localStorage.getItem("UserID")) !== Number(user)) {
         self.joinGroupMesasge = `${username} already joined this group!`;
         self.$alertify.info(self.joinGroupMesasge);
       }
@@ -318,21 +318,7 @@ export default {
   created() {
     var self = this;
     self.getProject();
-    self.connection = new signalR.HubConnectionBuilder()
-      .withUrl("http://10.4.4.224:93/working-management-hub")
-      .configureLogging(signalR.LogLevel.Information)
-      .build();
-
-    self.connection
-      .start()
-      .then(function() {
-        console.log("Connected working-management-hub detail ");
-        /// EventBus.$emit("reciveConnection", self.connection);
-      })
-      .catch(error => {
-        console.log("working-management-hub error detail!! ");
-        console.log(error);
-      });
+    self.connection = self.$SIGNALR;
   },
   destroyed() {},
   watch: {
@@ -1124,5 +1110,4 @@ body {
     clip: rect(auto, 20px, auto, auto);
   }
 }
-
 </style>

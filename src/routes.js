@@ -17,10 +17,12 @@ import Chat from "./views/clients/chat/index.vue";
 import Photo from "./views/clients/photo/Index.vue";
 import RoutineJob from "./views/clients/routine-job/Index.vue";
 import Abnormal from "./views/clients/abnormal/Index.vue";
+import Tutorial from "./views/clients/tutorial/Index.vue";
 
 import Notification from "./views/clients/notification/Index.vue";
 
 import Profile from "./views/shares/dash/Profile.vue";
+import PageNotFound from "./views/404/Index.vue";
 
 
 // auth
@@ -250,6 +252,19 @@ const router = new VueRouter({
         }
       ]
     },
+    //client tutorial
+    {
+      path: "/tutorial",
+      component: Dash,
+      children: [
+        {
+          path: "/tutorial/:id",
+          name: "Tutorial",
+          component: Tutorial,
+          meta: { requiresAuth: true }
+        }
+      ]
+    },
     //client chat
     {
       path: "/client-chat",
@@ -301,7 +316,8 @@ const router = new VueRouter({
           meta: { requiresAuth: true }
         }
       ]
-    }
+    },
+    { path: "*", component: PageNotFound }
   ]
 });
 

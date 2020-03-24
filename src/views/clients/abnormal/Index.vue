@@ -137,9 +137,13 @@
                   :toolbarClick="toolbarClick"
                   :allowExcelExport="true"
                   :allowPdfExport="true"
-                  :allowTextWrap="true"
+                  :rowSelected="rowSelected"
                   :contextMenuOpen="contextMenuOpen"
                   :editSettings="editSettings"
+                  :recordDoubleClick="recordDoubleClick"
+                  :allowResizing="true"
+                  :showColumnMenu="true"
+                  :gridLines="'Both'"
                 >
                   <e-columns>
                     <e-column
@@ -153,86 +157,88 @@
                       field="Priority"
                       :template="priorityTemplate"
                       headerText="Priority"
-                      width="110"
+                      width="120"
                       textAlign="Center"
                     ></e-column>
-                    <!-- <e-column field="Level" headerText="Level" width="150" textAlign="Center"></e-column> -->
-                    <e-column
+                    <!-- <e-column
                       field="Add Sub-Task"
                       :template="optionSubTaskTemplate"
                       headerText="Add Sub-Task"
                       width="150"
                       v-if="IsHideAdd"
                       textAlign="Center"
-                    ></e-column>
-                    <!-- <e-column
-                    field="ProjectName"
-                    headerText="Project name"
-                    :disableHtmlEncode="false"
-                    width="240"
                     ></e-column>-->
                     <e-column
                       field="JobName"
                       headerText="Task Name"
                       :disableHtmlEncode="false"
                       :template="jobNameTemplate"
+                      textAlign="Center"
                       width="240"
                     ></e-column>
-                    <e-column
-                      field="From"
-                      headerText="From"
-                      textAlign="Center"
-                      :disableHtmlEncode="false"
-                      width="230"
-                    ></e-column>
-
-                    <!-- <e-column
-                      field="Description"
-                      headerText="Description"
-                      :template="templateDescripton"
-                      :disableHtmlEncode="false"
-                      width="180"
-                      textAlign="Center"
-                    ></e-column>-->
-                    <e-column
-                      field="DeputyName"
-                      headerText="Deputy"
-                      :disableHtmlEncode="false"
-                      width="120"
-                    ></e-column>
+                    <e-column field="From" headerText="From" :disableHtmlEncode="false" width="120"></e-column>
                     <e-column
                       field="PIC"
                       headerText="PIC"
-                      width="100"
+                      width="180"
                       format="yMd"
-                      textAlign="Right"
+                      textAlign="Center"
                     ></e-column>
-                    <!-- <e-column field="Remark" :template="remarkTemplate" headerText="Remark" width="180" textAlign="Center"></e-column> -->
-                    <e-column field="DueDate" headerText="DueDate" width="160" textAlign="Center"></e-column>
                     <e-column
                       field="state"
                       :disableHtmlEncode="false"
                       headerText="Status"
-                      width="100"
+                      width="120"
                       textAlign="Center"
                     ></e-column>
+                    <!-- <e-column
+                      field="DueDateDaily"
+                      headerText="Daily"
+                      width="160"
+                      textAlign="Center"
+                    ></e-column>-->
                     <e-column
-                      field="EveryDay"
-                      headerText="Every Day"
+                      field="SpecificDate"
+                      headerText="Due Date"
+                      width="200"
+                      textAlign="Center"
+                    ></e-column>
+                    <!-- <e-column
+                      field="DueDateWeekly"
+                      headerText="Weekly"
                       width="160"
                       textAlign="Center"
                     ></e-column>
-                    <e-column field="Monthly" headerText="Monthly" width="160" textAlign="Center"></e-column>
                     <e-column
-                      field="Quarterly"
+                      field="DueDateMonthly"
+                      headerText="Monthly"
+                      width="160"
+                      textAlign="Center"
+                    ></e-column>
+                    <e-column
+                      field="DueDateQuarterly"
                       headerText="Quarterly"
                       width="160"
                       textAlign="Center"
                     ></e-column>
                     <e-column
-                      field="CreatedDate"
-                      headerText="CreatedDate"
+                      field="DueDateYearly"
+                      headerText="Yearly"
                       width="160"
+                      textAlign="Center"
+                    ></e-column>-->
+
+                    <e-column
+                      field="CreatedDateForEachTask"
+                      headerText="Created Date"
+                      width="200"
+                      textAlign="Center"
+                    ></e-column>
+                    <e-column
+                      field="Watch Video"
+                      :template="optionWatchVideoTemplate"
+                      headerText="Watch Video"
+                      width="150"
                       textAlign="Center"
                     ></e-column>
                   </e-columns>
@@ -357,55 +363,100 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="Period">Period</label>
+                      <small v-if="!editStatus" class="text-danger">(*) Require</small>
                       <select id="Period" v-model="selectedPeriodMain" class="form-control">
-                        <option value="reset" disabled>Choose period</option>
-                        <option value="EveryDay">Every day</option>
+                        <option value="reset">Choose period</option>
+                        <!-- <option value="Daily">Daily</option>
+                        <option value="Weekly">Weekly</option>
                         <option value="Monthly">Monthly</option>
                         <option value="Quarterly">Quarterly</option>
-                        <option value="SpecificDay">Specific Day</option>
+                        <option value="Yearly">Yearly</option>-->
+                        <option value="SpecificDay">Due Date</option>
                       </select>
                     </div>
                   </div>
-
                   <div class="col-md-12">
                     <div class="form-group box SpecificDay">
-                      <label for="Description">Specific Day</label>
+                      <label for="Description">Due Date</label>
                       <small v-if="!editStatus" class="text-danger">(*) Require</small>
                       <datetime
-                        v-model="task.deadline"
+                        ref="deadline"
+                        v-model="task.specificdate"
                         input-class="form-control"
                         placeholder="Select date"
                         type="date"
                       ></datetime>
                     </div>
                   </div>
-                  <div class="col-md-12">
-                    <div class="form-group box EveryDay">
-                      <label for="Description">Every day</label>
-                      <select class="form-control" v-model="selectedPeriod">
+                  <!-- Daily -->
+                  <div class="col-md-12 d-none" style="cursor: not-allowed;">
+                    <div class="form-group disabled box Daily">
+                      <label for="Daily">Daily</label>
+                      <small v-if="!editStatus" class="text-danger"></small>
+                      <datetime
+                        ref="daily"
+                        v-model="task.duedatedaily"
+                        input-class="form-control"
+                        placeholder="Select date"
+                        type="date"
+                      ></datetime>
+                    </div>
+                  </div>
+                  <!-- ----Daily -->
+                  <!-- Weekly -->
+                  <div class="col-md-2">
+                    <div class="form-group box Weekly">
+                      <label for="Weekly">Weekdays</label>
+                      <small v-if="!editStatus" class="text-danger">(*) Require</small>
+                      <select class="form-control" @change="getWeekly" v-model="weeklySelected">
                         <option disabled value>Please select one</option>
-                        <option v-for="(day,index) in everydays" :value="day.substring(0,3)">{{day}}</option>
+                        <option v-for="(day,index) in weekday" :value="day.substring(0,3)">{{day}}</option>
                       </select>
                     </div>
                   </div>
+                  <div class="col-md-2">
+                    <div class="form-group box Weekly">
+                      <label for="Weekly">Month</label>
+                      <small v-if="!editStatus" class="text-danger">(*) Require</small>
+                      <select class="form-control" v-model="monthOfWeeklySelected">
+                        <option disabled value="0">Please select one</option>
+                        <option v-for="n in 12" :value="n">{{n}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="form-group box Weekly">
+                      <label for="Weekly">Effective date</label>
+                      <small v-if="!editStatus" class="text-danger">(*) Require</small>
+                      <select class="form-control" v-model="task.dateofweekly">
+                        <option disabled value>Please select one</option>
+                        <option v-for="(day,index) in weekdaysOfMonth" :value="day">{{day}}</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- ---Weekly -->
+                  <!-- Monthly -->
                   <div class="col-md-12">
                     <div class="form-group box Monthly">
-                      <label for="Description">Monthly</label>
+                      <label for="Day">Dates Of Month</label>
                       <small v-if="!editStatus" class="text-danger">(*) Require</small>
-                      <select class="form-control" v-model="task.monthly">
+                      <select class="form-control" v-model="task.duedatemonthly">
                         <option disabled value>Please select one</option>
-                        <option
-                          v-for="(month,index) in monthly"
-                          :value="month.substring(0,3)"
-                        >{{month}}</option>
+                        <option v-for="n in 31" :value="n">{{$common.getDatesOfMonth(n)}}</option>
                       </select>
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <!-- --Monthly -->
+                  <!-- Quarterly -->
+                  <div class="col-md-6">
                     <div class="form-group box Quarterly">
                       <label for="Description">Quarterly</label>
                       <small v-if="!editStatus" class="text-danger">(*) Require</small>
-                      <select class="form-control" v-model="task.quarterly">
+                      <span
+                        class="text-danger"
+                      >*)Note: From {{quarterRange.firstDate}} to {{quarterRange.lastDate}}</span>
+                      <select class="form-control" v-model="quarterlySelected">
                         <option disabled value>Please select one</option>
                         <option
                           v-for="(quarter,index) in quarterly"
@@ -414,6 +465,35 @@
                       </select>
                     </div>
                   </div>
+                  <div class="col-md-6">
+                    <div class="form-group box Quarterly">
+                      <label for="Description">Date</label>
+                      <small v-if="!editStatus" class="text-danger">(*) Require</small>
+                      <datetime
+                        ref="deadline-quarterly"
+                        v-model="quarterlySelectedDate"
+                        input-class="form-control"
+                        placeholder="Select date"
+                        type="date"
+                      ></datetime>
+                    </div>
+                  </div>
+                  <!-- ---Quarterly -->
+                  <!-- Yearly -->
+                  <div class="col-md-12">
+                    <div class="form-group disabled box Yearly">
+                      <label for="Yearly">Date</label>
+                      <small v-if="!editStatus" class="text-danger"></small>
+                      <datetime
+                        ref="daily"
+                        v-model="task.duedateyearly"
+                        input-class="form-control"
+                        placeholder="Select date"
+                        type="date"
+                      ></datetime>
+                    </div>
+                  </div>
+                  <!-- ---Yearly -->
                 </div>
               </div>
               <div class="col-md-12">
@@ -471,7 +551,87 @@
       </div>
       <!-- /.modal-dialog -->
     </div>
+    <!-- Modal Comment -->
+    <div
+      class="modal fade"
+      id="modal-comment"
+      ref="modalComment"
+      aria-hidden="true"
+      style="display: none;"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="height:750px">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              <i class="fas fa-edit"></i>
+              {{taskName}}
+            </h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body" style="overflow-y: scroll;">
+            <div class="container">
+              <div class="row d-flex align-items-center">
+                <div class="col-md-12 comments-section">
+                  <!--====COMMENT AREA START====-->
+                  <div class="row">
+                    <div class="col-12">
+                      <!-- <h2>Comments</h2> -->
+                      <form class="comment-form" method="post" action>
+                        <textarea
+                          class="comment-area"
+                          v-model="comment.content"
+                          placeholder="Write your comment here"
+                        ></textarea>
+                        <button
+                          type="submit"
+                          @click.prevent="addComment"
+                          class="btn comment-btn"
+                        >Post</button>
+                      </form>
+                    </div>
+                  </div>
 
+                  <!-- =======COMMENTS START=======-->
+                  <div class="row">
+                    <div class="col-12">
+                      <div
+                        class="comment-box-wrapper"
+                        v-for="(item, key, index) in dataComment"
+                        :key="index"
+                      >
+                        <template v-if="key < totalShow">
+                          <tree :tree-data="item" @AddSub="isLoadComment" :taskID="comment.taskid"></tree>
+                        </template>
+                      </div>
+                      <template
+                        v-if="totalShow < dataComment.length || dataComment.length > totalShow"
+                      >
+                        <small
+                          style="cursor: pointer;"
+                          @click="totalShow += 3"
+                          class="text-center text-primary d-block"
+                        >
+                          Load more
+                          <i class="fas fa-chevron-down text-small"></i>
+                        </small>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+    <!-- End Modal Comment -->
     <div class="modal fade" id="modal-remark" aria-hidden="true" style="display: none;">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -514,6 +674,86 @@
       </div>
       <!-- /.modal-dialog -->
     </div>
+
+    <!-- modal-tutorial -->
+    <div class="modal fade" id="modal-tutorial" aria-hidden="true" style="display: none;">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              <i class="fas fa-plus"></i>
+              {{titleTutorial}}
+            </h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md">
+                <div class="form-group">
+                  <label for="Name">Name</label>
+                  <input type="text" v-model="tutorial.name" class="form-control Name" />
+                </div>
+              </div>
+
+              <div class="col-md">
+                <div class="form-group">
+                  <label for="Link">Link Toturial</label>
+                  <input type="file" id="Link" class="form-control Link" />
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="Link">Link Path</label>
+                  <input type="text" v-model="tutorial.path" class="form-control Path" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" @click="addOrUpdateTutorial">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end modal -->
+    <!-- Modal watch video -->
+    <div
+      class="modal fade"
+      id="modal-watch-video"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{titleTutorialVideo}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="embed-responsive embed-responsive-16by9">
+              <iframe
+                class="embed-responsive-item"
+                :src="srcTutorial"
+                id="video"
+                width="960"
+                height="540"
+                allowscriptaccess="always"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -522,6 +762,9 @@ import Vue from "vue";
 import Multiselect from "vue-multiselect";
 import { Datetime } from "vue-datetime";
 import EventBus from "../../../EventBus";
+import Tree from "../../shares/comment/Tree";
+import CommentMixin from "../../../mixin/comment";
+import Tutorial from "../../../mixin/tutorial";
 import {
   TreeGridPlugin,
   ContextMenu,
@@ -532,19 +775,27 @@ import {
   Filter,
   CommandColumn,
   TreeGridComponent,
-  Toolbar
+  Toolbar,
+  RowDD,
+  Resize,
+  ColumnMenu
 } from "@syncfusion/ej2-vue-treegrid";
 Vue.use(TreeGridPlugin);
 // register globally
 Vue.component("multiselect", Multiselect);
 export default {
   name: "abnormal-job",
+  mixins: [CommentMixin, Tutorial],
   components: {
     Multiselect,
+    Tree,
     Datetime
   },
   data() {
     return {
+      monthOfWeeklySelected: 0,
+      weekdaysOfMonth: [],
+      quarterRange: [],
       IsLeader: localStorage.getItem("IsLeader") === "true" ? true : false,
       title: "",
       dataLeft: [],
@@ -580,7 +831,7 @@ export default {
       editSettings: {
         allowAdding: true
       },
-      pageSettingsLeft: { pageSize: 10 },
+      pageSettingsLeft: { pageSize: 20 },
       searchSettingsLeft: { hierarchyMode: "Parent" },
       // --------------------------------------------------------------------
       searchSettings: { hierarchyMode: "Parent" },
@@ -618,12 +869,36 @@ export default {
           })
         };
       },
+      optionWatchVideoTemplate: function() {
+        return {
+          template: Vue.component("optionWatchTemplate", {
+            template: `<div id="optionWatchTemplate">
+                    <div class="btn-group">
+                        <a v-if="data.VideoStatus" @click="watchvideo" class="btn btn-success btn-sm" style="cursor:pointer ; color: white"  >Watch Video</a>
+                        </div>
+                    </div>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              watchvideo() {
+                let self = this;
+                $("#modal-watch-video").modal("show");
+                //self.title = self.data.title;
+                //console.log(self.title);
+              }
+            }
+          })
+        };
+      },
       optionFollowTemplate: function() {
         return {
           template: Vue.component("optionTemplate", {
             template: `<div id="optionTemplate">
                       <div class="btn-group">
-                        <button type="button" :class="!data.Follow ? 'btn btn-success btn-xs':'btn btn-danger btn-xs'" @click="addFollow(data)" v-if="data.Level == 1" ><i :class="!data.Follow ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{!data.Follow?'Follow':'Unfollow'}}</button>
+                        <button type="button" :class="data.Follow == 'No' ? 'btn btn-success btn-xs':'btn btn-danger btn-xs'" @click="addFollow(data)" v-if="data.Level == 1" ><i :class="data.Follow == 'No'  ? 'fas fa-bell':'fas fa-bell-slash'"></i> {{data.Follow == 'No' ?'Follow':'Unfollow'}}</button>
                       </div>
                     </div>`,
             data: function() {
@@ -713,10 +988,22 @@ export default {
           id: "Add-Sub-Task"
         },
         {
-          text: "Add Remark",
+          text: "Add Tutorial Video",
           iconCss: " e-icons e-add",
           target: ".e-content",
-          id: "Remark"
+          id: "Tutorial"
+        },
+        {
+          text: "Watch Video",
+          iconCss: " e-icons e-add",
+          target: ".e-content",
+          id: "WatchVideo"
+        },
+        {
+          text: "Edit Tutorial",
+          iconCss: " e-icons e-edit",
+          target: ".e-content",
+          id: "EditTutorial"
         },
         {
           text: "Finish Task",
@@ -737,7 +1024,7 @@ export default {
           id: "DeleteTask"
         }
       ],
-      pageSettings: { pageSize: 15 },
+      pageSettings: { pageSizes: true, pageSize: 15 },
       toolbar: [
         "Add",
         "Search",
@@ -748,12 +1035,19 @@ export default {
       ],
       sortSettings: {
         columns: [
-          { field: "DueDate", direction: "Ascending" },
-          { field: "CreatedDate", direction: "Ascending" },
-          { field: "JobName", direction: "Ascending" }
+          // { field: "CreatedDate", direction: "Ascending" },
+          // { field: "JobName", direction: "Ascending" }
         ]
       },
-      everydays: [
+      PERIODTYPE: [
+        "Daily",
+        "Weekly",
+        "Monthly",
+        "Quarterly",
+        "Yearly",
+        "SpecificDay"
+      ],
+      weekday: [
         "Monday",
         "Tuesday",
         "Wednesday",
@@ -799,6 +1093,11 @@ export default {
         remark: ""
       },
       ocid: 0,
+      dateOfMonthly: 0,
+      weeklySelected: "",
+      monthlySelected: "",
+      quarterlySelected: "",
+      quarterlySelectedDate: "",
       task: {
         id: 0,
         description: "",
@@ -810,10 +1109,16 @@ export default {
         parentID: 0,
         remark: "",
         deadline: "",
+        duedatedaily: "",
+        duedateweekly: "",
+        duedatemonthly: "",
+        duedatequarterly: "",
+        duedateyearly: "",
+        specificdate: "",
         status: false,
         fromWhoID: 0,
         priority: "M",
-        everyday: "",
+        weekly: "",
         monthly: "",
         quarterly: "",
         JobTypeID: 3,
@@ -825,7 +1130,7 @@ export default {
       whoOptions: [],
       whoSelected: [],
       selectedPeriod: "",
-      selectedPeriodMain: "reset",
+      selectedPeriodMain: "SpecificDay",
       deputies: [],
       selectedDeputies: [],
       showListTask: false,
@@ -833,10 +1138,14 @@ export default {
     };
   },
   mounted() {
+    let self = this;
     console.log("this.$refs.treegrid");
     console.log(this.$refs.treegrid);
     EventBus.$on("follow", this.addFollow);
     EventBus.$on("taskItem", this.infoEdit);
+    $(this.$refs.modalComment).on("hidden.bs.modal", () => {
+      this.clearForm();
+    });
     $(document).ready(function() {
       $("#Period")
         .change(function() {
@@ -844,6 +1153,27 @@ export default {
             .find("option:selected")
             .each(function() {
               var optionValue = $(this).attr("value");
+              switch (optionValue) {
+                case self.PERIODTYPE[0]: //daily
+                  self.task.periodType = 1;
+                  self.task.duedatedaily = new Date().toISOString();
+                  break;
+                case self.PERIODTYPE[1]: //weekly
+                  self.task.periodType = 2;
+                  break;
+                case self.PERIODTYPE[2]: //monthly
+                  self.task.periodType = 3;
+                  break;
+                case self.PERIODTYPE[3]: //quarterly
+                  self.task.periodType = 4;
+                  break;
+                case self.PERIODTYPE[4]: //yearly
+                  self.task.periodType = 5;
+                  break;
+                case self.PERIODTYPE[5]: //specific day
+                  self.task.periodType = 6;
+                  break;
+              }
               if (optionValue) {
                 $(".form-group.box")
                   .not("." + optionValue)
@@ -872,6 +1202,46 @@ export default {
     this.checkRole();
   },
   methods: {
+    getWeekdaysOfMonth(newVal) {
+      let indexof = this.weekday
+        .map(item => {
+          return item.substring(0, 3);
+        })
+        .indexOf(this.weeklySelected);
+      switch (indexof) {
+        case 0:
+          this.weekdaysOfMonth = this.$common.getMondaysInMonth(newVal);
+          break;
+        case 1:
+          this.weekdaysOfMonth = this.$common.getWednesdaysInMonth(newVal);
+          break;
+        case 2:
+          this.weekdaysOfMonth = this.$common.getTuesdaysInMonth(newVal);
+          break;
+        case 3:
+          this.weekdaysOfMonth = this.$common.getThursdaysInMonth(newVal);
+          break;
+        case 4:
+          this.weekdaysOfMonth = this.$common.getFridaysInMonth(newVal);
+          break;
+        case 5:
+          this.weekdaysOfMonth = this.$common.getSaturdaysInMonth(newVal);
+          break;
+      }
+    },
+    //-------------------Begin Comment
+    recordDoubleClick(args) {
+      console.log("recordDoubleClick");
+      console.log(args);
+      let data = args.rowData;
+      let self = this;
+      self.clearFormComment();
+      self.getAllComment(data.ID);
+      self.taskName = data.JobName;
+      self.comment.taskid = data.ID;
+      $(self.$refs.modalComment).modal("show");
+    },
+    //-------------------End Comment
     showModal() {
       alert(1);
       $("#modal-remark").modal("show");
@@ -962,6 +1332,21 @@ export default {
             .setAttribute("style", "display: none;");
           self.$swal("Warning!", "You are not assign this task!!!", "warning");
         }
+      }
+    },
+    rowSelected(args) {
+      console.log(args);
+      var self = this;
+      if (args.data.VideoStatus) {
+        self.srcTutorial = args.data.Tutorial.URL;
+        self.titleTutorialVideo = args.data.Tutorial.Name;
+        self.tutorial = {
+          id: args.data.Tutorial.ID,
+          name: args.data.Tutorial.Name,
+          url: args.data.Tutorial.URL,
+          path: args.data.Tutorial.Path,
+          taskid: args.data.ID
+        };
       }
     },
     rowSelectedLeft(args) {
@@ -1111,31 +1496,83 @@ export default {
       });
     },
     valid() {
-      if (this.task.jobName === "") {
-        this.$swal("Warning!", "Please enter the job name!", "warning");
+      let self = this;
+      if (self.task.jobName === "") {
+        self.$swal("Warning!", "Please enter the job name!", "warning");
         return false;
       }
-      if (this.selectedPeriodMain === "reset") {
-        this.$swal("Warning!", "Please select on preiod!", "warning");
+      if (self.selectedPeriodMain === "reset") {
+        self.$swal("Warning!", "Please select on preiod!", "warning");
         return false;
       } else {
-        switch (this.selectedPeriodMain) {
-          case "EveryDay":
-            if (this.task.everyday === "") {
-              this.$swal("Warning!", "Please select on every day!", "warning");
+        switch (self.selectedPeriodMain) {
+          case self.PERIODTYPE[0]: //daily
+            self.task.periodType = 1;
+            self.task.duedatedaily = new Date().toISOString();
+            if (self.task.duedatedaily === "") {
+              self.$swal("Warning!", "Please select on daily!", "warning");
               return false;
             }
             break;
-          case "Monthly":
-            if (this.task.monthly === "") {
-              this.$swal("Warning!", "Please select on monthly!", "warning");
+          case self.PERIODTYPE[1]: //weekly
+            if (self.task.duedateweekly === "") {
+              self.$swal("Warning!", "Please select on weekly!", "warning");
+              return false;
+            } else if (self.monthOfWeeklySelected === 0) {
+              self.$swal(
+                "Warning!",
+                "Please select on month of weekly!",
+                "warning"
+              );
+              return false;
+            } else if (self.task.dateofweekly === "") {
+              self.$swal(
+                "Warning!",
+                "Please select on effective date!",
+                "warning"
+              );
               return false;
             }
             break;
-
-          case "Quarterly":
-            if (this.task.quarterly === "") {
-              this.$swal("Warning!", "Please select on quarterly!", "warning");
+          case self.PERIODTYPE[2]: //monthly
+            if (self.task.duedatemonthly === "") {
+              self.$swal("Warning!", "Please select on monthly!", "warning");
+              return false;
+            }
+            break;
+          case self.PERIODTYPE[3]: //quarterly
+            if (self.task.duedatequarterly === "") {
+              self.$swal("Warning!", "Please select on quarterly!", "warning");
+              return false;
+            } else {
+              let bo = self.$common.checkQuarterly(
+                self.quarterlySelected,
+                self.quarterlySelectedDate
+              );
+              if (!bo.status) {
+                let alert = `<br> (The ${bo.quarter}: From ${self.quarterRange.firstDate} to ${self.quarterRange.lastDate} )`;
+                self.$swal(
+                  "Warning!",
+                  `There is no this date in the ${bo.quarter}. Please try it again! ${alert}`,
+                  "warning"
+                );
+                return false;
+              }
+            }
+            break;
+          case self.PERIODTYPE[4]: //yearly
+            if (self.task.duedateyearly === "") {
+              self.$swal("Warning!", "Please select on yearly!", "warning");
+              return false;
+            }
+            break;
+          case self.PERIODTYPE[5]: //specific day
+            if (self.task.specificdate === "") {
+              self.$swal(
+                "Warning!",
+                "Please select on specific date!",
+                "warning"
+              );
               return false;
             }
             break;
@@ -1204,39 +1641,98 @@ export default {
           self.task = {
             description: args.rowInfo.rowData.Description,
             jobName: args.rowInfo.rowData.JobName,
-            remark: args.rowInfo.rowData.Remark,
+            duedatedaily: args.rowInfo.rowData.DueDateDaily,
+            duedateweekly: args.rowInfo.rowData.DueDateWeekly,
+            duedatemonthly: args.rowInfo.rowData.DueDateMonthly,
+            duedatequarterly: args.rowInfo.rowData.DueDateQuarterly,
+            duedateyearly: args.rowInfo.rowData.DueDateYearly,
+            specificdate: args.rowInfo.rowData.SpecificDate,
             priority: args.rowInfo.rowData.PriorityID,
             id: args.rowInfo.rowData.ID,
+            dateofweekly: args.rowInfo.rowData.DateOfWeekly,
             level: args.rowInfo.rowData.Level,
-            pic: args.rowInfo.rowData.PIC || [],
-            deadline: args.rowInfo.rowData.Deadline
+            periodType: args.rowInfo.rowData.periodType,
+            pic: args.rowInfo.rowData.PIC || []
           };
-          self.selected = args.rowInfo.rowData.BeAssigneds;
-          let everyday = args.rowInfo.rowData.EveryDay;
-          let monthly = args.rowInfo.rowData.Monthly;
-          let quarterly = args.rowInfo.rowData.Quarterly;
-          let deadline = args.rowInfo.rowData.DueDate;
 
-          if (everyday != "#N/A" && everyday != "") {
-            self.selectedPeriodMain = "EveryDay";
-            self.selectedPeriod = everyday.substring(0, 3);
-          } else if (monthly !== "#N/A" && monthly !== "") {
-            self.selectedPeriodMain = "Monthly";
-            self.task.monthly = monthly.substring(0, 3);
-          } else if (quarterly !== "#N/A" && quarterly !== "") {
-            self.selectedPeriodMain = "Quarterly";
-            self.task.quarterly = quarterly.substring(0, 3);
-          } else if (deadline !== "#N/A" && deadline !== "") {
-            self.selectedPeriodMain = "SpecificDay";
-            self.task.deadline = args.rowInfo.rowData.Deadline;
+          let daily = args.rowInfo.rowData.DueDateDaily;
+          let weekly = args.rowInfo.rowData.DueDateWeekly;
+          let monthly = args.rowInfo.rowData.DueDateMonthly;
+          let quarterly = args.rowInfo.rowData.DueDateQuarterly;
+          let yearly = args.rowInfo.rowData.DueDateYearly;
+          let specific = args.rowInfo.rowData.SpecificDate;
+
+          let periodType = args.rowInfo.rowData.periodType;
+          switch (periodType) {
+            case 1:
+              self.selectedPeriodMain = "Daily";
+              self.task.duedatedaily = daily;
+              break;
+            case 2:
+              self.selectedPeriodMain = "Weekly";
+              self.weeklySelected = weekly.substring(0, 3);
+              self.monthOfWeeklySelected =
+                new Date(args.rowInfo.rowData.DateOfWeekly).getMonth() + 1;
+              self.task.dateofweekly = args.rowInfo.rowData.DateOfWeekly;
+              break;
+            case 3:
+              self.selectedPeriodMain = "Monthly";
+              self.task.duedatemonthly = monthly.substring(0, 1);
+              break;
+            case 4:
+              self.selectedPeriodMain = "Quarterly";
+              let quater = quarterly.split(",");
+              self.quarterlySelected = quater[0].substring(0, 3);
+              let year = new Date().getFullYear();
+              let stringDate = quater[1] + ", " + year;
+              self.quarterlySelectedDate = new Date(stringDate).toISOString();
+              self.task.duedatequarterly = quarterly;
+              break;
+            case 5:
+              self.selectedPeriodMain = "Yearly";
+              self.task.duedateyearly = new Date(
+                yearly + " 00:00 PM"
+              ).toISOString();
+              break;
+            case 6:
+              self.selectedPeriodMain = "SpecificDay";
+              self.task.specificdate = new Date(
+                specific + " 00:00 PM"
+              ).toISOString();
+              break;
           }
           break;
-        case "Remark":
-          self.task.remark = "";
-          self.editStatus = false;
-          self.remarkObj.id = args.rowInfo.rowData.ID;
-          self.remarkObj.remark = args.rowInfo.rowData.Remark;
-          $("#modal-remark").modal("show");
+        case "Tutorial":
+          self.titleTutorial =
+            args.rowInfo.rowData.JobName + " - Add Tutorial Video";
+          self.tutorial = {
+            id: 0,
+            name: args.rowInfo.rowData.JobName,
+            url: "",
+            path: "",
+            level: 0,
+            parentid: 0,
+            taskid: args.rowInfo.rowData.ID
+          };
+          $("#modal-tutorial").modal("show");
+          break;
+        case "EditTutorial":
+          self.titleTutorial =
+            args.rowInfo.rowData.JobName + " - Edit Tutorial Video";
+          self.isAddTutorial = false;
+          self.tutorial = {
+            id: 0,
+            name: args.rowInfo.rowData.JobName,
+            url: "",
+            path: "",
+            level: 0,
+            parentid: 0,
+            taskid: args.rowInfo.rowData.ID
+          };
+          $("#modal-tutorial").modal("show");
+          break;
+        case "WatchVideo":
+          $("#modal-watch-video").modal("show");
           break;
         case "DeleteTask":
           self.delete(args.rowInfo.rowData.ID);
@@ -1360,6 +1856,29 @@ export default {
       self.getUser();
       self.clearForm();
     },
+    getWeekly(event) {
+      let indexof = this.weekday
+        .map(item => {
+          return item.substring(0, 3);
+        })
+        .indexOf(event.target.value);
+      this.task.duedateweekly = `${this.weekday[indexof]}`;
+    },
+    //binding task.monthly
+    getDateInMonth(event) {
+      let arr = [];
+      for (const item of this.monthly) {
+        arr.push(item.substring(0, 3));
+      }
+      let indexOfMonthly = arr.indexOf(event.target.value);
+      if (indexOfMonthly > -1) {
+        this.dateInMonth = new Date(
+          new Date().getFullYear(),
+          indexOfMonthly + 1,
+          0
+        ).getDate();
+      }
+    },
     clearForm() {
       this.task = {
         id: 0,
@@ -1371,10 +1890,17 @@ export default {
         parentID: 0,
         remark: "",
         deadline: "",
+        duedatedaily: "",
+        duedateweekly: "",
+        duedatemonthly: "",
+        duedatequarterly: "",
+        duedateyearly: "",
+        specificdate: "",
+        dateofweekly: "",
         status: false,
         level: 0,
         fromWhoID: 0,
-        everyday: "",
+        weekly: "",
         monthly: "",
         quarterly: "",
         OCID: this.ocid,
@@ -1383,8 +1909,11 @@ export default {
         deputies: [],
         JobTypeID: 3
       };
+      this.weeklySelected = "";
+      this.monthOfWeeklySelected = 0;
+      this.dateOfMonthly = 0;
       this.PICs = [];
-      this.selectedPeriodMain = "reset";
+      this.selectedPeriodMain = "SpecificDay";
       this.selectedPeriod = "";
       this.projectSelected = [];
       this.selected = [];
@@ -1457,6 +1986,13 @@ export default {
     }
   },
   watch: {
+    quarterlySelected: function(newVal) {
+      let arr = this.quarterly.map(item => {
+        return item.substring(0, 3);
+      });
+      let indexof = arr.indexOf(newVal);
+      this.quarterRange = this.$common.getFirstDateLastDateQuarter(indexof + 1);
+    },
     selected: function(newVal, oldVal) {
       var self = this;
       let pics = newVal;
@@ -1473,7 +2009,7 @@ export default {
     },
     selectedPeriod: function(newVal, oldVal) {
       console.log(newVal);
-      this.task.everyday = newVal;
+      this.task.weekly = newVal;
     },
     task: function(newVal, oldVal) {
       console.log(newVal);
@@ -1503,6 +2039,30 @@ export default {
           })
           .change();
       });
+    },
+    quarterlySelectedDate: function(newVal) {
+      let arr = this.quarterly.map(item => {
+        return item.substring(0, 3);
+      });
+      let indexof = arr.indexOf(this.quarterlySelected);
+      this.task.duedatequarterly = `${
+        this.quarterly[indexof]
+      }, ${this.$common.toFormatDate(this.quarterlySelectedDate, false)}`;
+    },
+    weeklySelected(newVal) {
+      let self = this;
+      let indexof = self.weekday
+        .map(item => {
+          return item.substring(0, 3);
+        })
+        .indexOf(newVal);
+      if (self.monthOfWeeklySelected > 0) {
+        self.getWeekdaysOfMonth(self.monthOfWeeklySelected);
+      }
+      self.task.duedateweekly = `${self.weekday[indexof]}`;
+    },
+    monthOfWeeklySelected(newVal) {
+      this.getWeekdaysOfMonth(newVal);
     }
   },
   provide: {
@@ -1514,7 +2074,10 @@ export default {
       PdfExport,
       Page,
       Filter,
-      Toolbar
+      Toolbar,
+      RowDD,
+      Resize,
+      ColumnMenu
     ]
   }
 };
@@ -1537,5 +2100,136 @@ export default {
 }
 .e-grid .e-unboundcelldiv .e-icons {
   color: #fff2f2 !important;
+}
+</style>
+<style>
+.e-headertext {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.74);
+}
+
+.e-btn.e-flat {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+  box-shadow: none !important;
+  color: #fff !important;
+}
+.e-grid .e-unboundcelldiv .e-icons {
+  color: #fff2f2 !important;
+}
+
+.comments-section {
+  background: #fff;
+}
+.comment-area {
+  background: none repeat scroll 0 0 #fff;
+  border: medium none;
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  -ms-border-radius: 4px 4px 0 0;
+  -o-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
+  color: #777777;
+  float: left;
+  font-family: Lato;
+  font-size: 14px;
+  height: 85px;
+  letter-spacing: 0.3px;
+  padding: 10px 20px;
+  width: 100%;
+  resize: vertical;
+  outline: none;
+  border: 1px solid #f2f2f2;
+}
+.comment-btn {
+  float: right;
+  background: #4caf50;
+  margin: 5px 0;
+  padding: 6px 15px;
+  color: #fff;
+  letter-spacing: 1.5px;
+  outline: none;
+  border-radius: 4px;
+  box-shadow: none;
+}
+.comment-btn:hover,
+.comment-btn:focus {
+  background: #2e7d32;
+  outline: none;
+  border-radius: 4px;
+  box-shadow: none;
+}
+.comment-box-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 5px 0px;
+}
+.comment-box {
+  display: flex;
+  width: 100%;
+}
+.comment-box a {
+  color: #242475;
+}
+.commenter-image {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+}
+.comment-content {
+  display: flex;
+  flex-direction: column;
+  background: #f2f3f5;
+  margin-left: 5px;
+  padding: 4px 20px;
+  border-radius: 10px;
+}
+
+.commenter-head {
+  display: block;
+}
+
+.commenter-head .commenter-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.comment-date {
+  font-size: 0.7rem;
+}
+.comment-date i {
+  margin: 0 5px 0 10px;
+}
+.comment-body {
+  padding: 0 0 0 5px;
+  display: flex;
+  font-size: 1rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+.comment-footer {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.comment-footer span {
+  margin: 0 15px 0 0;
+}
+.comment-footer span a {
+  margin: 0 0px 0 2px;
+}
+
+.comment-footer span.comment-likes .active .fa-heart {
+  color: black;
+  font-size: 1rem;
+}
+.comment-footer span.comment-likes .active .fa-heart {
+  color: red;
+}
+
+.nested-comments {
+  margin-left: 50px;
 }
 </style>

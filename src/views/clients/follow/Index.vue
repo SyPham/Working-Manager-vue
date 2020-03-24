@@ -82,6 +82,8 @@
               :searchSettings="searchSettings"
               :dataSourceChanged="dataSourceChanged"
               :contextMenuItems="contextMenuItems"
+              :allowResizing="true"
+              :showColumnMenu="true"
             >
               <e-columns>
                 <e-column
@@ -105,46 +107,51 @@
                   :disableHtmlEncode="false"
                   :template="projectTemplate"
                   width="240"
+                  textAlign="Center"
                 ></e-column>
                 <e-column
                   field="JobName"
-                  headerText="Job Name"
+                  headerText="Task Name"
                   :disableHtmlEncode="false"
                   :template="jobNameTemplate"
+                  textAlign="Center"
                   width="240"
                 ></e-column>
-                <e-column field="From" headerText="From" :disableHtmlEncode="false" width="230"></e-column>
-                <e-column
-                  field="Description"
-                  :template="templateDescripton"
-                  headerText="Description"
-                  width="180"
-                  textAlign="Center"
-                ></e-column>
-                <e-column field="PIC" headerText="PIC" width="180" format="yMd" textAlign="Right"></e-column>
-                <e-column
-                  field="Remark"
-                  :template="remarkTemplate"
-                  headerText="Remark"
-                  width="180"
-                  textAlign="Center"
-                ></e-column>
+                <e-column field="From" headerText="From" :disableHtmlEncode="false" width="120"></e-column>
+                <e-column field="PIC" headerText="PIC" width="180" format="yMd" textAlign="Center"></e-column>
                 <e-column
                   field="state"
                   :disableHtmlEncode="false"
                   headerText="Status"
-                  :template="statusTemplate"
                   width="100"
                   textAlign="Center"
                 ></e-column>
-                <e-column field="DueDate" headerText="DueDate" width="160" textAlign="Center"></e-column>
-                <e-column field="EveryDay" headerText="EveryDay" width="160" textAlign="Center"></e-column>
-                <e-column field="Monthly" headerText="Monthly" width="160" textAlign="Center"></e-column>
-                <e-column field="Quarterly" headerText="Quarterly" width="160" textAlign="Center"></e-column>
+                <e-column field="DueDateDaily" headerText="Daily" width="160" textAlign="Center"></e-column>
+                 <e-column
+                  field="SpecificDate"
+                  headerText="Due Date"
+                  width="200"
+                  textAlign="Center"
+                ></e-column>
+                <e-column field="DueDateWeekly" headerText="Weekly" width="160" textAlign="Center"></e-column>
                 <e-column
-                  field="CreatedDate"
-                  headerText="CreatedDate"
+                  field="DueDateMonthly"
+                  headerText="Monthly"
                   width="160"
+                  textAlign="Center"
+                ></e-column>
+                <e-column
+                  field="DueDateQuarterly"
+                  headerText="Quarterly"
+                  width="160"
+                  textAlign="Center"
+                ></e-column>
+                <e-column field="DueDateYearly" headerText="Yearly" width="160" textAlign="Center"></e-column>
+               
+                <e-column
+                  field="CreatedDateForEachTask"
+                  headerText="CreatedDate"
+                  width="200"
                   textAlign="Center"
                 ></e-column>
               </e-columns>
@@ -248,7 +255,10 @@ import {
   ExcelExport,
   PdfExport,
   Toolbar,
-  Page
+  Page,
+  RowDD,
+  Resize,
+  ColumnMenu
 } from "@syncfusion/ej2-vue-treegrid";
 Vue.use(TreeGridPlugin);
 // register globally
@@ -397,7 +407,7 @@ export default {
           })
         };
       },
-      pageSettings: { pageSize: 10 },
+      pageSettings: { pageSizes: true, pageSize: 20 },
       PIC: [],
       expanded: {},
       selected: [],
@@ -407,7 +417,8 @@ export default {
       toolbar: [
         "Search",
         "ExpandAll",
-        "CollapseAll"
+        "CollapseAll",
+        "Print"
         // "ExcelExport",
         // "PdfExport"
       ]
@@ -524,7 +535,18 @@ export default {
     }
   },
   provide: {
-    treegrid: [ContextMenu, Sort, ExcelExport, PdfExport, Filter, Page, Toolbar]
+    treegrid: [
+      ContextMenu,
+      Sort,
+      ExcelExport,
+      PdfExport,
+      Filter,
+      Page,
+      Toolbar,
+      RowDD,
+      Resize,
+      ColumnMenu
+    ]
   }
 };
 </script>

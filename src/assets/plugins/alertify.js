@@ -17,8 +17,22 @@ const Toast = Swal.mixin({
     icon: "icon-class"
   }
 });
+
+
+
 var AlertifyPlugin = {
-  success: function(message, showButtonOK = false, title = "Success!") {
+  confirm: function (confirmText = "delete") {
+    return Promise.resolve(Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: `Yes, ${confirmText} it!`
+    }))
+  },
+  success: function (message, showButtonOK = false, title = "Success!") {
     if (showButtonOK) Swal.fire(title, message, "success");
     else {
       Toast.fire({
@@ -27,7 +41,7 @@ var AlertifyPlugin = {
       });
     }
   },
-  error: function(message, showButtonOK = false, title = "Error!") {
+  error: function (message, showButtonOK = false, title = "Error!") {
     if (showButtonOK) Swal.fire(title, message, "error");
     else {
       Toast.fire({
@@ -36,7 +50,7 @@ var AlertifyPlugin = {
       });
     }
   },
-  warning: function(message, showButtonOK = false, title = "Warning!") {
+  warning: function (message, showButtonOK = false, title = "Warning!") {
     if (showButtonOK) Swal.fire(title, message, "warning");
     else {
       Toast.fire({
@@ -45,7 +59,7 @@ var AlertifyPlugin = {
       });
     }
   },
-  info: function(message, showButtonOK = false, title = "Info!") {
+  info: function (message, showButtonOK = false, title = "Info!") {
     if (showButtonOK) Swal.fire(title, message, "info");
     else {
       Toast.fire({
@@ -54,7 +68,7 @@ var AlertifyPlugin = {
       });
     }
   },
-  question: function(message, showButtonOK = false, title = "Question!") {
+  question: function (message, showButtonOK = false, title = "Question!") {
     if (showButtonOK) Swal.fire(title, message, "question");
     else {
       Toast.fire({
@@ -65,12 +79,12 @@ var AlertifyPlugin = {
   }
 };
 
-export default function(Vue) {
+export default function (Vue) {
   Vue.alertify = AlertifyPlugin;
 
   Object.defineProperties(Vue.prototype, {
     $alertify: {
-      get: function() {
+      get: function () {
         return Vue.alertify;
       }
     }

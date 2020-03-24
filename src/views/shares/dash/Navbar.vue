@@ -4,9 +4,9 @@
       <div class="container-fluid">
         <a :href="homePageUrl" class="navbar-brand">
           <img
-            src="../../../assets/AdminLTELogo.png"
+            src="../../../assets/logo-1.png"
             alt="AdminLTE Logo"
-            class="brand-image img-circle elevation-3"
+            class="brand-image img-circle"
             style="opacity: .8"
           />
           <span class="brand-text font-weight-light">Work Management</span>
@@ -160,7 +160,7 @@
                     />
                     <div class="media-body">
                       <h3 class="dropdown-item-title">
-                        {{ item.Sender | capitalize }}
+                        {{ (item.Sender|| "System") | capitalize }}
                         <!-- <span class="right badge badge-danger">New</span> -->
                         <small class="float-right right badge badge-danger" v-show="!item.Seen">New</small>
                       </h3>
@@ -194,7 +194,7 @@
               <span class="dropdown-header">{{total}} Notifications</span>
               <div class="dropdown-divider"></div>
               <a v-for="(item,key,index) in data" :key="index" @click.prevent="pushRouter(item)">
-                <a class="dropdown-item">
+                <a class="dropdown-item" v-if="item.CreatedBy != user">
                   <i class="fas fa-envelope mr-2"></i>
                   {{item.Message}}
                   <span
@@ -222,6 +222,7 @@
 
 <script>
 import moment from "moment-timezone";
+
 import EventBus from "../../../EventBus";
 import Vue from "vue";
 import myUpload from "vue-image-crop-upload";
@@ -235,6 +236,7 @@ export default {
       totalCount: 0,
       loadMore: true,
       page: 1,
+      user: Number(localStorage.getItem("UserID")),
       pageSize: 10,
       imgNotifyBase64:
         "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEVsdX3////Hy86jqK1+ho2Ql521ur7a3N7s7e5YhiPTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg==", // the datebase64 url of created image,
@@ -284,6 +286,7 @@ export default {
 
   mounted() {
     let self = this;
+
     // Detect when scrolled to bottom.
     var lastScrollTop = 0;
     const listElm = document.querySelector("#infinite-list");
@@ -339,17 +342,12 @@ export default {
     //     self.$alertify.info("There is the new alert!");
     //   }
     // });
-    console.log(
-      "mounted Navbar---------------------------------------------------------"
-    );
   },
   computed: {},
   created() {
-    console.log(
-      "Created Navbar---------------------------------------------------------"
-    );
-
     let self = this;
+    self.todo();
+    self.getTaskListIsLate();
     self.permission = Number(localStorage.getItem("Role"));
     if (self.permission == 1) {
       self.homePageUrl = "#/dashboard-admin";
@@ -364,6 +362,7 @@ export default {
       self.imageProfile =
         "data:image/png;base64, " + localStorage.getItem("ImageProfile");
     }
+
     console.log("created");
     self.page = 1;
     self.data = [];
@@ -371,21 +370,7 @@ export default {
     self.routerName = self.$route.name;
     self.currentTime = moment().format("LTS");
     setInterval(() => this.updateCurrentTime(), 1 * 1000);
-    self.connection = new signalR.HubConnectionBuilder()
-      .withUrl("http://10.4.4.224:93/working-management-hub")
-      .configureLogging(signalR.LogLevel.Information)
-      .build();
-
-    self.connection
-      .start()
-      .then(function() {
-        console.log("Connected working-management-hub");
-        EventBus.$emit("reciveConnection", self.connection);
-      })
-      .catch(error => {
-        console.log("working-management-hub error!! ");
-        console.log(error);
-      });
+    self.connection = self.$SIGNALR;
 
     self.connection.on("ReceiveMessage", (user, message) => {
       console.log("ReceiveMessage");
@@ -398,8 +383,43 @@ export default {
         self.$alertify.info("There is the new alert!");
       }
     });
+
+    self.connection.on("NotCheckAlert", (user, list) => {
+      if (user === localStorage.getItem("UserID")) {
+        console.log(user);
+        console.log(list);
+      }
+    });
+    self.connection.on("ReceiveCheckAlert", (user, list) => {
+      let currentuSer = Number(localStorage.getItem("UserID"));
+      let userId = Number(user);
+      let listNotify = list || [];
+      console.log("ReceiveCheckAlert: ", listNotify);
+      if (currentuSer === userId && listNotify.length > 0) {
+        self.page = 1;
+        self.data = [];
+        self.getAllNotificationCurrentUser();
+        self.$alertify.info("There is the new alert!");
+      }
+    });
   },
   methods: {
+    todo: function() {
+      var self = this;
+      this.intervalid1 = setInterval(() => {
+        if (self.connection.connectionStarted) {
+          console.log(
+            localStorage.getItem("User") + "Vue yeu cau server check alert",
+            new Date().toLocaleDateString()
+          );
+          self.connection
+            .invoke("CheckAlert", localStorage.getItem("UserID"))
+            .catch(function(err) {
+              return console.error(err.toString());
+            });
+        }
+      }, 30000);
+    },
     imageBase64(img) {
       if (img == null) {
         return "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEVsdX3////Hy86jqK1+ho2Ql521ur7a3N7s7e5YhiPTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg==";
@@ -442,6 +462,11 @@ export default {
       console.log(status);
       console.log("field: " + field);
     },
+    getTaskListIsLate() {
+      let self = this;
+      let url = `api/Home/TaskListIsLate`;
+      self.$api.get(url).then(res => {});
+    },
     pushRouter(item) {
       let self = this;
       self.$api.get(`api/Home/Seen/${item.ID}`).then(res => {
@@ -450,17 +475,14 @@ export default {
         self.getAllNotificationCurrentUser();
       });
       let path = "/";
+      item.URL = item.URL || "";
       if (item.URL.includes("#")) {
         path = item.URL.split("#")[1];
       } else {
         path = item.URL;
       }
-      if (
-        self.$route.name !== "Follow Search" &&
-        self.routerName !== "Project Detail"
-      )
+      if (self.$route.path != item.URL && item.URL != "")
         self.$router.push(path);
-      else return;
     },
     callServer() {
       let self = this;

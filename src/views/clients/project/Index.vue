@@ -41,6 +41,8 @@
                   <th class="text-center" width="20">#</th>
                   <th class="text-center">Project Name</th>
                   <th class="text-center">Created By</th>
+                  <th class="text-center">Created Date</th>
+                  <th class="text-center">ON/OFF</th>
                   <th class="text-center">Option</th>
                 </tr>
               </thead>
@@ -49,13 +51,28 @@
                   <td class="text-center">{{key + 1}}</td>
                   <td class="text-center">{{item.Name}}</td>
                   <td class="text-center">{{$common.toTitleCase(item.CreatedByName)}}</td>
+                   <td class="text-center">{{item.CreatedDate}}</td>
+                  <td class="text-center">
+                    <div class="pretty p-switch" v-if="item.CreatedBy == createdBy">
+                      <input
+                        type="checkbox"
+                        :checked="item.Status"
+                        @click="open(item.ID)"
+                        name="switch1"
+                      />
+                      <div :class="item.Status?'state p-success':'state p-danger'">
+                        <label :class="item.Status?'':'dot'">{{item.Status?"ON":"OFF"}}</label>
+                      </div>
+                    </div>
+                    <div v-else>{{item.Status?"ON":"OFF"}}</div>
+                  </td>
                   <td class="py-0 align-middle text-center">
                     <div class="btn-group btn-group-sm">
                       <a
                         v-if="item.CreatedBy == createdBy"
                         @click="edit(item,index)"
                         style="cursor: pointer;"
-                        class="btn btn-info"
+                        class="btn btn-primary"
                       >
                         <i style="color:white" class="fas fa-edit"></i>
                       </a>
@@ -71,9 +88,17 @@
                         style="cursor: pointer;"
                         class="btn btn-info"
                         @click="$router.push(`/project-detail/${item.ID}`)"
-                        v-if="item.CreatedBy == createdBy || item.Manager.includes(Number(createdBy)) || item.Members.includes(Number(createdBy))"
+                        v-if="item.Status ?(item.CreatedBy == createdBy || item.Manager.includes(Number(createdBy)) || item.Members.includes(Number(createdBy))):false"
                       >
                         <i style="color:white" class="fas fa-info-circle"></i>
+                      </a>
+                      <a
+                        v-if="item.CreatedBy == createdBy"
+                        style="cursor: pointer;"
+                        @click="clone(item.ID)"
+                        class="btn btn-warning"
+                      >
+                        <i style="color:white" class="fas fa-clone"></i>
                       </a>
                     </div>
                   </td>
@@ -190,6 +215,7 @@ export default {
   data() {
     return {
       page: 1,
+      onOff: true,
       keyword: " ",
       pageSize: 20,
       temp: 1,
@@ -227,6 +253,24 @@ export default {
           console.log(self.ListProject);
         });
     },
+    open(projectId) {
+      let self = this;
+      this.$api.get(`api/Projects/open/${Number(projectId)}`).then(res => {
+        console.log(res);
+        if (res.data.status) {
+          if (res.data.result) {
+            self.onOff = res.data.result;
+            self.$alertify.success("ON!");
+          } else {
+            self.onOff = res.data.result;
+            self.$alertify.success("OFF!");
+          }
+          self.getProject();
+        } else {
+          self.$alertify.error("Failed!");
+        }
+      });
+    },
     save() {
       this.$api
         .post("api/projects/create", {
@@ -244,37 +288,49 @@ export default {
     resetForm() {
       $("#modal-add .Name").val("");
     },
-    remove(id) {
-      this.$swal({
-        title: "Are you sure?",
-        text: "You can't revert your action",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes Delete it!",
-        cancelButtonText: "No, Keep it!",
-        showCloseButton: true,
-        showLoaderOnConfirm: true
-      }).then(result => {
+    clone(id) {
+      let self = this;
+      let promise = self.$alertify.confirm("clone").then(result => {
         if (result.value) {
-          this.$api
-            .delete(`api/Projects/DeleteProject/${id}`)
+          self.$api
+            .get(`api/Projects/Clone/${id}`)
             .then(r => {
-              this.getProject();
-              this.$swal(
-                "Deleted",
-                "You successfully deleted this project",
+              self.getProject();
+              self.$swal(
+                "Cloned",
+                "You successfully clone this project",
                 "success"
               );
-              // alertify.success("Success");
             })
             .catch(r => {
               console.log(r);
             });
         } else {
-          this.$swal("Cancelled", "Your project is still intact", "info");
+          self.$swal("Cancelled", "Your project is still intact", "info");
         }
       });
-      // console.log(id);
+    },
+    remove(id) {
+      let self = this;
+      let promise = self.$alertify.confirm().then(result => {
+        if (result.value) {
+          self.$api
+            .delete(`api/Projects/DeleteProject/${id}`)
+            .then(r => {
+              self.getProject();
+              self.$swal(
+                "Deleted",
+                "You successfully deleted this project",
+                "success"
+              );
+            })
+            .catch(r => {
+              console.log(r);
+            });
+        } else {
+          self.$swal("Cancelled", "Your project is still intact", "info");
+        }
+      });
     },
     edit: function(item, index) {
       $("#modal-edit").modal("show");
@@ -302,6 +358,9 @@ export default {
         });
     }
   },
+  mounted() {
+    // $("body").tooltip({ selector: "[data-toggle=tooltip]", placement: "left" });
+  },
   watch: {
     keyword: function(newVal, oldVal) {
       var self = this;
@@ -313,4 +372,7 @@ export default {
 </script>
 
 <style scoped>
+.dot:after {
+  background-color: #dc3545 !important;
+}
 </style>

@@ -12,9 +12,10 @@ import "vue-datetime/dist/vue-datetime.css";
 import Paginate from "vuejs-paginate";
 import Auth from "./assets/plugins/auth";
 import Alertify from "./assets/plugins/alertify";
+import Signalr from "./assets/plugins/signalr";
 import CommonPlugin from "./assets/plugins/common";
-
-
+import VueClipboard from 'vue-clipboard2'
+Vue.use(VueClipboard)
 Vue.component("paginate", Paginate);
 Vue.use(Datetime);
 Vue.use(VueSweetalert2);
@@ -58,7 +59,11 @@ Vue.filter("toTitleCase", function (val) {
 });
 
 Vue.use(Alertify);
+Vue.use(Signalr);
 Vue.use(CommonPlugin);
+
+
+
 //configure route guards
 Router.beforeEach(function (to, from, next) {
   //prevent access to 'requiresGuest' routes;

@@ -83,6 +83,8 @@
               :toolbar="toolbar"
               :searchSettings="searchSettings"
               :dataSourceChanged="dataSourceChanged"
+              :allowResizing="true"
+              :showColumnMenu="true"
             >
               <e-columns>
                 <e-column
@@ -99,126 +101,58 @@
                   width="110"
                   textAlign="Center"
                 ></e-column>
-                <!-- <e-column field="Level" headerText="Level" width="150" textAlign="Center"></e-column> -->
                 <e-column
                   field="ProjectName"
                   headerText="Project name"
                   :disableHtmlEncode="false"
+                  :template="projectTemplate"
                   width="240"
+                  textAlign="Center"
                 ></e-column>
                 <e-column
                   field="JobName"
                   headerText="Task Name"
                   :disableHtmlEncode="false"
+                  :template="jobNameTemplate"
+                  textAlign="Center"
                   width="240"
                 ></e-column>
-                <e-column
-                  field="From"
-                  headerText="From Where? / From Who?"
-                  :disableHtmlEncode="false"
-                  width="230"
-                ></e-column>
-                <e-column
-                  field="Description"
-                  headerText="Description"
-                  width="180"
-                  textAlign="Center"
-                ></e-column>
-                <e-column field="PIC" headerText="PIC" width="180" format="yMd" textAlign="Right"></e-column>
-                <e-column field="DueDate" headerText="DueDate" width="160" textAlign="Center"></e-column>
-                <e-column field="Remark" headerText="Remark" width="180" textAlign="Center"></e-column>
+                <e-column field="From" headerText="From" :disableHtmlEncode="false" width="120"></e-column>
+                <e-column field="PIC" headerText="PIC" width="180" format="yMd" textAlign="Center"></e-column>
                 <e-column
                   field="state"
                   :disableHtmlEncode="false"
                   headerText="Status"
-                  width="100"
+                  width="120"
+                  textAlign="Center"
+                ></e-column>
+                <e-column field="DueDateDaily" headerText="Daily" width="160" textAlign="Center"></e-column>
+                <e-column field="SpecificDate" headerText="Due Date" width="160" textAlign="Center"></e-column>
+                <e-column field="DueDateWeekly" headerText="Weekly" width="160" textAlign="Center"></e-column>
+                <e-column
+                  field="DueDateMonthly"
+                  headerText="Monthly"
+                  width="200"
                   textAlign="Center"
                 ></e-column>
                 <e-column
-                  field="CreatedDate"
-                  headerText="CreatedDate"
+                  field="DueDateQuarterly"
+                  headerText="Quarterly"
                   width="160"
+                  textAlign="Center"
+                ></e-column>
+                <e-column field="DueDateYearly" headerText="Yearly" width="160" textAlign="Center"></e-column>
+
+                <e-column
+                  field="CreatedDateForEachTask"
+                  headerText="Created Date"
+                  width="200"
                   textAlign="Center"
                 ></e-column>
               </e-columns>
             </ejs-treegrid>
-            <!-- <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>From</th>
-                  <th>Job Name/ Project Name</th>
-                  <th>Be Assigned</th>
-                  <th>Description</th>
-                  <th>Deadline</th>
-                  <th>Remark</th>
-                  <th>Status</th>
-                  <th>Created Time</th>
-                  <th>Option</th>
-                </tr>
-              </thead>
-              <tbody style="overflow-y:hidden">
-                <tr v-for="(task,key,index) in tasks" :key="index">
-                  <td>{{key + 1}}</td>
-                  <td>{{task.From}}</td>
-                  <td>{{task.ProjectName}}</td>
-                  <td>
-                    <span
-                      v-for="(pic,key,index) in task.PIC"
-                      :key="index"
-                      class="badge bg-secondary"
-                    >{{pic}}</span>
-                  </td>
-                  <td>{{task.Description}}</td>
-                  <td>{{task.DueDate}}</td>
-                  <td>{{task.Remark}}</td>
-                  <td>
-                    <span class="badge bg-danger">{{task.Status== true ? "done": "undone"}}</span>
-                  </td>
-                  <td>{{task.CreatedDate}}</td>
-                  <td class="py-0 align-middle">
-                    <button
-                      type="button"
-                      class="btn btn-block btn-info btn-xs"
-                      data-toggle="modal"
-                      data-target="#modal-sub-task"
-                    >
-                      <i class="fas fa-plus"></i> Sub
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>-->
           </div>
           <!-- ./card-body -->
-          <div class="card-footer clearfix">
-            <!-- <ul class="pagination pagination-sm m-0 float-right">
-              <li class="page-item">
-                <a class="page-link" href="#">First</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">Next</a>
-              </li>
-
-              <li class="page-item">
-                <a class="page-link" href="#">1</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">2</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">3</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">Previous</a>
-              </li>
-
-              <li class="page-item">
-                <a class="page-link" href="#">Last</a>
-              </li>
-            </ul>-->
-          </div>
-          <!-- /.card-footer -->
         </div>
         <!-- /.card -->
       </div>
@@ -240,7 +174,10 @@ import {
   PdfExport,
   Toolbar,
   Filter,
-  Page
+  Page,
+  RowDD,
+  Resize,
+  ColumnMenu
 } from "@syncfusion/ej2-vue-treegrid";
 Vue.use(TreeGridPlugin);
 // register globally
@@ -286,6 +223,44 @@ export default {
           })
         };
       },
+      jobNameTemplate: function() {
+        return {
+          template: Vue.component("jobNameTemplate", {
+            template: `<a id="jobNameTemplate" data-toggle="tooltip" :title="data.JobName">
+                      {{data.JobName}}
+                      </a>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
+      projectTemplate: function() {
+        return {
+          template: Vue.component("projectTemplate", {
+            template: `<a id="projectTemplate" data-toggle="tooltip" :title="data.ProjectName">
+                      {{data.ProjectName}}
+                      </a>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            },
+            methods: {
+              addSubscribe(data) {
+                EventBus.$emit("follow", data);
+              }
+            }
+          })
+        };
+      },
       searchSettings: {
         hierarchyMode: "Parent",
         fields: ["JobName"],
@@ -293,7 +268,7 @@ export default {
         key: "task",
         ignoreCase: true
       },
-      pageSettings: { pageSize: 10 },
+      pageSettings: { pageSizes: true, pageSize: 10 },
       PIC: [],
       expanded: {},
       selected: [],
@@ -305,7 +280,8 @@ export default {
       toolbar: [
         "Search",
         "ExpandAll",
-        "CollapseAll"
+        "CollapseAll",
+        "Print"
         // "ExcelExport",
         // "PdfExport"
       ]
@@ -424,7 +400,17 @@ export default {
     }
   },
   provide: {
-    treegrid: [Sort, ExcelExport, PdfExport, Filter, Page, Toolbar]
+    treegrid: [
+      Sort,
+      ExcelExport,
+      PdfExport,
+      Filter,
+      Page,
+      Toolbar,
+      RowDD,
+      Resize,
+      ColumnMenu
+    ]
   }
 };
 </script>
