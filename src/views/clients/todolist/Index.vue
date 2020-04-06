@@ -135,6 +135,7 @@
               :allowResizing="true"
               :showColumnMenu="true"
               :gridLines="'Both'"
+              :rowSelected='rowSelected'
             >
               <e-columns>
                 <e-column
@@ -288,6 +289,39 @@
         <!-- /.modal-content -->
       </div>
       <!-- /.modal-dialog -->
+    </div>
+     <!-- Modal watch video -->
+    <div
+      class="modal fade"
+      id="modal-watch-video"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{titleTutorialVideo}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="embed-responsive embed-responsive-16by9">
+              <iframe
+                class="embed-responsive-item"
+                :src="srcTutorial"
+                id="video"
+                width="960"
+                height="540"
+                allowscriptaccess="always"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -443,6 +477,8 @@ export default {
         }
       ],
       modalTitle: "Add New Task",
+      titleTutorialVideo: '',
+      srcTutorial: '',
       sort: "",
       contextMenuItems: [
         // {
@@ -457,6 +493,12 @@ export default {
         //   target: ".e-content",
         //   id: "Remark"
         // },
+         {
+          text: "Watch Video",
+          iconCss: " e-icons e-add",
+          target: ".e-content",
+          id: "WatchVideo"
+        },
         {
           text: "Finish Task",
           iconCss: " e-icons e-add",
@@ -797,26 +839,7 @@ export default {
         console.log(self.tasks);
       });
     },
-    sortMonthly(month) {
-      var self = this;
-      self.$api
-        .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/%20/${month}`)
-        .then(res => {
-          self.tasks = res.data;
-          self.data = res.data;
-          console.log(self.tasks);
-        });
-    },
-    sortQuarterly(quarter) {
-      var self = this;
-      self.$api
-        .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/%20/%20/${quarter}`)
-        .then(res => {
-          self.tasks = res.data;
-          self.data = res.data;
-          console.log(self.tasks);
-        });
-    },
+   
     sortHigh() {
       var self = this;
       self.$api.get(`api/Tasks/GetListTreeTask/H/%20`).then(res => {
@@ -843,6 +866,26 @@ export default {
         console.log("sortLow");
         console.log(self.tasks);
       });
+    },
+     sortMonthly(month) {
+      var self = this;
+      self.$api
+        .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/%20/${month}`)
+        .then(res => {
+          self.tasks = res.data;
+          self.data = res.data;
+          console.log(self.tasks);
+        });
+    },
+    sortQuarterly(quarter) {
+      var self = this;
+      self.$api
+        .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/%20/%20/${quarter}`)
+        .then(res => {
+          self.tasks = res.data;
+          self.data = res.data;
+          console.log(self.tasks);
+        });
     },
     toolbarClick(args) {
       var self = this;
@@ -982,6 +1025,18 @@ export default {
       //     self.$swal("Warning!", "You are not assign this task!!!", "warning");
       //   }
       // }
+        if (arg.rowInfo.rowData.VideoStatus) {
+        document
+          .querySelectorAll("li#WatchVideo")[0]
+          .setAttribute("style", "display: block;");
+        document
+          .querySelectorAll("li#Done")[0]
+          .setAttribute("style", "display: block;");
+      } else {
+        document
+          .querySelectorAll("li#WatchVideo")[0]
+          .setAttribute("style", "display: none;");
+      }
     },
     contextMenuClick: function(args) {
       var self = this;
@@ -1035,16 +1090,20 @@ export default {
           self.dateDateTime = args.rowInfo.rowData.Deadline;
 
           break;
-        case "Remark":
-          self.task.remark = "";
-          self.editStatus = false;
-          self.remarkObj.id = args.rowInfo.rowData.ID;
-          self.remarkObj.remark = args.rowInfo.rowData.Remark;
-          $("#modal-remark").modal("show");
+        case "WatchVideo":
+          $("#modal-watch-video").modal("show");
           break;
         case "DeleteTask":
           self.delete(args.rowInfo.rowData.ID);
           break;
+      }
+    },
+     rowSelected(args) {
+      console.log(args);
+      var self = this;
+      if (args.data.VideoStatus) {
+        self.srcTutorial = args.data.Tutorial.URL;
+        self.titleTutorialVideo = args.data.Tutorial.Name;
       }
     },
     getUser(projectID = 0) {

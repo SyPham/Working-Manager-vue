@@ -1640,7 +1640,7 @@ export default {
 
           self.whoSelected = args.rowInfo.rowData.FromWho;
           self.PICs = args.rowInfo.rowData.PICs || [];
-
+          self.selected = args.rowInfo.rowData.BeAssigneds;
           self.projectSelected = {
             ID: args.rowInfo.rowData.ProjectID,
             Name: args.rowInfo.rowData.ProjectName

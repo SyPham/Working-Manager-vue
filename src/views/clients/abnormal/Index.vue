@@ -66,8 +66,8 @@
           <!-- <button type="button" @click="sortProject" class="btn bg-gradient-secondary btn-sm">
             <i class="fas fa-tasks"></i> Project
           </button>
-          <button type="button" @click="sortRoutine" class="btn bg-gradient-secondary btn-sm">
-            <i class="fas fa-book-open"></i> Routine Job
+          <button type="button" @click="sortAbnormal" class="btn bg-gradient-secondary btn-sm">
+            <i class="fas fa-book-open"></i> Abnormal Job
           </button>-->
 
           <button type="button" @click="sortHigh" class="btn bg-gradient-secondary btn-sm">
@@ -1413,7 +1413,7 @@ export default {
           console.log(self.tasks);
         });
     },
-    sortRoutine() {
+    sortAbnormal() {
       var self = this;
       self.$api
         .get(`api/Tasks/GetListTreeAbnormal/${self.ocid}/routine`)
@@ -1848,7 +1848,7 @@ export default {
       var self = this;
       self.editStatus = false;
       self.getDeputies();
-      self.modalTitle = "Add New Routine Task";
+      self.modalTitle = "Add New Abnormal Task";
       self.whoSelected = {
         ID: Number(localStorage.getItem("UserID")),
         Username: localStorage.getItem("User")

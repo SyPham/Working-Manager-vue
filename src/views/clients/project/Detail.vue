@@ -2037,7 +2037,7 @@ export default {
   },
   watch: {
     "$route.path": function(name) {
-      alert(name);
+      
     },
     whoSelected: function(newVal, oldVal) {
       var self = this;

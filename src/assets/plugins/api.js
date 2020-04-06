@@ -1,5 +1,5 @@
 import axios from "axios";
-axios.defaults.baseURL = "http://10.4.4.224:93";
+axios.defaults.baseURL = "http://10.4.0.76:96";
 
 axios.defaults.headers.post["Content-Type"] = "application/json; charset=utf-8";
 axios.interceptors.request.use(
@@ -19,7 +19,7 @@ axios.interceptors.request.use(
 );
 
 var APIPlugin = axios.create({
-  baseURL: `http://10.4.4.224:93/`
+  baseURL: `http://10.4.0.76:96/`
 });
 
 export default function (Vue) {
