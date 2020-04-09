@@ -84,23 +84,32 @@
     </div>
     <div class="row">
       <div>
-<div class="col-md-12">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="card-title">
-              <i class="fas fa-list"></i> To Do List
-            </h5>
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title" style="margin-right: 150px!important;">
+                <i class="fas fa-list"></i> To Do List
+              </h5>
+             <div class="card-tools float-left">
+                  <div class="input-group input-group-sm" style="width: 196px;">
+                    <input type="text" @keyup.enter='search' class="form-control float-right searchtext" placeholder="Search">
 
-            <div class="card-tools">
-              <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                <i class="fas fa-minus"></i>
-              </button>
+                    <div class="input-group-append">
+                      <a @click='search' class="btn btn-default"><i class="fas fa-search"></i></a>
+                    </div>
+                  </div>
+                </div>
+<!-- 
+              <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                  <i class="fas fa-minus"></i>
+                </button>
 
-              <button type="button" class="btn btn-tool" data-card-widget="remove">
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-            <!-- <div class="card-tools pr-5">
+                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div> -->
+              <!-- <div class="card-tools pr-5">
               <div class="input-group input-group-sm" style="width: 150px;">
                 <input
                   type="text"
@@ -115,110 +124,131 @@
                   </button>
                 </div>
               </div>
-            </div>-->
-          </div>
-          <!-- /.card-header -->
-          <div class="card-body table-responsive p-0" >
-            <ejs-treegrid
-              ref="treegrid"
-              :dataSource="data"
-              childMapping="children"
-              allowSelection='false'
-              :treeColumnIndex="3"
-              :allowPaging="true"
-              :height="'100%'"
-              :width="'100%'"
-              :pageSettings="pageSettings"
-              :allowSorting="true"
-              :contextMenuClick="contextMenuClick"
-              :dataSourceChanged="dataSourceChanged"
-              :sortSettings="sortSettings"
-              :toolbar="toolbar"
-              :searchSettings="searchSettings"
-              :toolbarClick="toolbarClick"
-              :allowExcelExport="true"
-              :allowPdfExport="true"
-              :contextMenuItems="contextMenuItems"
-              :contextMenuOpen="contextMenuOpen"
-              :recordDoubleClick="recordDoubleClick"
-              :allowResizing="true"
-              :showColumnMenu="true"
-              :gridLines="'Both'"
-              :rowSelected='rowSelected'
-            >
-              <e-columns>
-                <e-column
-                  field="Follow"
-                  :template="optionFollowTemplate"
-                  headerText="Follow"
-                  width="130"
-                  textAlign="Center"
-                ></e-column>
-                <e-column
-                  field="Priority"
-                  :template="priorityTemplate"
-                  headerText="Priority"
-                  width="120"
-                  textAlign="Center"
-                ></e-column>
-                <!-- <e-column field="Level" headerText="Level" width="150" textAlign="Center"></e-column> -->
-                <e-column
-                  field="ProjectName"
-                  headerText="Project name"
-                  :disableHtmlEncode="false"
-                  :template="projectTemplate"
-                  width="240"
-                  textAlign="Center"
-                ></e-column>
-                <e-column
-                  field="JobName"
-                  headerText="Task Name"
-                  :disableHtmlEncode="false"
-                  :template="jobNameTemplate"
-                  textAlign="Center"
-                  width="240"
-                ></e-column>
-                <e-column field="From" headerText="From" :disableHtmlEncode="false" width="120"></e-column>
-                <e-column field="PIC" headerText="PIC" width="180" format="yMd" textAlign="Center"></e-column>
-                <e-column
-                  field="state"
-                  :disableHtmlEncode="false"
-                  headerText="Status"
-                  width="120"
-                  textAlign="Center"
-                ></e-column>
-                <e-column field="DueDateDaily" headerText="Daily" width="160" textAlign="Center"></e-column>
-                <e-column field="SpecificDate" headerText="Due Date" width="200" textAlign="Center"></e-column>
-                <e-column field="DueDateWeekly" headerText="Weekly" width="160" textAlign="Center"></e-column>
-                <e-column
-                  field="DueDateMonthly"
-                  headerText="Monthly"
-                  width="160"
-                  textAlign="Center"
-                ></e-column>
-                <e-column
-                  field="DueDateQuarterly"
-                  headerText="Quarterly"
-                  width="160"
-                  textAlign="Center"
-                ></e-column>
-                <e-column field="DueDateYearly" headerText="Yearly" width="160" textAlign="Center"></e-column>
+              </div>-->
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body table-responsive p-0">
+              <ejs-treegrid
+                ref="treegrid"
+                :dataSource="data"
+                childMapping="children"
+                allowSelection="false"
+                :treeColumnIndex="3"
+                :allowPaging="true"
+                :height="'100%'"
+                :width="'100%'"
+                :pageSettings="pageSettings"
+                :allowSorting="true"
+                :contextMenuClick="contextMenuClick"
+                :dataSourceChanged="dataSourceChanged"
+                :sortSettings="sortSettings"
+                :toolbar="toolbar"
+                :searchSettings="searchSettings"
+                :toolbarClick="toolbarClick"
+                :allowExcelExport="true"
+                :allowPdfExport="true"
+                :contextMenuItems="contextMenuItems"
+                :contextMenuOpen="contextMenuOpen"
+                :recordDoubleClick="recordDoubleClick"
+                :allowResizing="true"
+                :showColumnMenu="true"
+                :gridLines="'Both'"
+                :rowSelected="rowSelected"
+              >
+                <e-columns>
+                  <e-column
+                    field="Follow"
+                    :template="optionFollowTemplate"
+                    headerText="Follow"
+                    width="130"
+                    textAlign="Center"
+                  ></e-column>
+                  <e-column
+                    field="Priority"
+                    :template="priorityTemplate"
+                    headerText="Priority"
+                    width="120"
+                    textAlign="Center"
+                  ></e-column>
+                  <!-- <e-column field="Level" headerText="Level" width="150" textAlign="Center"></e-column> -->
+                  <e-column
+                    field="ProjectName"
+                    headerText="Project name"
+                    :disableHtmlEncode="false"
+                    :template="projectTemplate"
+                    width="240"
+                    textAlign="Center"
+                  ></e-column>
+                  <e-column
+                    field="JobName"
+                    headerText="Task Name"
+                    :disableHtmlEncode="false"
+                    :template="jobNameTemplate"
+                    textAlign="Center"
+                    width="240"
+                  ></e-column>
+                  <e-column field="From" headerText="From" :disableHtmlEncode="false" width="120"></e-column>
+                  <e-column
+                    field="PIC"
+                    headerText="PIC"
+                    width="180"
+                    format="yMd"
+                    textAlign="Center"
+                  ></e-column>
+                  <e-column
+                    field="state"
+                    :disableHtmlEncode="false"
+                    headerText="Status"
+                    width="120"
+                    textAlign="Center"
+                  ></e-column>
+                  <e-column field="DueDateDaily" headerText="Daily" width="160" textAlign="Center"></e-column>
+                  <e-column
+                    field="SpecificDate"
+                    headerText="Due Date"
+                    width="200"
+                    textAlign="Center"
+                  ></e-column>
+                  <e-column
+                    field="DueDateWeekly"
+                    headerText="Weekly"
+                    width="160"
+                    textAlign="Center"
+                  ></e-column>
+                  <e-column
+                    field="DueDateMonthly"
+                    headerText="Monthly"
+                    width="160"
+                    textAlign="Center"
+                  ></e-column>
+                  <e-column
+                    field="DueDateQuarterly"
+                    headerText="Quarterly"
+                    width="160"
+                    textAlign="Center"
+                  ></e-column>
+                  <e-column
+                    field="DueDateYearly"
+                    headerText="Yearly"
+                    width="160"
+                    textAlign="Center"
+                  ></e-column>
 
-                <e-column
-                  field="CreatedDateForEachTask"
-                  headerText="Created Date"
-                  width="200"
-                  textAlign="Center"
-                ></e-column>
-              </e-columns>
-            </ejs-treegrid>
+                  <e-column
+                    field="CreatedDateForEachTask"
+                    headerText="Created Date"
+                    width="200"
+                    textAlign="Center"
+                  ></e-column>
+                </e-columns>
+              </ejs-treegrid>
+            </div>
+            <!-- ./card-body -->
           </div>
-          <!-- ./card-body -->
+          <!-- /.card -->
         </div>
-        <!-- /.card -->
       </div>
-      </div>
-      
+
       <!-- /.col -->
     </div>
 
@@ -301,7 +331,7 @@
       </div>
       <!-- /.modal-dialog -->
     </div>
-     <!-- Modal watch video -->
+    <!-- Modal watch video -->
     <div
       class="modal fade"
       id="modal-watch-video"
@@ -343,9 +373,9 @@ import Multiselect from "vue-multiselect";
 import { Datetime } from "vue-datetime";
 import EventBus from "../../../EventBus";
 import Tree from "../../shares/comment/Tree";
-import VueDragscroll from 'vue-dragscroll'
-import { dragscroll } from 'vue-dragscroll'
-Vue.use(VueDragscroll)
+import VueDragscroll from "vue-dragscroll";
+import { dragscroll } from "vue-dragscroll";
+Vue.use(VueDragscroll);
 import {
   TreeGridPlugin,
   ContextMenu,
@@ -379,7 +409,7 @@ export default {
     Datetime,
     Tree
   },
-  mixins: [CommentMixin,GridTreeMixin],
+  mixins: [CommentMixin, GridTreeMixin],
   data() {
     return {
       //-----------------datetime range
@@ -494,8 +524,8 @@ export default {
         }
       ],
       modalTitle: "Add New Task",
-      titleTutorialVideo: '',
-      srcTutorial: '',
+      titleTutorialVideo: "",
+      srcTutorial: "",
       sort: "",
       contextMenuItems: [
         // {
@@ -510,7 +540,7 @@ export default {
         //   target: ".e-content",
         //   id: "Remark"
         // },
-         {
+        {
           text: "Watch Video",
           iconCss: " e-icons e-add",
           target: ".e-content",
@@ -657,6 +687,10 @@ export default {
   computed: {},
 
   methods: {
+     search() {
+        let searchText = document.getElementsByClassName('searchtext')[0].value;
+        this.$refs.treegrid.search(searchText);
+     },
     // AddSub(data) {
     //   this.getAllComment(data);
     // },
@@ -856,7 +890,7 @@ export default {
         console.log(self.tasks);
       });
     },
-   
+
     sortHigh() {
       var self = this;
       self.$api.get(`api/Tasks/GetListTreeTask/H/%20`).then(res => {
@@ -902,7 +936,7 @@ export default {
         console.log(self.tasks);
       });
     },
-     sortMonthly(month) {
+    sortMonthly(month) {
       var self = this;
       self.$api
         .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/%20/${month}`)
@@ -1060,7 +1094,7 @@ export default {
       //     self.$swal("Warning!", "You are not assign this task!!!", "warning");
       //   }
       // }
-        if (arg.rowInfo.rowData.VideoStatus) {
+      if (arg.rowInfo.rowData.VideoStatus) {
         document
           .querySelectorAll("li#WatchVideo")[0]
           .setAttribute("style", "display: block;");
@@ -1133,7 +1167,7 @@ export default {
           break;
       }
     },
-     rowSelected(args) {
+    rowSelected(args) {
       console.log(args);
       var self = this;
       if (args.data.VideoStatus) {
@@ -1433,5 +1467,4 @@ export default {
 .nested-comments {
   margin-left: 50px;
 }
-
 </style>

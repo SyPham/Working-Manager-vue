@@ -11,16 +11,16 @@ export default {
 </script>
 
 <style>
-@import "../node_modules/@syncfusion/ej2-base/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-buttons/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-calendars/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-dropdowns/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-inputs/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-navigations/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-popups/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-splitbuttons/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-grids/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-treegrid/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-base/styles/bootstrap.css";
+@import "../node_modules/@syncfusion/ej2-buttons/styles/bootstrap.css";
+@import "../node_modules/@syncfusion/ej2-calendars/styles/bootstrap.css";
+@import "../node_modules/@syncfusion/ej2-dropdowns/styles/bootstrap.css";
+@import "../node_modules/@syncfusion/ej2-inputs/styles/bootstrap.css";
+@import "../node_modules/@syncfusion/ej2-navigations/styles/bootstrap.css";
+@import "../node_modules/@syncfusion/ej2-popups/styles/bootstrap.css";
+@import "../node_modules/@syncfusion/ej2-splitbuttons/styles/bootstrap.css";
+@import "../node_modules/@syncfusion/ej2-grids/styles/bootstrap.css";
+@import "../node_modules/@syncfusion/ej2-treegrid/styles/bootstrap.css";
 .page-enter-active,
 .page-leave-active {
   transition: opacity 1s, transform 1s;

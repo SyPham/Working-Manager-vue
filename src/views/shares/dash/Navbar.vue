@@ -222,7 +222,6 @@
 
 <script>
 import moment from "moment-timezone";
-
 import EventBus from "../../../EventBus";
 import Vue from "vue";
 import myUpload from "vue-image-crop-upload";
