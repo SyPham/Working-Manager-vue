@@ -19,11 +19,12 @@ Vue.use(VueClipboard)
 Vue.component("paginate", Paginate);
 Vue.use(Datetime);
 Vue.use(VueSweetalert2);
-
+import VueDragscroll from 'vue-dragscroll'
+Vue.use(VueDragscroll)
 Vue.use(Auth);
 Vue.use({
   install(Vue) {
-    axios.defaults.baseURL = "http://10.4.4.224:93";
+    axios.defaults.baseURL = "http://10.4.4.224:11111";
     axios.defaults.headers.post["Content-Type"] =
       "application/json; charset=utf-8";
     var instance = axios.create();

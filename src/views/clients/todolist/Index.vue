@@ -17,7 +17,7 @@
       <div class="col-md-12 col-xs-12 col-12">
         <h5 class="text-primary">Sort By:</h5>
       </div>
-      <div class="col-lg-6 col-xs-12 col-12 pb-4">
+      <div class="col-lg-12 col-xs-12 col-12 pb-4">
         <button type="button" @click="sortProject" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-tasks"></i> Project
         </button>
@@ -36,11 +36,17 @@
         <button type="button" @click="sortLow" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-low-vision"></i> Low
         </button>
+        <button type="button" @click="sortByAssignedJob" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-marker"></i> Assigned
+        </button>
+        <button type="button" @click="sortByBeAssignedJob" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-pencil-alt"></i> BeAssigned
+        </button>
         <button type="button" @click="clearSearch" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-sync-alt"></i> All
         </button>
       </div>
-      <div class="col-lg-2 col-xs-6 col-6 pb-4">
+      <div class="col-lg-2 col-xs-6 col-6 pb-4" v-if="false">
         <div class="form-group Weekly">
           <select class="form-control" v-model="selectedEveryday">
             <option disabled value="reset">Sort by weekdays</option>
@@ -48,7 +54,7 @@
           </select>
         </div>
       </div>
-      <div class="col-lg-2 col-xs-6 col-6 pb-4">
+      <div class="col-lg-2 col-xs-6 col-6 pb-4" v-if="false">
         <div class="form-group Weekly">
           <select class="form-control" v-model="selectedMonthly">
             <option disabled value="reset">Sort by monthly</option>
@@ -56,7 +62,7 @@
           </select>
         </div>
       </div>
-      <div class="col-lg-2 col-xs-6 col-6 pb-4">
+      <div class="col-lg-2 col-xs-6 col-6 pb-4" v-if="false">
         <div class="form-group Weekly">
           <select class="form-control" v-model="selectedQuarterly">
             <option disabled value="reset">Sort by quarterly</option>
@@ -77,7 +83,8 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-12">
+      <div>
+<div class="col-md-12">
         <div class="card">
           <div class="card-header">
             <h5 class="card-title">
@@ -111,14 +118,16 @@
             </div>-->
           </div>
           <!-- /.card-header -->
-          <div class="card-body table-responsive p-0">
+          <div class="card-body table-responsive p-0" >
             <ejs-treegrid
               ref="treegrid"
               :dataSource="data"
               childMapping="children"
+              allowSelection='false'
               :treeColumnIndex="3"
               :allowPaging="true"
-              :height="'700px'"
+              :height="'100%'"
+              :width="'100%'"
               :pageSettings="pageSettings"
               :allowSorting="true"
               :contextMenuClick="contextMenuClick"
@@ -208,6 +217,8 @@
         </div>
         <!-- /.card -->
       </div>
+      </div>
+      
       <!-- /.col -->
     </div>
 
@@ -332,6 +343,9 @@ import Multiselect from "vue-multiselect";
 import { Datetime } from "vue-datetime";
 import EventBus from "../../../EventBus";
 import Tree from "../../shares/comment/Tree";
+import VueDragscroll from 'vue-dragscroll'
+import { dragscroll } from 'vue-dragscroll'
+Vue.use(VueDragscroll)
 import {
   TreeGridPlugin,
   ContextMenu,
@@ -357,6 +371,9 @@ import GridTreeMixin from "../../../mixin/gridTree";
 Vue.use(VMdDateRangePicker);
 export default {
   name: "todolist",
+  directives: {
+    dragscroll
+  },
   components: {
     Multiselect,
     Datetime,
@@ -864,6 +881,24 @@ export default {
         self.tasks = res.data;
         self.data = res.data;
         console.log("sortLow");
+        console.log(self.tasks);
+      });
+    },
+    sortByAssignedJob() {
+      var self = this;
+      self.$api.get(`api/Tasks/SortBy/assigned/Assigned`).then(res => {
+        self.tasks = res.data;
+        self.data = res.data;
+        console.log("sortByAssignedJob");
+        console.log(self.tasks);
+      });
+    },
+    sortByBeAssignedJob() {
+      var self = this;
+      self.$api.get(`api/Tasks/SortBy/beAssigned/BeAssigned`).then(res => {
+        self.tasks = res.data;
+        self.data = res.data;
+        console.log("sortByBeAssignedJob");
         console.log(self.tasks);
       });
     },
@@ -1398,4 +1433,5 @@ export default {
 .nested-comments {
   margin-left: 50px;
 }
+
 </style>
