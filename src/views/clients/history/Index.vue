@@ -142,7 +142,12 @@
                   textAlign="Center"
                 ></e-column>
                 <e-column field="DueDateYearly" headerText="Yearly" width="160" textAlign="Center"></e-column>
-
+                  <e-column
+                    field="ModifyDateTime"
+                    headerText="Modify DateTime"
+                    width="200"
+                    textAlign="Center"
+                  ></e-column>
                 <e-column
                   field="CreatedDateForEachTask"
                   headerText="Created Date"
