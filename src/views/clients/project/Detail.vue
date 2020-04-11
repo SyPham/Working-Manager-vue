@@ -94,7 +94,9 @@
                   >
                     <i class="fas fa-book-open"></i> Routine Job
                   </button>-->
-
+                  <button type="button" @click="all" class="btn bg-gradient-secondary btn-sm">
+                    <i class="fas fa-sync-alt"></i> All
+                  </button>
                   <button type="button" @click="sortHigh" class="btn bg-gradient-secondary btn-sm">
                     <i class="fas fa-exclamation"></i> High
                   </button>
@@ -108,9 +110,7 @@
                   <button type="button" @click="sortLow" class="btn bg-gradient-secondary btn-sm">
                     <i class="fas fa-low-vision"></i> Low
                   </button>
-                  <button type="button" @click="getTasks" class="btn bg-gradient-secondary btn-sm">
-                    <i class="fas fa-sync-alt"></i> All
-                  </button>
+                
                   <a href="#/client-chat" class="btn bg-gradient-secondary btn-sm">
                     <i class="fas fa-comment-dots"></i> Chat Room
                   </a>
@@ -1180,6 +1180,10 @@ export default {
   },
   methods: {
     //-------------------Begin Comment
+    all() {
+      this.getTasks();
+      this.$refs.treegrid.search('');   
+    },
     recordDoubleClick(args) {
       console.log("recordDoubleClick");
       console.log(args);

@@ -69,7 +69,9 @@
           <button type="button" @click="sortRoutine" class="btn bg-gradient-secondary btn-sm">
             <i class="fas fa-book-open"></i> Routine Job
           </button>-->
-
+          <button type="button" @click="all" class="btn bg-gradient-secondary btn-sm">
+            <i class="fas fa-sync-alt"></i> All
+          </button>
           <button type="button" @click="sortHigh" class="btn bg-gradient-secondary btn-sm">
             <i class="fas fa-exclamation"></i> High
           </button>
@@ -79,9 +81,7 @@
           <button type="button" @click="sortLow" class="btn bg-gradient-secondary btn-sm">
             <i class="fas fa-low-vision"></i> Low
           </button>
-          <button type="button" @click="getTasks" class="btn bg-gradient-secondary btn-sm">
-            <i class="fas fa-sync-alt"></i> All
-          </button>
+         
         </div>
         <div class="col-md-12">
           <div class="card">
@@ -1211,6 +1211,10 @@ export default {
     this.checkRole();
   },
   methods: {
+    all() {
+      this.getTasks();
+      this.$refs.treegrid.search('');   
+    },
     getWeekdaysOfMonth(newVal) {
       let indexof = this.weekday
         .map(item => {

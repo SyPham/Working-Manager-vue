@@ -18,6 +18,9 @@
         <h5 class="text-primary">Sort By:</h5>
       </div>
       <div class="col-lg-12 col-xs-12 col-12 pb-4">
+          <button type="button" @click="clearSearch" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-sync-alt"></i> All
+        </button>
         <button type="button" @click="sortProject" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-tasks"></i> Project
         </button>
@@ -42,9 +45,7 @@
         <button type="button" @click="sortByBeAssignedJob" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-pencil-alt"></i> BeAssigned
         </button>
-        <button type="button" @click="clearSearch" class="btn bg-gradient-secondary btn-sm">
-          <i class="fas fa-sync-alt"></i> All
-        </button>
+      
       </div>
       <div class="col-lg-2 col-xs-6 col-6 pb-4" v-if="false">
         <div class="form-group Weekly">
@@ -92,7 +93,7 @@
               </h5>
              <div class="card-tools float-left">
                   <div class="input-group input-group-sm" style="width: 196px;">
-                    <input type="text" @keyup.enter='search' class="form-control float-right searchtext" placeholder="Search">
+                    <input type="text" ref='inputSearch' @keyup.enter='search' class="form-control float-right searchtext" placeholder="Search">
 
                     <div class="input-group-append">
                       <a @click='search' class="btn btn-default"><i class="fas fa-search"></i></a>
@@ -777,6 +778,8 @@ export default {
       $(self.$refs.modalComment).modal("show");
     },
     clearSearch() {
+      this.$refs.treegrid.search('');
+      this.$refs.inputSearch.value = '';
       this.selectedEveryday = "reset";
       this.selectedMonthly = "reset";
       this.selectedQuarterly = "reset";

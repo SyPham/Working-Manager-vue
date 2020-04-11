@@ -5,6 +5,9 @@
         <h5>Sort:</h5>
       </div>
       <div class="col-md-12 pb-4">
+            <button type="button" @click="clearSearch" class="btn bg-gradient-secondary btn-sm">
+          <i class="fas fa-sync-alt"></i> All
+        </button>
         <button type="button" @click="sortProject" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-tasks"></i> Project
         </button>
@@ -21,9 +24,7 @@
         <button type="button" @click="sortLow" class="btn bg-gradient-secondary btn-sm">
           <i class="fas fa-low-vision"></i> Low
         </button>
-        <button type="button" @click="clearSearch" class="btn bg-gradient-secondary btn-sm">
-          <i class="fas fa-sync-alt"></i> All
-        </button>
+    
       </div>
       <!-- <div class="col-md-12 pb-4">
         <button
@@ -451,6 +452,7 @@ export default {
         key: "",
         ignoreCase: true
       };
+      this.$refs.treegrid.search('');
     },
     searchTreeGrid() {
       let self = this;
