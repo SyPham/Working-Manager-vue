@@ -83,6 +83,7 @@
               :searchSettings="searchSettings"
               :dataSourceChanged="dataSourceChanged"
               :contextMenuItems="contextMenuItems"
+              :recordDoubleClick='recordDoubleClick'
               :allowResizing="true"
               :showColumnMenu="true"
             >
@@ -244,6 +245,87 @@
       </div>
       <!-- /.col -->
     </div>
+
+    
+    <div
+      class="modal fade"
+      id="modal-comment"
+      ref="modalComment"
+      aria-hidden="true"
+      style="display: none;"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="height:750px">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              <i class="fas fa-edit"></i>
+              {{taskName}}
+            </h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body" style="overflow-y: scroll;">
+            <div class="container">
+              <div class="row d-flex align-items-center">
+                <div class="col-md-12 comments-section">
+                  <!--====COMMENT AREA START====-->
+                  <div class="row">
+                    <div class="col-12">
+                      <!-- <h2>Comments</h2> -->
+                      <form class="comment-form" method="post" action>
+                        <textarea
+                          class="comment-area"
+                          v-model="comment.content"
+                          placeholder="Write your comment here"
+                        ></textarea>
+                        <button
+                          type="submit"
+                          @click.prevent="addComment"
+                          class="btn comment-btn"
+                        >Post</button>
+                      </form>
+                    </div>
+                  </div>
+
+                  <!-- =======COMMENTS START=======-->
+                  <div class="row">
+                    <div class="col-12">
+                      <div
+                        class="comment-box-wrapper"
+                        v-for="(item, key, index) in dataComment"
+                        :key="index"
+                      >
+                        <template v-if="key < totalShow">
+                          <tree :tree-data="item" @AddSub="isLoadComment" :taskID="comment.taskid"></tree>
+                        </template>
+                      </div>
+                      <template
+                        v-if="totalShow < dataComment.length || dataComment.length > totalShow"
+                      >
+                        <small
+                          style="cursor: pointer;"
+                          @click="totalShow += 3"
+                          class="text-center text-primary d-block"
+                        >
+                          Load more
+                          <i class="fas fa-chevron-down text-small"></i>
+                        </small>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
   </div>
 </template>
 
@@ -269,11 +351,15 @@ import {
 Vue.use(TreeGridPlugin);
 // register globally
 Vue.component("multiselect", Multiselect);
+import CommentMixin from "../../../mixin/comment";
+import Tree from "../../shares/comment/Tree";
 export default {
   name: "client-follow",
+  mixins: [CommentMixin],
   components: {
     Multiselect,
-    Datetime
+    Datetime,
+    Tree
   },
   data() {
     return {
@@ -442,6 +528,17 @@ export default {
     this.getTasks();
   },
   methods: {
+        recordDoubleClick(args) {
+      console.log("recordDoubleClick");
+      console.log(args);
+      let data = args.rowData;
+      let self = this;
+      self.clearFormComment();
+      self.getAllComment(data.ID);
+      self.taskName = data.JobName;
+      self.comment.taskid = data.ID;
+      $(self.$refs.modalComment).modal("show");
+    },
     clearSearch() {
       let self = this;
       self.getTasks();
@@ -558,22 +655,6 @@ export default {
 };
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-<style >
-.e-headertext {
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.74);
-}
-.e-treecell {
-  font-size: 16px;
-}
-.e-btn.e-flat {
-  background-color: #6c757d !important;
-  border-color: #6c757d !important;
-  box-shadow: none !important;
-  color: #fff !important;
-}
-.e-grid .e-unboundcelldiv .e-icons {
-  color: #fff2f2 !important;
-}
+<style scoped>
+
 </style>

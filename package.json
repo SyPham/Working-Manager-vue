@@ -6,7 +6,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot --host 10.4.4.224 --port 94",
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --host 192.168.1.11 --port 1003",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
@@ -17,6 +17,7 @@
     "axios": "^0.19.2",
     "cropperjs": "^1.5.6",
     "luxon": "^1.22.0",
+    "messaging-api-line": "^0.8.5",
     "pretty-checkbox": "^3.0.3",
     "v-md-date-range-picker": "^2.6.0",
     "vue": "^2.5.11",

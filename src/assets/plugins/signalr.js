@@ -1,5 +1,5 @@
 const CONNECTION = new signalR.HubConnectionBuilder()
-    .withUrl("http://10.4.4.224:11111/working-management-hub")
+    .withUrl("http://localhost:5000/working-management-hub")
     .configureLogging(signalR.LogLevel.Information)
     .build();
 CONNECTION

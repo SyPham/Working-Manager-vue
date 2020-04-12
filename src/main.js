@@ -24,7 +24,7 @@ Vue.use(VueDragscroll)
 Vue.use(Auth);
 Vue.use({
   install(Vue) {
-    axios.defaults.baseURL = "http://10.4.4.224:11111";
+    axios.defaults.baseURL = "http://localhost:5000";
     axios.defaults.headers.post["Content-Type"] =
       "application/json; charset=utf-8";
     var instance = axios.create();
@@ -34,7 +34,8 @@ Vue.use({
           Authorization: "Bearer " + Vue.auth.getToken()
         };
         config.headers.post = {
-          "Content-Type": "application/json; charset=utf-8"
+          "Content-Type": "application/json; charset=utf-8",
+          'Access-Control-Allow-Origin': '*'
         };
         return config;
       },
