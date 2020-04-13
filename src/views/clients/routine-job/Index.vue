@@ -190,6 +190,7 @@
                       :disableHtmlEncode="false"
                       headerText="Status"
                       width="120"
+                      :template='statusTemplate'
                       textAlign="Center"
                     ></e-column>
                     <e-column
@@ -207,6 +208,12 @@
                     <e-column
                       field="DueDateWeekly"
                       headerText="Weekly"
+                      width="160"
+                      textAlign="Center"
+                    ></e-column>
+                      <e-column
+                      field="DateOfWeekly"
+                      headerText="Date Of Weekly"
                       width="160"
                       textAlign="Center"
                     ></e-column>
@@ -843,6 +850,18 @@ export default {
       searchSettingsLeft: { hierarchyMode: "Parent" },
       // --------------------------------------------------------------------
       searchSettings: { hierarchyMode: "Parent" },
+      statusTemplate: function() {
+        return {
+          template: Vue.component("status", {
+            template: `<span :class="data.state !== 'Undone' ? 'badge bg-success' : 'badge bg-danger'">{{data.state}}</span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            }
+          })
+        };
+      },
       priorityTemplate: function() {
         return {
           template: Vue.component("priority", {

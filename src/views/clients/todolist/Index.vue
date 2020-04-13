@@ -200,6 +200,7 @@
                     field="state"
                     :disableHtmlEncode="false"
                     headerText="Status"
+                    :template="statusTemplate"
                     width="120"
                     textAlign="Center"
                   ></e-column>
@@ -214,6 +215,7 @@
                     field="DueDateWeekly"
                     headerText="Weekly"
                     width="160"
+                    :template="weeklyTemplate"
                     textAlign="Center"
                   ></e-column>
                   <e-column
@@ -430,6 +432,30 @@ export default {
       valueRange: [],
       //-----------------end datetime range
       searchSettings: { hierarchyMode: "Parent" },
+      weeklyTemplate: function() {
+        return {
+          template: Vue.component("weekly", {
+            template: `<span>{{ data.DueDateWeekly.length > 0 ? (data.DueDateWeekly + ', ' + data.DateOfWeekly) : ''}}</span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            }
+          })
+        };
+      },
+      statusTemplate: function() {
+        return {
+          template: Vue.component("status", {
+            template: `<span :class="data.state !== 'Undone' ? 'badge bg-success' : 'badge bg-danger'">{{data.state}}</span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            }
+          })
+        };
+      },
       priorityTemplate: function() {
         return {
           template: Vue.component("priority", {
@@ -684,6 +710,7 @@ export default {
     EventBus.$off("AddSub", this.AddSub);
   },
   created() {
+    $('#overlay').fadeIn();
     this.getProjects();
     this.getFrom();
     this.getUserForWho();
@@ -710,10 +737,10 @@ export default {
             }
           })
         .then( function(res) {
-          console.log(res.data);
+          console.log("Test line message: ", res.data);
         })
         .catch( function(err) {
-          console.error(err);
+          console.error("Test line message: ",err);
         });
       },
      search() {
@@ -1223,7 +1250,6 @@ export default {
     },
     getTasks() {
       var self = this;
-
       self.$api
         .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/%20`)
         .then(res => {
@@ -1233,6 +1259,8 @@ export default {
             "task -----------------------------------------------------------------------"
           );
           console.log(self.data);
+        }).then(complete => {
+          $('#overlay').fadeOut();
         });
     },
     getProjects() {

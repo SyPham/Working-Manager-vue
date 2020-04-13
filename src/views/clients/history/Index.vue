@@ -125,6 +125,7 @@
                   field="state"
                   :disableHtmlEncode="false"
                   headerText="Status"
+                  :template="statusTemplate"
                   width="120"
                   textAlign="Center"
                 ></e-column>
@@ -281,6 +282,18 @@ export default {
   },
   data() {
     return {
+       statusTemplate: function() {
+        return {
+          template: Vue.component("status", {
+            template: `<span :class="data.state !== 'Late' ? 'badge bg-success' : 'badge bg-danger'">{{data.state}}</span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            }
+          })
+        };
+      },
       priorityTemplate: function() {
         return {
           template: Vue.component("priority", {
@@ -386,6 +399,7 @@ export default {
     EventBus.$off("Undo", this.undo);
   },
   created() {
+    $('#overlay').fadeIn();
     this.getTasks();
     this.searchTreeGrid();
   },
@@ -496,11 +510,14 @@ export default {
     },
     getTasks() {
       var self = this;
-      self.$api.get(`api/Tasks/GetListTreeHistory`).then(res => {
+      self.$api.get(`api/Tasks/GetListTreeHistory`)
+      .then(res => {
         self.search = "";
         self.jobTypeID = 0;
         self.data = res.data;
         console.log(self.data);
+      }).then(complete => {
+        $('#overlay').fadeOut();
       });
     }
   },

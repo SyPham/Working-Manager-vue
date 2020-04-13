@@ -229,6 +229,7 @@ export default {
     };
   },
   created() {
+    $('#overlay').fadeIn();
     this.getProject();
   },
   methods: {
@@ -251,7 +252,8 @@ export default {
           self.totalPage = res.data.total;
           console.log("self.ListProject");
           console.log(self.ListProject);
-        });
+    
+        }).then( () => $('#overlay').fadeOut());
     },
     open(projectId) {
       let self = this;

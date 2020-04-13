@@ -187,6 +187,7 @@
                       field="state"
                       :disableHtmlEncode="true"
                       headerText="Status"
+                      :template="statusTemplate"
                       width="120"
                       textAlign="Center"
                     >
@@ -857,6 +858,18 @@ export default {
       selectedPeriod: "",
       quarterRange: [],
       searchSettings: { hierarchyMode: "Parent" },
+      statusTemplate: function() {
+        return {
+          template: Vue.component("status", {
+            template: `<span :class="data.state !== 'Undone' ? 'badge bg-success' : 'badge bg-danger'">{{data.state}}</span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            }
+          })
+        };
+      },
       priorityTemplate: function() {
         return {
           template: Vue.component("priority", {
@@ -1160,6 +1173,7 @@ export default {
   },
   created() {
     let self = this;
+    $('#overlay').fadeIn();
     //self.getWeekdaysOfMonth(new Date().getMonth());
     //Kiem tra xem neu tren router co search thi seach
     $(document).ready(function() {
@@ -1959,7 +1973,7 @@ export default {
             // self.$router.push("/todolist");
             // return;
           }
-        });
+        }).then( () => $('#overlay').fadeOut());
     },
     getWeekdaysOfMonth(newVal) {
       let indexof = this.weekday
