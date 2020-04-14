@@ -496,12 +496,12 @@
                         <!-- <option value="Monthly">Monthly</option>
                         <option value="Quarterly">Quarterly</option>-->
                         <option value="Yearly">Yearly</option>
-                        <option value="SpecificDay">Due Date</option>
+                        <option value="SpecificDate">Due Date</option>
                       </select>
                     </div>
                   </div>
                   <div class="col-md-3">
-                    <div class="form-group box SpecificDay">
+                    <div class="form-group box SpecificDate">
                       <label for="Description">Date</label>
                       <small v-if="!editStatus" class="text-danger">(*) Require</small>
                       <datetime
@@ -514,7 +514,7 @@
                     </div>
                   </div>
                   <div class="col-md-3">
-                    <div class="form-group box SpecificDay">
+                    <div class="form-group box SpecificDate">
                       <label for="Description">Time</label>
                       <small v-if="!editStatus" class="text-danger">(*) Require</small>
                       <datetime
@@ -1042,7 +1042,7 @@ export default {
         "Monthly",
         "Quarterly",
         "Yearly",
-        "SpecificDay"
+        "SpecificDate"
       ],
       sortSettings: {
         columns: [
@@ -1138,7 +1138,7 @@ export default {
         "Third quarter",
         "Fourth quarter"
       ],
-      selectedPeriodMain: "SpecificDay",
+      selectedPeriodMain: "SpecificDate",
       time: "",
       //----------------------------------------------------To Do List Params
       monthOfWeeklySelected: 0,
@@ -1173,7 +1173,6 @@ export default {
   },
   created() {
     let self = this;
-    $('#overlay').fadeIn();
     //self.getWeekdaysOfMonth(new Date().getMonth());
     //Kiem tra xem neu tren router co search thi seach
     $(document).ready(function() {
@@ -1480,7 +1479,7 @@ export default {
               ).toISOString();
               break;
             case 6:
-              self.selectedPeriodMain = "SpecificDay";
+              self.selectedPeriodMain = "SpecificDate";
               self.time =new Date(
                 data.SpecificDate
               ).toISOString();
@@ -1549,7 +1548,7 @@ export default {
       var self = this;
       self.editStatus = false;
       self.clearForm();
-      self.selectedPeriodMain = "SpecificDay";
+      self.selectedPeriodMain = "SpecificDate";
       self.modalTitle = "Add New Project Task";
       self.whoSelected = {
         ID: Number(localStorage.getItem("UserID")),
@@ -1587,7 +1586,7 @@ export default {
       this.monthOfWeeklySelected = 0;
       this.dateOfMonthly = 0;
       this.PICs = [];
-      this.selectedPeriodMain = "SpecificDay";
+      this.selectedPeriodMain = "SpecificDate";
       this.selectedPeriod = "";
       this.projectSelected = [];
       this.ocSelected = [];
@@ -1923,6 +1922,7 @@ export default {
       }
     },
     GetUserByProjectID(id) {
+    $('#overlay').fadeIn();
       var self = this;
       let projectid = id || 0;
       let api = self.$api

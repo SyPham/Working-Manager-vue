@@ -524,7 +524,6 @@ export default {
     EventBus.$off("follow", this.unfollow);
   },
   created() {
-    $('#overlay').fadeIn();
     this.searchTreeGrid();
     this.getTasks();
   },
@@ -623,6 +622,7 @@ export default {
       self.getTasks();
     },
     getTasks() {
+    $('#overlay').fadeIn();
       var self = this;
       self.$api.get("api/Follow/LoadFollow").then(res => {
         self.tasks = res.data;

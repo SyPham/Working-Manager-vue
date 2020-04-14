@@ -154,6 +154,8 @@
                 :allowResizing="true"
                 :showColumnMenu="true"
                 :gridLines="'Both'"
+                :created='onCreated'
+                :dataBound='onDataBound'
                 :rowSelected="rowSelected"
               >
                 <e-columns>
@@ -193,9 +195,14 @@
                     field="PIC"
                     headerText="PIC"
                     width="180"
-                    format="yMd"
                     textAlign="Center"
                   ></e-column>
+                   <e-column
+                      field="DeputyName"
+                      headerText="Deputy"
+                      width="180"
+                      textAlign="Center"
+                    ></e-column>
                   <e-column
                     field="state"
                     :disableHtmlEncode="false"
@@ -222,6 +229,7 @@
                     field="DueDateMonthly"
                     headerText="Monthly"
                     width="160"
+                    :template="monthlyTemplate"
                     textAlign="Center"
                   ></e-column>
                   <e-column
@@ -432,10 +440,22 @@ export default {
       valueRange: [],
       //-----------------end datetime range
       searchSettings: { hierarchyMode: "Parent" },
+      monthlyTemplate: function() {
+        return {
+          template: Vue.component("monthly", {
+            template: `<span>{{ data.DueDateMonthly.length > 0 ? data.DateOfMonthly: ''}}</span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            }
+          })
+        };
+      },
       weeklyTemplate: function() {
         return {
           template: Vue.component("weekly", {
-            template: `<span>{{ data.DueDateWeekly.length > 0 ? (data.DueDateWeekly + ', ' + data.DateOfWeekly) : ''}}</span>`,
+            template: `<span>{{ data.DueDateWeekly.length > 0 ? (data.DueDateWeekly.substring(0,3) + ', ' + data.DateOfWeekly) : ''}}</span>`,
             data: function() {
               return {
                 data: {}
@@ -691,8 +711,7 @@ export default {
     };
   },
   mounted() {
-    console.log("this.$refs.treegrid");
-    console.log(this.$refs.treegrid);
+    console.log("this.$refs.treegrid: ", this.$refs.treegrid);
     EventBus.$on("follow", this.addFollow);
     EventBus.$on("AddSub", this.AddSub);
     EventBus.$on("taskItem", this.infoEdit);
@@ -710,11 +729,9 @@ export default {
     EventBus.$off("AddSub", this.AddSub);
   },
   created() {
-    $('#overlay').fadeIn();
     this.getProjects();
     this.getFrom();
     this.getUserForWho();
-    this.getTasks();
     this.searchTreeGrid();
     this.who = localStorage.getItem("User");
     //this.test();
@@ -722,6 +739,11 @@ export default {
   computed: {},
 
   methods: {
+    onCreated() {
+      this.getTasks();
+    },
+    onDataBound(){
+    },
     test() {
      
         axios({
@@ -1249,6 +1271,7 @@ export default {
       });
     },
     getTasks() {
+    $('#overlay').fadeIn();
       var self = this;
       self.$api
         .get(`api/Tasks/GetListTreeTask/%20/%20/%20/%20/%20`)

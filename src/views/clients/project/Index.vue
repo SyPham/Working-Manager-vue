@@ -229,7 +229,6 @@ export default {
     };
   },
   created() {
-    $('#overlay').fadeIn();
     this.getProject();
   },
   methods: {
@@ -241,6 +240,7 @@ export default {
       self.temp = self.page * self.pageSize - 1;
     },
     getProject() {
+    $('#overlay').fadeIn();
       let self = this;
       this.$api
         .get(

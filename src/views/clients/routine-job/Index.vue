@@ -182,7 +182,12 @@
                       field="PIC"
                       headerText="PIC"
                       width="180"
-                      format="yMd"
+                      textAlign="Center"
+                    ></e-column>
+                      <e-column
+                      field="DeputyName"
+                      headerText="Deputy"
+                      width="180"
                       textAlign="Center"
                     ></e-column>
                     <e-column
@@ -209,18 +214,14 @@
                       field="DueDateWeekly"
                       headerText="Weekly"
                       width="160"
-                      textAlign="Center"
-                    ></e-column>
-                      <e-column
-                      field="DateOfWeekly"
-                      headerText="Date Of Weekly"
-                      width="160"
+                      :template="weeklyTemplate"
                       textAlign="Center"
                     ></e-column>
                     <e-column
                       field="DueDateMonthly"
                       headerText="Monthly"
                       width="160"
+                      :template="monthlyTemplate"
                       textAlign="Center"
                     ></e-column>
                     <e-column
@@ -384,12 +385,12 @@
                         <option value="Monthly">Monthly</option>
                         <option value="Quarterly">Quarterly</option>
                         <option value="Yearly">Yearly</option>
-                        <!-- <option value="SpecificDay">Specific Day</option> -->
+                        <!-- <option value="SpecificDate">Specific Day</option> -->
                       </select>
                     </div>
                   </div>
                   <div class="col-md-12">
-                    <div class="form-group box SpecificDay">
+                    <div class="form-group box SpecificDate">
                       <label for="Description">Specific Day</label>
                       <small v-if="!editStatus" class="text-danger">(*) Require</small>
                       <datetime
@@ -850,6 +851,30 @@ export default {
       searchSettingsLeft: { hierarchyMode: "Parent" },
       // --------------------------------------------------------------------
       searchSettings: { hierarchyMode: "Parent" },
+           monthlyTemplate: function() {
+        return {
+          template: Vue.component("monthly", {
+            template: `<span>{{ data.DueDateMonthly.length > 0 ? data.DateOfMonthly: ''}}</span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            }
+          })
+        };
+      },
+      weeklyTemplate: function() {
+        return {
+          template: Vue.component("weekly", {
+            template: `<span>{{ data.DueDateWeekly.length > 0 ? (data.DueDateWeekly.substring(0,3) + ', ' + data.DateOfWeekly) : ''}}</span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            }
+          })
+        };
+      },
       statusTemplate: function() {
         return {
           template: Vue.component("status", {
@@ -1073,7 +1098,7 @@ export default {
         "Monthly",
         "Quarterly",
         "Yearly",
-        "SpecificDay"
+        "SpecificDate"
       ],
       weekday: [
         "Monday",
@@ -1709,11 +1734,12 @@ export default {
               self.weeklySelected = weekly.substring(0, 3);
               self.monthOfWeeklySelected =
                 new Date(args.rowInfo.rowData.DateOfWeekly).getMonth() + 1;
+                debugger
               self.task.dateofweekly = args.rowInfo.rowData.DateOfWeekly;
               break;
             case 3:
               self.selectedPeriodMain = "Monthly";
-              self.task.duedatemonthly = monthly.substring(0, 1);
+              self.task.duedatemonthly = monthly.replace(/[a-z]/g,'');
               break;
             case 4:
               self.selectedPeriodMain = "Quarterly";
@@ -1731,7 +1757,7 @@ export default {
               ).toISOString();
               break;
             case 6:
-              self.selectedPeriodMain = "SpecificDay";
+              self.selectedPeriodMain = "SpecificDate";
               self.task.specificdate = new Date(
                 specific + " 00:00 PM"
               ).toISOString();
@@ -1748,7 +1774,7 @@ export default {
           //   self.selectedPeriodMain = "Quarterly";
           //   self.task.quarterly = quarterly.substring(0, 3);
           // } else if (deadline !== "#N/A" && deadline !== "") {
-          //   self.selectedPeriodMain = "SpecificDay";
+          //   self.selectedPeriodMain = "SpecificDate";
           //   self.task.deadline = args.rowInfo.rowData.Deadline;
           // }
           break;

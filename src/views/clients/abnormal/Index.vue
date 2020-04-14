@@ -372,12 +372,12 @@
                         <option value="Monthly">Monthly</option>
                         <option value="Quarterly">Quarterly</option>
                         <option value="Yearly">Yearly</option>-->
-                        <option value="SpecificDay">Due Date</option>
+                        <option value="SpecificDate">Due Date</option>
                       </select>
                     </div>
                   </div>
                   <div class="col-md-12">
-                    <div class="form-group box SpecificDay">
+                    <div class="form-group box SpecificDate">
                       <label for="Description">Due Date</label>
                       <small v-if="!editStatus" class="text-danger">(*) Require</small>
                       <datetime
@@ -1058,7 +1058,7 @@ export default {
         "Monthly",
         "Quarterly",
         "Yearly",
-        "SpecificDay"
+        "SpecificDate"
       ],
       weekday: [
         "Monday",
@@ -1143,7 +1143,7 @@ export default {
       whoOptions: [],
       whoSelected: [],
       selectedPeriod: "",
-      selectedPeriodMain: "SpecificDay",
+      selectedPeriodMain: "SpecificDate",
       deputies: [],
       selectedDeputies: [],
       showListTask: false,
@@ -1720,7 +1720,7 @@ export default {
               ).toISOString();
               break;
             case 6:
-              self.selectedPeriodMain = "SpecificDay";
+              self.selectedPeriodMain = "SpecificDate";
               self.task.specificdate = new Date(
                 specific + " 00:00 PM"
               ).toISOString();
@@ -1938,7 +1938,7 @@ export default {
       this.monthOfWeeklySelected = 0;
       this.dateOfMonthly = 0;
       this.PICs = [];
-      this.selectedPeriodMain = "SpecificDay";
+      this.selectedPeriodMain = "SpecificDate";
       this.selectedPeriod = "";
       this.projectSelected = [];
       this.selected = [];

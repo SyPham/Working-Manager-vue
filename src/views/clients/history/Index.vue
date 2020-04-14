@@ -399,7 +399,6 @@ export default {
     EventBus.$off("Undo", this.undo);
   },
   created() {
-    $('#overlay').fadeIn();
     this.getTasks();
     this.searchTreeGrid();
   },
@@ -509,6 +508,7 @@ export default {
       self.getTasks();
     },
     getTasks() {
+    $('#overlay').fadeIn();
       var self = this;
       self.$api.get(`api/Tasks/GetListTreeHistory`)
       .then(res => {
