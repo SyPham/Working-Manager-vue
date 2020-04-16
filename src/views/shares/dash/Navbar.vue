@@ -279,7 +279,8 @@ export default {
       data: [],
       total: 0,
       homePageUrl: "",
-      connection: []
+      connection: [],
+      state: ""
     };
   },
 
@@ -344,6 +345,7 @@ export default {
   },
   computed: {},
   created() {
+
     let self = this;
     self.todo();
     self.getTaskListIsLate();
@@ -382,6 +384,8 @@ export default {
         self.$alertify.info("There is the new alert!");
       }
     });
+    
+      console.log("SIGNALR VUEJS __________________", this.connection)
 
     self.connection.on("NotCheckAlert", (user, list) => {
       if (user === localStorage.getItem("UserID")) {
@@ -416,8 +420,19 @@ export default {
             .catch(function(err) {
               return console.error(err.toString());
             });
-        }
-      }, 30000);
+            // self.connection.invoke("Ping","").catch(err => 
+            // {
+            //   this.state = "Disconnected";
+             
+            // console.error(err)
+            // });
+        } else {
+          setTimeout(() => {
+            self.$router.push('/maintenance');
+            clearInterval(this.intervalid1);
+          }, 3000)
+              }
+      }, 10000);
     },
     imageBase64(img) {
       if (img == null) {

@@ -1,0 +1,28 @@
+<template>
+  <section class="content">
+    <div class="error-page">
+      <h2 class="headline text-warning">404</h2>
+
+      <div class="error-content">
+        <h3>
+          <i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page not found.
+        </h3>
+
+        <h3>
+          Our website is under maintenance.
+        </h3>
+
+       
+      </div>
+      <!-- /.error-content -->
+    </div>
+    <!-- /.error-page -->
+  </section>
+</template>
+
+<script>
+export default {};
+</script>
+
+<style scoped>
+</style>

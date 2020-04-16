@@ -23,6 +23,7 @@ import Notification from "./views/clients/notification/Index.vue";
 
 import Profile from "./views/shares/dash/Profile.vue";
 import PageNotFound from "./views/404/Index.vue";
+import Maintenance from "./views/maintenance/index.vue";
 
 
 // auth
@@ -317,6 +318,22 @@ const router = new VueRouter({
         }
       ]
     },
+    {
+      path: '/maintenance',
+      component: Maintenance,
+      children: [
+        {
+          path: "/maintenance",
+          name: "Maintenance",
+          component: Maintenance,
+        }
+      ]
+    },
+    {
+      path: 'p404',
+      component: PageNotFound,
+    },
+   
     { path: "*", component: PageNotFound }
   ]
 });

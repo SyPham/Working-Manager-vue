@@ -40,8 +40,12 @@ Vue.use({
         return config;
       },
       function (error) {
-        // Do something with request error
-        return Promise.reject(error);
+        if (401 === error.response.status) {
+          router.push("/login");
+          return Promise.resolve(error.response);
+        } else {
+            return Promise.reject(error);
+        }
       }
     );
     Vue.prototype.$api = instance;

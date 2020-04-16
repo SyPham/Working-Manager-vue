@@ -132,12 +132,10 @@
                 <e-column field="DueDateDaily" headerText="Daily" width="160" textAlign="Center"></e-column>
                 <e-column field="SpecificDate" headerText="Due Date" width="160" textAlign="Center"></e-column>
                 <e-column field="DueDateWeekly" 
-                 :template='weeklyTemplate'
                  headerText="Weekly" width="160" textAlign="Center"></e-column>
                 <e-column
                   field="DueDateMonthly"
                   headerText="Monthly"
-                  :template='monthlyTemplate'
                   width="200"
                   textAlign="Center"
                 ></e-column>
