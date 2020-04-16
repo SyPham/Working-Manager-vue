@@ -508,6 +508,7 @@
                         ref="deadline"
                         v-model="task.specificdate"
                         input-class="form-control"
+                        value-zone="local"
                         placeholder="Select date"
                         type="date"
                       ></datetime>
@@ -523,9 +524,8 @@
                         input-class="form-control"
                         placeholder="Select time"
                         type="time"
-                        value-zone="local"
                         use12-hour
-                        zone="local"
+                        value-zone="local"
                       ></datetime>
                     </div>
                   </div>
@@ -1102,7 +1102,7 @@ export default {
         priority: "M",
         pic: [],
         JobTypeID: 1,
-        periodType: 0
+        periodType: 6
       },
       projectName: "",
       projectOptions: [],
@@ -1443,7 +1443,9 @@ export default {
           let monthly = data.DueDateMonthly;
           let quarterly = data.DueDateQuarterly;
           let yearly = data.DueDateYearly;
-          let specific = data.SpecificDate;
+          let specific = new Date(
+                data.SpecificDate.replace(/ PM$| AM$/,'')
+              ).toISOString();
           let periodType = data.periodType;
           switch (periodType) {
             case 1:
@@ -1480,12 +1482,8 @@ export default {
               break;
             case 6:
               self.selectedPeriodMain = "SpecificDate";
-              self.time =new Date(
-                data.SpecificDate
-              ).toISOString();
-              self.task.specificdate = new Date(
-                data.SpecificDate
-              ).toISOString();
+              self.time =specific;
+              self.task.specificdate = specific;
               break;
           }
 
@@ -1580,7 +1578,7 @@ export default {
         level: 0,
         pic: [],
         JobTypeID: 1,
-        periodType: 0
+        periodType: 6
       };
       this.weeklySelected = "";
       this.monthOfWeeklySelected = 0;
@@ -1702,24 +1700,24 @@ export default {
         if (check) {
           
           self.task.fromWhoID = self.whoSelected.ID;
-          if (self.task.id > 0) {
-            if (self.task.pic.length > 0 && self.task.level > 1) {
-              let flag = false;
-              for (let i of self.task.pic) {
-                if (self.PICs.includes(i)) {
-                  flag = true;
-                  break;
-                }
-              }
-              if (!flag) {
-                self.$alertify.warning(
-                  "You should add the pic for main task!",
-                  true
-                );
-                return;
-              }
-            }
-          }
+          // if (self.task.id > 0) {
+          //   if (self.task.pic.length > 0 && self.task.level > 1) {
+          //     let flag = false;
+          //     for (let i of self.task.pic) {
+          //       if (self.PICs.includes(i)) {
+          //         flag = true;
+          //         break;
+          //       }
+          //     }
+          //     if (!flag) {
+          //       self.$alertify.warning(
+          //         "You should add the pic for main task!",
+          //         true
+          //       );
+          //       return;
+          //     }
+          //   }
+          // }
 
           self.$api.post("api/Tasks/CreateTask", self.task).then(res => {
             if (res.data) {
@@ -2151,9 +2149,16 @@ export default {
       this.getWeekdaysOfMonth(newVal);
     },
     time(newVal) {
-      if (newVal.indexOf("+07:00") > -1)
-        this.task.specificdate = newVal.replace("+07:00","");
-      else this.task.specificdate = newVal;
+      debugger
+      if(newVal){
+        let regex = /\d{4}-\d{2}-\d{2}T/;
+        let date = this.task.specificdate.match(regex)[0];
+        this.task.specificdate = newVal.replace(regex,date);
+      }
+    
+      // if (newVal.indexOf("+07:00") > -1)
+      //   this.task.specificdate = newVal.replace("+07:00","");
+      // else this.task.specificdate = datetime;
     }
   },
   provide: {

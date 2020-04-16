@@ -131,10 +131,13 @@
                 ></e-column>
                 <e-column field="DueDateDaily" headerText="Daily" width="160" textAlign="Center"></e-column>
                 <e-column field="SpecificDate" headerText="Due Date" width="160" textAlign="Center"></e-column>
-                <e-column field="DueDateWeekly" headerText="Weekly" width="160" textAlign="Center"></e-column>
+                <e-column field="DueDateWeekly" 
+                 :template='weeklyTemplate'
+                 headerText="Weekly" width="160" textAlign="Center"></e-column>
                 <e-column
                   field="DueDateMonthly"
                   headerText="Monthly"
+                  :template='monthlyTemplate'
                   width="200"
                   textAlign="Center"
                 ></e-column>
@@ -282,6 +285,30 @@ export default {
   },
   data() {
     return {
+       monthlyTemplate: function() {
+        return {
+          template: Vue.component("monthly", {
+            template: `<span>{{ data.DueDateMonthly.length > 0 ? data.DateOfMonthly: ''}}</span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            }
+          })
+        };
+      },
+      weeklyTemplate: function() {
+        return {
+          template: Vue.component("weekly", {
+            template: `<span>{{ data.DueDateWeekly.length > 0 ? (data.DueDateWeekly.substring(0,3) + ', ' + data.DateOfWeekly) : ''}}</span>`,
+            data: function() {
+              return {
+                data: {}
+              };
+            }
+          })
+        };
+      },
        statusTemplate: function() {
         return {
           template: Vue.component("status", {
@@ -372,7 +399,7 @@ export default {
         key: "task",
         ignoreCase: true
       },
-      pageSettings: { pageSizes: true, pageSize: 10 },
+      pageSettings: { pageSizes: true, pageSize: 20 },
       PIC: [],
       expanded: {},
       selected: [],

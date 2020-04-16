@@ -385,7 +385,7 @@
                         v-model="task.specificdate"
                         input-class="form-control"
                         placeholder="Select date"
-                        type="date"
+                        type="datetime"
                       ></datetime>
                     </div>
                   </div>
@@ -1623,20 +1623,21 @@ export default {
     contextMenuClick: function(args) {
       var self = this;
       console.log(args);
+      let data = args.rowInfo.rowData;
       switch (args.item.id) {
         case "Add-Sub-Task":
           self.editStatus = false;
           self.getDeputies();
 
           self.clearForm();
-          self.getUser(args.rowInfo.rowData.ProjectID);
+          self.getUser(data.ProjectID);
 
           self.modalTitle = "Add Sub-Task";
-          self.task.parentID = args.rowInfo.rowData.ID;
-          self.task.projectID = args.rowInfo.rowData.ProjectID;
+          self.task.parentID = data.ID;
+          self.task.projectID = data.ProjectID;
           self.projectSelected = {
-            ID: args.rowInfo.rowData.ProjectID,
-            Name: args.rowInfo.rowData.ProjectName
+            ID: data.ProjectID,
+            Name: data.ProjectName
           };
           self.whoSelected = {
             Username: localStorage.getItem("User"),
@@ -1646,7 +1647,7 @@ export default {
           $("#modal-task").modal("show");
           break;
         case "Done":
-          self.done(args.rowInfo.rowData.ID);
+          self.done(data.ID);
           break;
         case "EditTask":
           self.clearForm();
@@ -1654,40 +1655,42 @@ export default {
           self.editStatus = true;
           self.modalTitle = "Edit Task";
           $("#modal-task").modal("show");
-          self.PICs = args.rowInfo.rowData.PICs || [];
+          self.PICs = data.PICs || [];
 
-          self.getUser(args.rowInfo.rowData.ProjectID);
-          self.task.priority = args.rowInfo.rowData.PriorityID;
-          self.whoSelected = args.rowInfo.rowData.FromWho;
+          self.getUser(data.ProjectID);
+          self.task.priority = data.PriorityID;
+          self.whoSelected = data.FromWho;
           self.projectSelected = {
-            ID: args.rowInfo.rowData.ProjectID,
-            Name: args.rowInfo.rowData.ProjectName
+            ID: data.ProjectID,
+            Name: data.ProjectName
           };
           self.task = {
-            description: args.rowInfo.rowData.Description,
-            jobName: args.rowInfo.rowData.JobName,
-            duedatedaily: args.rowInfo.rowData.DueDateDaily,
-            duedateweekly: args.rowInfo.rowData.DueDateWeekly,
-            duedatemonthly: args.rowInfo.rowData.DueDateMonthly,
-            duedatequarterly: args.rowInfo.rowData.DueDateQuarterly,
-            duedateyearly: args.rowInfo.rowData.DueDateYearly,
-            specificdate: args.rowInfo.rowData.SpecificDate,
-            priority: args.rowInfo.rowData.PriorityID,
-            id: args.rowInfo.rowData.ID,
-            dateofweekly: args.rowInfo.rowData.DateOfWeekly,
-            level: args.rowInfo.rowData.Level,
-            periodType: args.rowInfo.rowData.periodType,
-            pic: args.rowInfo.rowData.PIC || []
+            description: data.Description,
+            jobName: data.JobName,
+            duedatedaily: data.DueDateDaily,
+            duedateweekly: data.DueDateWeekly,
+            duedatemonthly: data.DueDateMonthly,
+            duedatequarterly: data.DueDateQuarterly,
+            duedateyearly: data.DueDateYearly,
+            specificdate: data.SpecificDate,
+            priority: data.PriorityID,
+            id: data.ID,
+            dateofweekly: data.DateOfWeekly,
+            level: data.Level,
+            periodType: data.periodType,
+            pic: data.PIC || [],
+            periodType: data.periodType
           };
 
-          let daily = args.rowInfo.rowData.DueDateDaily;
-          let weekly = args.rowInfo.rowData.DueDateWeekly;
-          let monthly = args.rowInfo.rowData.DueDateMonthly;
-          let quarterly = args.rowInfo.rowData.DueDateQuarterly;
-          let yearly = args.rowInfo.rowData.DueDateYearly;
-          let specific = args.rowInfo.rowData.SpecificDate;
-
-          let periodType = args.rowInfo.rowData.periodType;
+          let daily = data.DueDateDaily;
+          let weekly = data.DueDateWeekly;
+          let monthly = data.DueDateMonthly;
+          let quarterly = data.DueDateQuarterly;
+          let yearly = data.DueDateYearly;
+          let specific = new Date(
+                data.SpecificDate.replace(/ PM$| AM$/,'')
+              ).toISOString();
+          let periodType = data.periodType;
           switch (periodType) {
             case 1:
               self.selectedPeriodMain = "Daily";
@@ -1697,8 +1700,8 @@ export default {
               self.selectedPeriodMain = "Weekly";
               self.weeklySelected = weekly.substring(0, 3);
               self.monthOfWeeklySelected =
-                new Date(args.rowInfo.rowData.DateOfWeekly).getMonth() + 1;
-              self.task.dateofweekly = args.rowInfo.rowData.DateOfWeekly;
+                new Date(data.DateOfWeekly).getMonth() + 1;
+              self.task.dateofweekly = data.DateOfWeekly;
               break;
             case 3:
               self.selectedPeriodMain = "Monthly";
@@ -1721,38 +1724,37 @@ export default {
               break;
             case 6:
               self.selectedPeriodMain = "SpecificDate";
-              self.task.specificdate = new Date(
-                specific + " 00:00 PM"
-              ).toISOString();
+              self.task.specificdate = specific;
               break;
           }
+          self.selected = data.BeAssigneds;
           break;
         case "Tutorial":
           self.titleTutorial =
-            args.rowInfo.rowData.JobName + " - Add Tutorial Video";
+            data.JobName + " - Add Tutorial Video";
           self.tutorial = {
             id: 0,
-            name: args.rowInfo.rowData.JobName,
+            name: data.JobName,
             url: "",
             path: "",
             level: 0,
             parentid: 0,
-            taskid: args.rowInfo.rowData.ID
+            taskid: data.ID
           };
           $("#modal-tutorial").modal("show");
           break;
         case "EditTutorial":
           self.titleTutorial =
-            args.rowInfo.rowData.JobName + " - Edit Tutorial Video";
+            data.JobName + " - Edit Tutorial Video";
           self.isAddTutorial = false;
           self.tutorial = {
             id: 0,
-            name: args.rowInfo.rowData.JobName,
+            name: data.JobName,
             url: "",
             path: "",
             level: 0,
             parentid: 0,
-            taskid: args.rowInfo.rowData.ID
+            taskid: data.ID
           };
           $("#modal-tutorial").modal("show");
           break;
@@ -1760,7 +1762,7 @@ export default {
           $("#modal-watch-video").modal("show");
           break;
         case "DeleteTask":
-          self.delete(args.rowInfo.rowData.ID);
+          self.delete(data.ID);
           break;
       }
     },
@@ -1932,7 +1934,8 @@ export default {
         priority: "M",
         pic: [],
         deputies: [],
-        JobTypeID: 3
+        JobTypeID: 3,
+        periodType: 6
       };
       this.weeklySelected = "";
       this.monthOfWeeklySelected = 0;

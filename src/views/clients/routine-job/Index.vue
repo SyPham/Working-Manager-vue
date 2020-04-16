@@ -385,12 +385,12 @@
                         <option value="Monthly">Monthly</option>
                         <option value="Quarterly">Quarterly</option>
                         <option value="Yearly">Yearly</option>
-                        <!-- <option value="SpecificDate">Specific Day</option> -->
+                        <!-- <option value="SpecificDay">Specific Day</option> -->
                       </select>
                     </div>
                   </div>
                   <div class="col-md-12">
-                    <div class="form-group box SpecificDate">
+                    <div class="form-group box SpecificDay">
                       <label for="Description">Specific Day</label>
                       <small v-if="!editStatus" class="text-danger">(*) Require</small>
                       <datetime
@@ -1734,7 +1734,6 @@ export default {
               self.weeklySelected = weekly.substring(0, 3);
               self.monthOfWeeklySelected =
                 new Date(args.rowInfo.rowData.DateOfWeekly).getMonth() + 1;
-                debugger
               self.task.dateofweekly = args.rowInfo.rowData.DateOfWeekly;
               break;
             case 3:
@@ -1757,7 +1756,7 @@ export default {
               ).toISOString();
               break;
             case 6:
-              self.selectedPeriodMain = "SpecificDate";
+              self.selectedPeriodMain = "SpecificDay";
               self.task.specificdate = new Date(
                 specific + " 00:00 PM"
               ).toISOString();
@@ -1774,7 +1773,7 @@ export default {
           //   self.selectedPeriodMain = "Quarterly";
           //   self.task.quarterly = quarterly.substring(0, 3);
           // } else if (deadline !== "#N/A" && deadline !== "") {
-          //   self.selectedPeriodMain = "SpecificDate";
+          //   self.selectedPeriodMain = "SpecificDay";
           //   self.task.deadline = args.rowInfo.rowData.Deadline;
           // }
           break;
